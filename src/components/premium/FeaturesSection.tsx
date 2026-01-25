@@ -1,6 +1,66 @@
 import { useState, useRef, useEffect } from "react";
-import { X, Activity, Brain, Network, Shield, Zap, LineChart } from "lucide-react";
+import { X, Activity, Brain, Network, Shield, Zap, LineChart, Calendar, Code, FileText, User, Clock } from "lucide-react";
 import { FloatingSurface, GlassPanel, AmbientGlow } from "./DepthSystem";
+import RadialOrbitalTimeline from "@/components/ui/radial-orbital-timeline";
+
+// Timeline data for the orbital visualization
+const timelineData = [
+  {
+    id: 1,
+    title: "Data Ingestion",
+    date: "Real-time",
+    content: "Continuous data collection from all supply chain touchpoints.",
+    category: "Input",
+    icon: FileText,
+    relatedIds: [2],
+    status: "completed" as const,
+    energy: 100,
+  },
+  {
+    id: 2,
+    title: "Processing",
+    date: "< 50ms",
+    content: "ML models analyze patterns and detect anomalies.",
+    category: "Analysis",
+    icon: Code,
+    relatedIds: [1, 3],
+    status: "completed" as const,
+    energy: 90,
+  },
+  {
+    id: 3,
+    title: "Prediction",
+    date: "Ongoing",
+    content: "Forecasting disruptions before they occur.",
+    category: "Intelligence",
+    icon: Brain,
+    relatedIds: [2, 4],
+    status: "in-progress" as const,
+    energy: 75,
+  },
+  {
+    id: 4,
+    title: "Optimization",
+    date: "Continuous",
+    content: "Resource allocation and routing decisions.",
+    category: "Action",
+    icon: Zap,
+    relatedIds: [3, 5],
+    status: "in-progress" as const,
+    energy: 60,
+  },
+  {
+    id: 5,
+    title: "Execution",
+    date: "Automated",
+    content: "Implementing decisions across the network.",
+    category: "Output",
+    icon: Network,
+    relatedIds: [4],
+    status: "pending" as const,
+    energy: 40,
+  },
+];
 
 const features = [
   {
@@ -168,43 +228,17 @@ const FeaturesSection = () => {
         
         {/* Feature nodes - connected system visualization */}
         <div className="relative max-w-5xl mx-auto">
-          {/* Central core with pulse */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none hidden lg:flex">
-            <div className="relative">
-              <div 
-                className="w-24 h-24 rounded-full bg-gradient-to-br from-primary/10 to-transparent border border-border/20 flex items-center justify-center transition-all duration-1000"
-                style={{
-                  boxShadow: hoveredFeature ? "0 0 60px -15px hsl(var(--primary) / 0.4)" : "none"
-                }}
-              >
-                <div className="w-8 h-8 bg-primary/30 rounded-full animate-pulse" style={{ animationDuration: "3s" }} />
-              </div>
-              
-              {/* Connection lines to hovered card */}
-              <svg className="absolute inset-0 w-full h-full" style={{ overflow: 'visible', width: '400px', height: '400px', left: '-188px', top: '-188px' }}>
-                {features.map((feature, i) => {
-                  const isHovered = hoveredFeature === feature.id;
-                  const angle = ((i / features.length) * Math.PI * 2) - Math.PI / 2;
-                  const radius = 180;
-                  const endX = 200 + Math.cos(angle) * radius;
-                  const endY = 200 + Math.sin(angle) * radius;
-                  
-                  return (
-                    <line
-                      key={feature.id}
-                      x1="200"
-                      y1="200"
-                      x2={endX}
-                      y2={endY}
-                      stroke={`hsl(var(--primary) / ${isHovered ? 0.4 : 0.08})`}
-                      strokeWidth={isHovered ? 2 : 1}
-                      strokeDasharray={isHovered ? "none" : "4 4"}
-                      className="transition-all duration-700"
-                    />
-                  );
-                })}
-              </svg>
-            </div>
+          {/* Orbital Timeline Visualization - Hidden on mobile, shown on larger screens */}
+          <div className="hidden lg:block mb-16">
+            <FloatingSurface elevation="medium" glow glowColor="primary" className="rounded-3xl">
+              <GlassPanel intensity="subtle" bordered className="rounded-3xl p-6">
+                <RadialOrbitalTimeline 
+                  timelineData={timelineData} 
+                  centerIcon={Brain}
+                  centerLabel="AI Core"
+                />
+              </GlassPanel>
+            </FloatingSurface>
           </div>
           
           {/* Feature grid */}
