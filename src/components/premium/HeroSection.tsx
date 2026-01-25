@@ -3,11 +3,9 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NetworkCanvas from "./NetworkCanvas";
 import { FloatingSurface, AmbientGlow } from "./DepthSystem";
-
 const HeroSection = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
-
   useEffect(() => {
     const handleScroll = () => {
       if (!sectionRef.current) return;
@@ -15,62 +13,47 @@ const HeroSection = () => {
       const progress = Math.max(0, Math.min(1, -rect.top / rect.height));
       setScrollProgress(progress);
     };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("scroll", handleScroll, {
+      passive: true
+    });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
   const contentOpacity = 1 - scrollProgress * 1.5;
   const contentTranslate = scrollProgress * 40;
-
-  return (
-    <section 
-      ref={sectionRef}
-      className="relative min-h-[110vh] flex items-center justify-center overflow-hidden"
-    >
+  return <section ref={sectionRef} className="relative min-h-[110vh] flex items-center justify-center overflow-hidden">
       {/* Animated network */}
-      <NetworkCanvas 
-        nodeCount={50} 
-        chaos={scrollProgress * 0.3}
-        className="absolute inset-0 opacity-40"
-        colorScheme="neutral"
-        scrollReactive={true}
-        parallaxFactor={0.15}
-      />
+      <NetworkCanvas nodeCount={50} chaos={scrollProgress * 0.3} className="absolute inset-0 opacity-40" colorScheme="neutral" scrollReactive={true} parallaxFactor={0.15} />
       
       {/* Ambient depth glows */}
       <AmbientGlow color="primary" size="xl" intensity="subtle" position="right" className="top-1/4" />
       <AmbientGlow color="secondary" size="lg" intensity="subtle" position="left" className="top-2/3" />
       
       {/* Depth layers */}
-      <div 
-        className="absolute inset-0 pointer-events-none transition-opacity duration-1000"
-        style={{ 
-          background: `radial-gradient(ellipse at 50% 40%, transparent 0%, hsl(var(--background) / ${0.2 + scrollProgress * 0.5}) 70%)` 
-        }}
-      />
+      <div className="absolute inset-0 pointer-events-none transition-opacity duration-1000" style={{
+      background: `radial-gradient(ellipse at 50% 40%, transparent 0%, hsl(var(--background) / ${0.2 + scrollProgress * 0.5}) 70%)`
+    }} />
       
       {/* Content */}
-      <div 
-        className="relative z-10 container mx-auto px-8 lg:px-20 xl:px-28 transition-all duration-700"
-        style={{ 
-          opacity: Math.max(0, contentOpacity),
-          transform: `translateY(${contentTranslate}px)`
-        }}
-      >
+      <div className="relative z-10 container mx-auto px-8 lg:px-20 xl:px-28 transition-all duration-700" style={{
+      opacity: Math.max(0, contentOpacity),
+      transform: `translateY(${contentTranslate}px)`
+    }}>
         <div className="max-w-5xl">
           {/* Branding - very subtle */}
-          <div className="mb-20 animate-fade-in" style={{ animationDelay: "0.2s", animationDuration: "1.2s" }}>
-            <span className="text-[10px] tracking-[0.5em] uppercase text-muted-foreground/40 font-light">
+          <div className="mb-20 animate-fade-in" style={{
+          animationDelay: "0.2s",
+          animationDuration: "1.2s"
+        }}>
+            <span className="tracking-[0.5em] uppercase text-muted-foreground/40 font-light text-4xl font-mono">
               Synapsio
             </span>
           </div>
           
           {/* Headline - larger, more breathing room */}
-          <h1 
-            className="text-5xl md:text-7xl lg:text-[5.5rem] xl:text-[6.5rem] font-light tracking-[-0.03em] mb-14 animate-fade-in leading-[0.92]"
-            style={{ animationDelay: "0.4s", animationDuration: "1.4s" }}
-          >
+          <h1 className="text-5xl md:text-7xl lg:text-[5.5rem] xl:text-[6.5rem] font-light tracking-[-0.03em] mb-14 animate-fade-in leading-[0.92]" style={{
+          animationDelay: "0.4s",
+          animationDuration: "1.4s"
+        }}>
             <span className="text-foreground">Intelligent</span>
             <br />
             <span className="text-foreground">orchestration</span>
@@ -79,34 +62,27 @@ const HeroSection = () => {
           </h1>
           
           {/* Subheadline - more space */}
-          <p 
-            className="text-lg md:text-xl lg:text-[1.35rem] text-muted-foreground/45 max-w-xl mb-20 font-light leading-[1.7] animate-fade-in"
-            style={{ animationDelay: "0.6s", animationDuration: "1.4s" }}
-          >
+          <p className="text-lg md:text-xl lg:text-[1.35rem] text-muted-foreground/45 max-w-xl mb-20 font-light leading-[1.7] animate-fade-in" style={{
+          animationDelay: "0.6s",
+          animationDuration: "1.4s"
+        }}>
             Transform fragmented operations into adaptive, self-optimizing networks. 
             Real-time coordination. Predictive intelligence.
           </p>
           
           {/* CTAs - floating surfaces */}
-          <div 
-            className="flex flex-col sm:flex-row gap-6 animate-fade-in"
-            style={{ animationDelay: "0.8s", animationDuration: "1.4s" }}
-          >
+          <div className="flex flex-col sm:flex-row gap-6 animate-fade-in" style={{
+          animationDelay: "0.8s",
+          animationDuration: "1.4s"
+        }}>
             <FloatingSurface elevation="high" glow glowColor="primary" className="rounded-full">
-              <Button 
-                size="lg" 
-                className="group bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-12 py-8 text-sm tracking-wide font-normal transition-all duration-1000 hover:scale-[1.02]"
-              >
+              <Button size="lg" className="group bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-12 py-8 text-sm tracking-wide font-normal transition-all duration-1000 hover:scale-[1.02]">
                 View Pitchdeck
                 <ArrowRight className="ml-3 h-4 w-4 transition-transform duration-700 group-hover:translate-x-1" />
               </Button>
             </FloatingSurface>
             <FloatingSurface elevation="medium" className="rounded-full">
-              <Button 
-                size="lg" 
-                variant="ghost"
-                className="text-muted-foreground/50 hover:text-foreground hover:bg-card/20 rounded-full px-12 py-8 text-sm tracking-wide font-normal border border-border/15 hover:border-border/35 transition-all duration-1000 backdrop-blur-sm"
-              >
+              <Button size="lg" variant="ghost" className="text-muted-foreground/50 hover:text-foreground hover:bg-card/20 rounded-full px-12 py-8 text-sm tracking-wide font-normal border border-border/15 hover:border-border/35 transition-all duration-1000 backdrop-blur-sm">
                 Explore Product
               </Button>
             </FloatingSurface>
@@ -115,14 +91,15 @@ const HeroSection = () => {
       </div>
       
       {/* Scroll hint - more subtle */}
-      <div 
-        className="absolute bottom-20 left-1/2 -translate-x-1/2 transition-opacity duration-1000"
-        style={{ opacity: 1 - scrollProgress * 4 }}
-      >
+      <div className="absolute bottom-20 left-1/2 -translate-x-1/2 transition-opacity duration-1000" style={{
+      opacity: 1 - scrollProgress * 4
+    }}>
         <div className="flex flex-col items-center gap-4">
           <span className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground/25">Scroll</span>
           <div className="w-5 h-8 rounded-full border border-border/15 flex justify-center pt-1.5">
-            <div className="w-0.5 h-1.5 bg-muted-foreground/25 rounded-full animate-bounce" style={{ animationDuration: "2.5s" }} />
+            <div className="w-0.5 h-1.5 bg-muted-foreground/25 rounded-full animate-bounce" style={{
+            animationDuration: "2.5s"
+          }} />
           </div>
         </div>
       </div>
@@ -131,8 +108,6 @@ const HeroSection = () => {
       <div className="absolute bottom-0 left-0 right-0 h-[50vh] pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-transparent" />
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default HeroSection;
