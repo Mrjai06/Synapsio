@@ -2,7 +2,9 @@ import { useEffect, useState, useRef } from "react";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NetworkCanvas from "./NetworkCanvas";
+import HeroVisualAnchor from "./HeroVisualAnchor";
 import { FloatingSurface, AmbientGlow } from "./DepthSystem";
+
 const HeroSection = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
@@ -33,12 +35,23 @@ const HeroSection = () => {
       background: `radial-gradient(ellipse at 50% 40%, transparent 0%, hsl(var(--background) / ${0.2 + scrollProgress * 0.5}) 70%)`
     }} />
       
+      {/* Visual Anchor - offset to the right */}
+      <div 
+        className="absolute right-0 top-1/2 -translate-y-1/2 w-[500px] h-[500px] lg:w-[600px] lg:h-[600px] xl:w-[700px] xl:h-[700px] opacity-60 transition-all duration-1000"
+        style={{
+          transform: `translateY(calc(-50% + ${contentTranslate * 0.5}px))`,
+          opacity: Math.max(0, 0.6 - scrollProgress * 0.8),
+        }}
+      >
+        <HeroVisualAnchor className="w-full h-full" />
+      </div>
+      
       {/* Content */}
       <div className="relative z-10 container mx-auto px-8 lg:px-20 xl:px-28 transition-all duration-700" style={{
       opacity: Math.max(0, contentOpacity),
       transform: `translateY(${contentTranslate}px)`
     }}>
-        <div className="max-w-5xl">
+        <div className="max-w-5xl lg:max-w-2xl xl:max-w-3xl">
           {/* Branding - very subtle */}
           <div className="mb-20 animate-fade-in" style={{
           animationDelay: "0.2s",
