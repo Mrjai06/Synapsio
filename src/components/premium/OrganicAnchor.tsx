@@ -17,20 +17,11 @@ interface OrganicAnchorProps {
   className?: string;
 }
 
-// Helper to get computed CSS variable and convert to usable color
-const getCSSColor = (variable: string, alpha: number = 1): string => {
-  const root = document.documentElement;
-  const value = getComputedStyle(root).getPropertyValue(variable).trim();
-  if (!value) return `hsla(19, 62%, 63%, ${alpha})`; // fallback to primary
-  return `hsla(${value}, ${alpha})`;
-};
-
 const OrganicAnchor = ({ className = "" }: OrganicAnchorProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>();
   const nodesRef = useRef<Node[]>([]);
   const timeRef = useRef(0);
-  const colorsRef = useRef<{ primary: string; muted: string }>({ primary: "", muted: "" });
 
   const config = useMemo(() => ({
     nodeCount: 12,
@@ -48,12 +39,6 @@ const OrganicAnchor = ({ className = "" }: OrganicAnchorProps) => {
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-
-    // Cache the computed CSS colors
-    const root = document.documentElement;
-    const primaryHSL = getComputedStyle(root).getPropertyValue("--primary").trim() || "19 62% 63%";
-    const mutedHSL = getComputedStyle(root).getPropertyValue("--muted-foreground").trim() || "200 20% 65%";
-    colorsRef.current = { primary: primaryHSL, muted: mutedHSL };
 
     const resizeCanvas = () => {
       const dpr = window.devicePixelRatio || 1;
@@ -137,7 +122,6 @@ const OrganicAnchor = ({ className = "" }: OrganicAnchorProps) => {
 
     const drawConnections = (ctx: CanvasRenderingContext2D) => {
       const nodes = nodesRef.current;
-      const { primary, muted } = colorsRef.current;
       
       for (let i = 0; i < nodes.length; i++) {
         for (let j = i + 1; j < nodes.length; j++) {
@@ -148,14 +132,14 @@ const OrganicAnchor = ({ className = "" }: OrganicAnchorProps) => {
           if (distance < config.connectionDistance) {
             const opacity = (1 - distance / config.connectionDistance) * 0.25;
             
-            // Create gradient line with computed colors
+            // Create gradient line
             const gradient = ctx.createLinearGradient(
               nodes[i].x, nodes[i].y,
               nodes[j].x, nodes[j].y
             );
-            gradient.addColorStop(0, `hsla(${primary}, ${opacity})`);
-            gradient.addColorStop(0.5, `hsla(${muted}, ${opacity * 0.5})`);
-            gradient.addColorStop(1, `hsla(${primary}, ${opacity})`);
+            gradient.addColorStop(0, `hsla(var(--primary), ${opacity})`);
+            gradient.addColorStop(0.5, `hsla(var(--muted-foreground), ${opacity * 0.5})`);
+            gradient.addColorStop(1, `hsla(var(--primary), ${opacity})`);
             
             ctx.beginPath();
             ctx.moveTo(nodes[i].x, nodes[i].y);
@@ -172,7 +156,6 @@ const OrganicAnchor = ({ className = "" }: OrganicAnchorProps) => {
       const rect = canvas.getBoundingClientRect();
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
-      const { primary } = colorsRef.current;
       
       nodesRef.current.forEach((node, i) => {
         // Calculate distance from center for glow intensity
@@ -187,8 +170,8 @@ const OrganicAnchor = ({ className = "" }: OrganicAnchorProps) => {
           node.x, node.y, 0,
           node.x, node.y, node.radius * 6
         );
-        glowGradient.addColorStop(0, `hsla(${primary}, ${0.15 * glowIntensity})`);
-        glowGradient.addColorStop(1, `hsla(${primary}, 0)`);
+        glowGradient.addColorStop(0, `hsla(var(--primary), ${0.15 * glowIntensity})`);
+        glowGradient.addColorStop(1, "hsla(var(--primary), 0)");
         
         ctx.beginPath();
         ctx.arc(node.x, node.y, node.radius * 6, 0, Math.PI * 2);
@@ -200,9 +183,9 @@ const OrganicAnchor = ({ className = "" }: OrganicAnchorProps) => {
           node.x - node.radius * 0.3, node.y - node.radius * 0.3, 0,
           node.x, node.y, node.radius
         );
-        coreGradient.addColorStop(0, `hsla(${primary}, ${0.6 * glowIntensity})`);
-        coreGradient.addColorStop(0.7, `hsla(${primary}, ${0.4 * glowIntensity})`);
-        coreGradient.addColorStop(1, `hsla(${primary}, ${0.2 * glowIntensity})`);
+        coreGradient.addColorStop(0, `hsla(var(--primary), ${0.6 * glowIntensity})`);
+        coreGradient.addColorStop(0.7, `hsla(var(--primary), ${0.4 * glowIntensity})`);
+        coreGradient.addColorStop(1, `hsla(var(--primary), ${0.2 * glowIntensity})`);
         
         ctx.beginPath();
         ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
@@ -215,7 +198,6 @@ const OrganicAnchor = ({ className = "" }: OrganicAnchorProps) => {
       const rect = canvas.getBoundingClientRect();
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
-      const { primary } = colorsRef.current;
       
       // Breathing effect for core
       const breathScale = 1 + Math.sin(timeRef.current * config.breathSpeed * 0.5) * 0.1;
@@ -226,9 +208,9 @@ const OrganicAnchor = ({ className = "" }: OrganicAnchorProps) => {
         centerX, centerY, 0,
         centerX, centerY, 120
       );
-      outerGlow.addColorStop(0, `hsla(${primary}, 0.08)`);
-      outerGlow.addColorStop(0.5, `hsla(${primary}, 0.03)`);
-      outerGlow.addColorStop(1, `hsla(${primary}, 0)`);
+      outerGlow.addColorStop(0, "hsla(var(--primary), 0.08)");
+      outerGlow.addColorStop(0.5, "hsla(var(--primary), 0.03)");
+      outerGlow.addColorStop(1, "hsla(var(--primary), 0)");
       
       ctx.beginPath();
       ctx.arc(centerX, centerY, 120, 0, Math.PI * 2);
@@ -240,8 +222,8 @@ const OrganicAnchor = ({ className = "" }: OrganicAnchorProps) => {
         centerX, centerY, 0,
         centerX, centerY, 40
       );
-      innerGlow.addColorStop(0, `hsla(${primary}, 0.2)`);
-      innerGlow.addColorStop(1, `hsla(${primary}, 0)`);
+      innerGlow.addColorStop(0, "hsla(var(--primary), 0.2)");
+      innerGlow.addColorStop(1, "hsla(var(--primary), 0)");
       
       ctx.beginPath();
       ctx.arc(centerX, centerY, 40, 0, Math.PI * 2);
@@ -253,9 +235,9 @@ const OrganicAnchor = ({ className = "" }: OrganicAnchorProps) => {
         centerX - 2, centerY - 2, 0,
         centerX, centerY, coreRadius
       );
-      coreGradient.addColorStop(0, `hsla(${primary}, 0.7)`);
-      coreGradient.addColorStop(0.6, `hsla(${primary}, 0.5)`);
-      coreGradient.addColorStop(1, `hsla(${primary}, 0.3)`);
+      coreGradient.addColorStop(0, "hsla(var(--primary), 0.7)");
+      coreGradient.addColorStop(0.6, "hsla(var(--primary), 0.5)");
+      coreGradient.addColorStop(1, "hsla(var(--primary), 0.3)");
       
       ctx.beginPath();
       ctx.arc(centerX, centerY, coreRadius, 0, Math.PI * 2);
