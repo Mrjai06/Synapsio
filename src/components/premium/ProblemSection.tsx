@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
-import { Database, Users, ShieldAlert, TrendingUp, AlertTriangle, Clock, DollarSign, Link2Off } from "lucide-react";
+import { Database, Users, ShieldAlert, TrendingUp } from "lucide-react";
 
 interface ProblemNode {
   id: string;
@@ -78,11 +78,8 @@ const connections = [
 
 const ProblemSection = () => {
   const [activeNode, setActiveNode] = useState<number | null>(null);
-  const [selectedNode, setSelectedNode] = useState<number | null>(0);
   const sectionRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.2 });
-
-  const displayedNode = activeNode !== null ? activeNode : selectedNode;
 
   const getNodeCenter = (index: number) => {
     const node = problemNodes[index];
@@ -140,15 +137,15 @@ const ProblemSection = () => {
                 className="w-full h-full relative z-10"
                 style={{ overflow: "visible" }}
               >
-                {/* Connection lines */}
+                {/* Connection lines - always visible with animation */}
                 {connections.map((connection, index) => {
                   const from = getNodeCenter(connection.from);
                   const to = getNodeCenter(connection.to);
-                  const isHighlighted = displayedNode === connection.from || displayedNode === connection.to;
-                  const isDimmed = displayedNode !== null && !isHighlighted;
+                  const isHighlighted = activeNode === connection.from || activeNode === connection.to;
 
                   return (
                     <g key={index}>
+                      {/* Base line */}
                       <motion.line
                         x1={from.x}
                         y1={from.y}
@@ -156,31 +153,29 @@ const ProblemSection = () => {
                         y2={to.y}
                         stroke={isHighlighted ? "hsl(var(--primary))" : "hsl(var(--border))"}
                         strokeWidth={isHighlighted ? 2 : 1}
-                        strokeOpacity={isDimmed ? 0.1 : isHighlighted ? 0.6 : 0.25}
-                        strokeDasharray={isHighlighted ? "none" : "4 4"}
+                        strokeOpacity={isHighlighted ? 0.7 : 0.35}
                         initial={{ pathLength: 0 }}
                         animate={isInView ? { pathLength: 1 } : {}}
                         transition={{ duration: 1.5, delay: 0.8 + index * 0.1 }}
                       />
                       
-                      {/* Animated pulse on connections */}
-                      {isHighlighted && (
-                        <motion.circle
-                          r={3}
-                          fill="hsl(var(--primary))"
-                          initial={{ opacity: 0 }}
-                          animate={{
-                            opacity: [0, 0.8, 0],
-                            cx: [from.x, to.x],
-                            cy: [from.y, to.y],
-                          }}
-                          transition={{
-                            duration: 2,
-                            repeat: Infinity,
-                            ease: "linear",
-                          }}
-                        />
-                      )}
+                      {/* Animated pulse on ALL connections - always visible */}
+                      <motion.circle
+                        r={2.5}
+                        fill={isHighlighted ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
+                        initial={{ opacity: 0 }}
+                        animate={isInView ? {
+                          opacity: [0, isHighlighted ? 0.9 : 0.5, 0],
+                          cx: [from.x, to.x],
+                          cy: [from.y, to.y],
+                        } : {}}
+                        transition={{
+                          duration: 2.5 + index * 0.3,
+                          delay: 1.5 + index * 0.4,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                      />
                     </g>
                   );
                 })}
@@ -189,15 +184,14 @@ const ProblemSection = () => {
                 {problemNodes.map((node, index) => {
                   const center = getNodeCenter(index);
                   const Icon = node.icon;
-                  const isActive = displayedNode === index;
-                  const isDimmed = displayedNode !== null && !isActive;
+                  const isActive = activeNode === index;
 
                   return (
                     <motion.g
                       key={node.id}
                       initial={{ opacity: 0, scale: 0 }}
                       animate={isInView ? { 
-                        opacity: isDimmed ? 0.4 : 1, 
+                        opacity: 1, 
                         scale: 1,
                       } : {}}
                       transition={{ 
@@ -208,7 +202,6 @@ const ProblemSection = () => {
                       }}
                       onMouseEnter={() => setActiveNode(index)}
                       onMouseLeave={() => setActiveNode(null)}
-                      onClick={() => setSelectedNode(index)}
                       style={{ cursor: "pointer" }}
                     >
                       {/* Outer glow ring - animated */}
@@ -304,10 +297,43 @@ const ProblemSection = () => {
               <div className="absolute inset-0 bg-card/30 backdrop-blur-xl rounded-3xl border border-border/20" />
               
               <div className="relative p-8 md:p-10">
+                {/* Intro text when no node is hovered */}
                 <AnimatePresence mode="wait">
-                  {displayedNode !== null && (
+                  {activeNode === null ? (
                     <motion.div
-                      key={displayedNode}
+                      key="intro"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.4, ease: "easeOut" }}
+                    >
+                      <p className="text-[10px] tracking-[0.3em] uppercase text-primary/60 mb-4">
+                        Explore the problems
+                      </p>
+                      <h3 className="text-xl font-medium text-foreground mb-4">
+                        Hover over a node
+                      </h3>
+                      <p className="text-muted-foreground/60 text-sm leading-relaxed">
+                        Fragmented systems, manual coordination, and disconnected data create hidden risk, 
+                        cost, and operational drag at scale.
+                      </p>
+                      
+                      {/* Quick overview list */}
+                      <ul className="mt-8 space-y-3">
+                        {problemNodes.map((node, i) => (
+                          <li
+                            key={node.id}
+                            className="flex items-center gap-3 text-sm text-muted-foreground/50"
+                          >
+                            <span className="w-1.5 h-1.5 rounded-full bg-border" />
+                            {node.title}
+                          </li>
+                        ))}
+                      </ul>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key={activeNode}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
@@ -317,23 +343,23 @@ const ProblemSection = () => {
                       <div className="flex items-center gap-4 mb-6">
                         <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
                           {(() => {
-                            const Icon = problemNodes[displayedNode].icon;
+                            const Icon = problemNodes[activeNode].icon;
                             return <Icon className="w-6 h-6 text-primary" />;
                           })()}
                         </div>
                         <div>
                           <p className="text-[10px] tracking-[0.3em] uppercase text-primary/60 mb-1">
-                            Problem {displayedNode + 1} of 4
+                            Problem {activeNode + 1} of 4
                           </p>
                           <h3 className="text-xl font-medium text-foreground">
-                            {problemNodes[displayedNode].title}
+                            {problemNodes[activeNode].title}
                           </h3>
                         </div>
                       </div>
 
                       {/* Description */}
                       <p className="text-muted-foreground/70 text-sm leading-relaxed mb-8">
-                        {problemNodes[displayedNode].description}
+                        {problemNodes[activeNode].description}
                       </p>
 
                       {/* Impacts */}
@@ -342,7 +368,7 @@ const ProblemSection = () => {
                           Business Impact
                         </p>
                         <ul className="space-y-3">
-                          {problemNodes[displayedNode].impacts.map((impact, i) => (
+                          {problemNodes[activeNode].impacts.map((impact, i) => (
                             <motion.li
                               key={i}
                               initial={{ opacity: 0, x: -10 }}
@@ -355,21 +381,6 @@ const ProblemSection = () => {
                             </motion.li>
                           ))}
                         </ul>
-                      </div>
-
-                      {/* Node indicator dots */}
-                      <div className="flex items-center gap-2 mt-10 pt-6 border-t border-border/10">
-                        {problemNodes.map((_, i) => (
-                          <button
-                            key={i}
-                            onClick={() => setSelectedNode(i)}
-                            className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                              displayedNode === i 
-                                ? "bg-primary w-6" 
-                                : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
-                            }`}
-                          />
-                        ))}
                       </div>
                     </motion.div>
                   )}
