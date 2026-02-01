@@ -90,10 +90,24 @@ const FeaturesSection = () => {
     return () => observer.disconnect();
   }, []);
 
+  // Listen for external feature selection events
+  useEffect(() => {
+    const handleSetActiveFeature = (event: CustomEvent<string>) => {
+      if (features.find(f => f.id === event.detail)) {
+        setActiveFeature(event.detail);
+      }
+    };
+
+    window.addEventListener('setActiveFeature', handleSetActiveFeature as EventListener);
+    return () => {
+      window.removeEventListener('setActiveFeature', handleSetActiveFeature as EventListener);
+    };
+  }, []);
+
   const activeData = features.find(f => f.id === activeFeature)!;
 
   return (
-    <section className="relative py-32 md:py-48 overflow-hidden">
+    <section data-features-section className="relative py-32 md:py-48 overflow-hidden">
       <AmbientGlow color="primary" size="xl" intensity="medium" position="center" />
       <AmbientGlow color="accent" size="md" intensity="subtle" position="right" className="top-1/3" />
 
