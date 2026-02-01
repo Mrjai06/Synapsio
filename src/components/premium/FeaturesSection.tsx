@@ -119,11 +119,11 @@ const FeaturesSection = () => {
           </h2>
         </div>
 
-        {/* 3-Column Layout */}
-        <div className="grid lg:grid-cols-[280px_1fr_340px] gap-8 lg:gap-12 xl:gap-16 items-start">
+        {/* 2-Column Layout: Cards + Details */}
+        <div className="grid lg:grid-cols-[1fr_400px] gap-8 lg:gap-12 xl:gap-16 items-start mb-12">
           
-          {/* LEFT COLUMN: Feature Selector */}
-          <div className="space-y-4">
+          {/* LEFT: Feature Cards - Horizontal on desktop */}
+          <div className="grid sm:grid-cols-3 gap-4">
             {features.map((feature) => {
               const isActive = activeFeature === feature.id;
               const Icon = feature.icon;
@@ -132,43 +132,41 @@ const FeaturesSection = () => {
                 <motion.button
                   key={feature.id}
                   onClick={() => setActiveFeature(feature.id)}
-                  className={`w-full text-left p-6 rounded-2xl border transition-all duration-500 ${
+                  className={`text-left p-5 rounded-2xl border transition-all duration-500 ${
                     isActive 
-                      ? "bg-accent/10 border-accent/40" 
+                      ? "bg-accent/10 border-accent/40 ring-2 ring-accent/20" 
                       : "bg-background/40 border-border/20 hover:border-border/40"
                   }`}
                   whileHover={{ scale: isActive ? 1 : 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <div className="flex items-start gap-4">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors duration-500 ${
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors duration-500 ${
                       isActive ? "bg-accent/20" : "bg-primary/10"
                     }`}>
-                      <Icon className={`w-6 h-6 transition-colors duration-500 ${
+                      <Icon className={`w-5 h-5 transition-colors duration-500 ${
                         isActive ? "text-accent" : "text-primary/60"
                       }`} />
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className={`font-medium text-lg mb-1 transition-colors duration-500 ${
-                        isActive ? "text-accent" : "text-foreground"
-                      }`}>
-                        {feature.title}
-                      </h3>
-                      <p className="text-sm text-muted-foreground/50 leading-relaxed">
-                        {feature.description}
-                      </p>
-                    </div>
+                    <h3 className={`font-medium text-base transition-colors duration-500 ${
+                      isActive ? "text-accent" : "text-foreground"
+                    }`}>
+                      {feature.title}
+                    </h3>
                   </div>
+                  <p className="text-sm text-muted-foreground/50 leading-relaxed">
+                    {feature.description}
+                  </p>
                   
                   <AnimatePresence>
                     {isActive && (
                       <motion.div
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -10 }}
-                        className="flex items-center gap-2 mt-4 pt-4 border-t border-accent/20"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="flex items-center gap-2 mt-3 pt-3 border-t border-accent/20"
                       >
-                        <span className="text-xs text-accent/70 uppercase tracking-wider">Active</span>
+                        <span className="text-xs text-accent/70 uppercase tracking-wider">Viewing</span>
                         <ArrowRight className="w-3 h-3 text-accent/70" />
                       </motion.div>
                     )}
@@ -178,27 +176,7 @@ const FeaturesSection = () => {
             })}
           </div>
 
-          {/* CENTER COLUMN: Supply Chain System Visualization */}
-          <div className="relative aspect-[4/3] max-w-[550px] mx-auto w-full lg:max-w-none">
-            <div className="absolute inset-0 rounded-3xl border border-border/10 bg-background/30 backdrop-blur-sm overflow-hidden">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={activeFeature}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.5 }}
-                  className="absolute inset-0"
-                >
-                  {activeFeature === "marketplace" && <MarketplaceVisualization />}
-                  {activeFeature === "operations" && <OperationsVisualization />}
-                  {activeFeature === "communication" && <CommunicationVisualization />}
-                </motion.div>
-              </AnimatePresence>
-            </div>
-          </div>
-
-          {/* RIGHT COLUMN: Decision-Focused Explanation */}
+          {/* RIGHT: Decision-Focused Explanation */}
           <div className="lg:sticky lg:top-32">
             <AnimatePresence mode="wait">
               <motion.div
@@ -207,10 +185,10 @@ const FeaturesSection = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.4 }}
-                className="space-y-6"
+                className="space-y-5"
               >
                 {/* Headline */}
-                <h3 className="text-2xl md:text-[1.75rem] font-light text-foreground leading-tight">
+                <h3 className="text-xl md:text-2xl font-light text-foreground leading-tight">
                   {activeData.content.headline}
                 </h3>
 
@@ -219,7 +197,7 @@ const FeaturesSection = () => {
                   <p className="text-xs uppercase tracking-wider text-accent/70 mb-2">
                     Decision Automated
                   </p>
-                  <p className="text-foreground/90 leading-relaxed">
+                  <p className="text-foreground/90 leading-relaxed text-sm">
                     {activeData.content.decision}
                   </p>
                 </div>
@@ -234,49 +212,75 @@ const FeaturesSection = () => {
                   </p>
                 </div>
 
-                {/* What's removed */}
-                <div className="space-y-3">
-                  <p className="text-xs uppercase tracking-wider text-muted-foreground/50">
-                    What's Eliminated
-                  </p>
-                  <div className="space-y-2">
-                    {Object.entries(activeData.content.removal).map(([key, value], idx) => (
+                {/* Metrics - horizontal */}
+                <div className="grid grid-cols-3 gap-2">
+                  {activeData.content.metrics.map((metric, idx) => {
+                    const Icon = metric.icon;
+                    return (
                       <motion.div
-                        key={key}
-                        initial={{ opacity: 0, x: 10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: idx * 0.1 }}
-                        className="flex items-start gap-3 text-sm"
+                        key={metric.label}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.2 + idx * 0.1 }}
+                        className="text-center p-3 rounded-xl bg-background/50 border border-border/10"
                       >
-                        <span className="w-1.5 h-1.5 rounded-full bg-accent/60 mt-2 shrink-0" />
-                        <span className="text-muted-foreground/70">{value}</span>
+                        <Icon className="w-4 h-4 text-accent mx-auto mb-1" />
+                        <p className="text-lg font-medium text-accent">{metric.value}</p>
+                        <p className="text-[9px] text-muted-foreground/50 uppercase tracking-wider">
+                          {metric.label}
+                        </p>
                       </motion.div>
-                    ))}
-                  </div>
+                    );
+                  })}
                 </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
 
-                {/* Metrics */}
-                <div className="pt-4 border-t border-border/20">
-                  <div className="grid grid-cols-3 gap-3">
-                    {activeData.content.metrics.map((metric, idx) => {
-                      const Icon = metric.icon;
-                      return (
-                        <motion.div
-                          key={metric.label}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.3 + idx * 0.1 }}
-                          className="text-center p-3 rounded-xl bg-background/50 border border-border/10"
-                        >
-                          <Icon className="w-4 h-4 text-accent mx-auto mb-2" />
-                          <p className="text-xl font-medium text-accent">{metric.value}</p>
-                          <p className="text-[10px] text-muted-foreground/50 uppercase tracking-wider mt-1">
-                            {metric.label}
-                          </p>
-                        </motion.div>
-                      );
-                    })}
-                  </div>
+        {/* VISUALIZATION - Full width below cards */}
+        <div className="relative w-full aspect-[16/9] max-h-[600px] rounded-3xl border border-border/20 bg-background/40 backdrop-blur-sm overflow-hidden">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeFeature}
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.5 }}
+              className="absolute inset-0"
+            >
+              {activeFeature === "marketplace" && <MarketplaceVisualization />}
+              {activeFeature === "operations" && <OperationsVisualization />}
+              {activeFeature === "communication" && <CommunicationVisualization />}
+            </motion.div>
+          </AnimatePresence>
+          
+          {/* What's eliminated - overlay at bottom */}
+          <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background/90 via-background/60 to-transparent">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeFeature}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                className="max-w-2xl mx-auto"
+              >
+                <p className="text-xs uppercase tracking-wider text-muted-foreground/50 mb-3 text-center">
+                  What's Eliminated
+                </p>
+                <div className="flex flex-wrap justify-center gap-4">
+                  {Object.entries(activeData.content.removal).map(([key, value], idx) => (
+                    <motion.div
+                      key={key}
+                      initial={{ opacity: 0, x: 10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.1 }}
+                      className="flex items-center gap-2 text-sm bg-background/60 px-3 py-1.5 rounded-full border border-border/20"
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-accent/60 shrink-0" />
+                      <span className="text-muted-foreground/70">{value}</span>
+                    </motion.div>
+                  ))}
                 </div>
               </motion.div>
             </AnimatePresence>
