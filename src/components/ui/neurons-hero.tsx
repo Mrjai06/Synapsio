@@ -66,36 +66,17 @@ const CosmicSynapseCanvas = ({ className }: { className?: string }) => {
                 const scale = perspective / (perspective + z2);
                 const projectedX = (x1 * scale) + canvas.width / 2;
                 const projectedY = (y1 * scale) + canvas.height / 2;
-                return { x: projectedX, y: projectedY, scale, z: z2 };
+                return { x: projectedX, y: projectedY, scale };
             }
 
             draw() {
-                const { x, y, scale, z } = this.project();
-                
-                // Depth-based coloring - brighter in front, darker in back
-                const depthFactor = (z + 300) / 600; // Normalize z to 0-1 range
-                const brightness = Math.max(0.15, Math.min(1, 1.2 - depthFactor * 0.8));
-                const baseAlpha = 0.2 + brightness * 0.6 + this.activation * 0.4;
-                
-                // Larger nodes in front, smaller in back
-                const depthRadius = this.radius * scale * (0.6 + brightness * 0.6);
-                
+                const { x, y, scale } = this.project();
                 ctx!.beginPath();
-                ctx!.arc(x, y, depthRadius, 0, Math.PI * 2);
-                
-                // Gradient color based on depth - warm tones in front, cool in back
-                const r = Math.floor(160 + brightness * 60);
-                const g = Math.floor(190 + brightness * 40);
-                const b = Math.floor(210 + brightness * 30);
-                ctx!.fillStyle = `rgba(${r}, ${g}, ${b}, ${baseAlpha})`;
-                
-                // Add glow to front neurons
-                if (brightness > 0.6) {
-                    ctx!.shadowColor = `rgba(180, 210, 220, ${brightness * 0.4})`;
-                    ctx!.shadowBlur = 6 * brightness;
-                }
+                ctx!.arc(x, y, this.radius * scale, 0, Math.PI * 2);
+                // Whiter nodes for better visibility
+                const alpha = 0.3 + this.activation * 0.7;
+                ctx!.fillStyle = `rgba(180, 210, 220, ${alpha})`; // Light teal-white
                 ctx!.fill();
-                ctx!.shadowBlur = 0;
             }
 
             update() {
@@ -171,87 +152,25 @@ const CosmicSynapseCanvas = ({ className }: { className?: string }) => {
 
         const init = () => {
             neurons = [];
-            const numNeurons = 500;
-            
-            // Create brain shape using two hemispheres
+            const numNeurons = 600; // Reduced for performance
+            const radius = 280;
             for (let i = 0; i < numNeurons; i++) {
-                const t = i / numNeurons;
-                const phi = Math.acos(-1 + 2 * t);
+                const phi = Math.acos(-1 + (2 * i) / numNeurons);
                 const theta = Math.sqrt(numNeurons * Math.PI) * phi;
-                
-                // Brain dimensions - wider than tall, with two lobes
-                const baseRadius = 180;
-                const xScale = 1.4; // Wider
-                const yScale = 1.1; // Slightly tall
-                const zScale = 1.2; // Deep
-                
-                let x = baseRadius * xScale * Math.cos(theta) * Math.sin(phi);
-                let y = baseRadius * yScale * Math.cos(phi) - 30; // Offset down slightly
-                let z = baseRadius * zScale * Math.sin(theta) * Math.sin(phi);
-                
-                // Create the central fissure (gap between hemispheres)
-                const fissureDepth = 25 * Math.exp(-Math.pow(y + 30, 2) / 8000);
-                if (Math.abs(x) < 40) {
-                    const fissureFactor = 1 - (1 - Math.abs(x) / 40) * 0.4;
-                    x *= fissureFactor;
-                    y -= fissureDepth * (1 - Math.abs(x) / 40);
-                }
-                
-                // Add cortical folding (gyri and sulci) - brain wrinkles
-                const foldFreq = 6;
-                const foldAmp = 12;
-                const fold = Math.sin(theta * foldFreq) * Math.sin(phi * foldFreq * 0.7) * foldAmp;
-                const normal = { x: Math.cos(theta) * Math.sin(phi), y: Math.cos(phi), z: Math.sin(theta) * Math.sin(phi) };
-                x += normal.x * fold;
-                y += normal.y * fold;
-                z += normal.z * fold;
-                
-                // Flatten the bottom (brainstem area)
-                if (y > 80) {
-                    y = 80 + (y - 80) * 0.3;
-                }
-                
+                const x = radius * Math.cos(theta) * Math.sin(phi);
+                const y = radius * Math.sin(phi) * Math.sin(theta);
+                const z = radius * Math.cos(phi);
                 neurons.push(new Neuron(x, y, z));
-            }
-            
-            // Add some neurons for the brainstem
-            for (let i = 0; i < 40; i++) {
-                const t = i / 40;
-                const angle = t * Math.PI * 2;
-                const stemY = 80 + t * 60;
-                const stemRadius = 25 * (1 - t * 0.5);
-                const x = Math.cos(angle) * stemRadius;
-                const z = Math.sin(angle) * stemRadius;
-                neurons.push(new Neuron(x, stemY, z));
             }
             
             neurons.forEach(neuron => {
                 neurons.forEach(other => {
                     if (neuron !== other) {
                         const dist = Math.hypot(neuron.x - other.x, neuron.y - other.y, neuron.z - other.z);
-                        if (dist < 55) {
+                        if (dist < 50) {
                             neuron.neighbors.push(other);
                         }
                     }
-                });
-            });
-        };
-
-        const drawConnections = () => {
-            neurons.forEach(neuron => {
-                const pos1 = neuron.project();
-                neuron.neighbors.forEach(neighbor => {
-                    const pos2 = neighbor.project();
-                    const avgZ = (pos1.z + pos2.z) / 2;
-                    const depthFactor = (avgZ + 300) / 600;
-                    const alpha = Math.max(0.02, 0.15 * (1 - depthFactor * 0.7));
-                    
-                    ctx!.beginPath();
-                    ctx!.moveTo(pos1.x, pos1.y);
-                    ctx!.lineTo(pos2.x, pos2.y);
-                    ctx!.strokeStyle = `rgba(120, 160, 180, ${alpha})`;
-                    ctx!.lineWidth = 0.5 * pos1.scale;
-                    ctx!.stroke();
                 });
             });
         };
@@ -265,18 +184,7 @@ const CosmicSynapseCanvas = ({ className }: { className?: string }) => {
                 neurons[Math.floor(Math.random() * neurons.length)].fire();
             }
 
-            // Sort neurons by z-depth for proper layering (back to front)
-            const sortedNeurons = [...neurons].sort((a, b) => {
-                const aZ = a.project().z;
-                const bZ = b.project().z;
-                return bZ - aZ; // Back to front
-            });
-
-            // Draw connections first (behind neurons)
-            drawConnections();
-            
-            // Update and draw neurons
-            sortedNeurons.forEach(neuron => neuron.update());
+            neurons.forEach(neuron => neuron.update());
             
             pulses = pulses.filter(pulse => !pulse.update());
             pulses.forEach(pulse => pulse.draw());
