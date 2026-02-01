@@ -57,7 +57,7 @@ const footerLinks: FooterSection[] = [
 
 const Footer = () => {
   return (
-    <footer className="relative border-t border-border/10 bg-background">
+    <footer className="relative border-t border-border/10 bg-black">
       <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
         {/* Divider */}
         <AnimatedContainer delay={0}>
