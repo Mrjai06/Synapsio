@@ -1,6 +1,7 @@
 import HeroSection from "@/components/premium/HeroSection";
 import ProblemSection from "@/components/premium/ProblemSection";
 import SolutionSection from "@/components/premium/SolutionSection";
+import ProcessOverviewSection from "@/components/premium/ProcessOverviewSection";
 import ProductSection from "@/components/premium/ProductSection";
 import OpportunitySection from "@/components/premium/OpportunitySection";
 import RoadmapSection from "@/components/premium/RoadmapSection";
@@ -51,12 +52,12 @@ const Index = () => {
           <SolutionSection />
         </section>
         
-        {/* Narrative bridge: From solution to product */}
+        {/* Narrative bridge: From solution to process */}
         <div className="relative py-20 md:py-28">
           <div className="container mx-auto px-8 lg:px-16">
             <div className="max-w-lg ml-auto text-right">
               <p className="text-sm text-muted-foreground/40 font-light leading-relaxed">
-                Powered by intelligent capabilities
+                A unified workflow
               </p>
               <div className="mt-4 flex justify-end">
                 <svg width="40" height="20" viewBox="0 0 40 20" className="text-border/40">
@@ -68,6 +69,22 @@ const Index = () => {
                   />
                 </svg>
               </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Process Overview - Interactive workflow diagram */}
+        <section id="process">
+          <ProcessOverviewSection />
+        </section>
+        
+        {/* Narrative bridge: From process to product */}
+        <div className="relative py-20 md:py-28">
+          <div className="container mx-auto px-8 lg:px-16">
+            <div className="max-w-lg">
+              <p className="text-sm text-muted-foreground/40 font-light leading-relaxed">
+                Powered by intelligent capabilities
+              </p>
             </div>
           </div>
         </div>
