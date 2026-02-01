@@ -290,7 +290,7 @@ const ProblemSection = () => {
             initial={{ opacity: 0, x: 30 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.5 }}
-            className="order-1 lg:order-2 lg:sticky lg:top-32"
+            className="order-1 lg:order-2 lg:sticky lg:top-32 lg:ml-12 xl:ml-20"
           >
             <div className="relative">
               {/* Glass panel background */}
