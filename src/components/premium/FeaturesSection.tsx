@@ -411,7 +411,7 @@ const LiveExplanationPanel = ({
   ];
 
   return (
-    <div className="absolute top-1/2 -translate-y-1/2 left-4 z-20 w-56 bg-background/90 backdrop-blur-sm rounded-xl border border-border/30 overflow-hidden">
+    <div className="absolute top-2 left-4 z-20 w-56 bg-background/90 backdrop-blur-sm rounded-xl border border-border/30 overflow-hidden">
       <div className="p-3 border-b border-border/20">
         <p className="text-[9px] uppercase tracking-widest text-muted-foreground/50">Live System Activity</p>
       </div>
