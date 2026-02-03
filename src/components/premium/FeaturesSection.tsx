@@ -290,61 +290,66 @@ const FeaturesSection = () => {
           </div>
         </div>
 
-        {/* VISUALIZATION - Full width below cards */}
-        <div className="relative w-full aspect-[16/9] max-h-[600px] rounded-3xl border border-border/20 bg-background/40 backdrop-blur-sm overflow-hidden">
-          {/* System State Indicator - Top Right */}
-          <SystemStateIndicator state={systemState} />
+        {/* VISUALIZATION AREA - Sidebar + Main visualization */}
+        <div className="flex gap-4 w-full">
+          {/* Live Explanation Panel - Sidebar on the left */}
+          <div className="shrink-0">
+            <LiveExplanationPanel 
+              semantics={activeData.semantics} 
+              state={systemState} 
+            />
+          </div>
           
-          {/* Live Explanation Panel - Top Left, synced to animation */}
-          <LiveExplanationPanel 
-            semantics={activeData.semantics} 
-            state={systemState} 
-          />
-          
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeFeature}
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.5 }}
-              className="absolute inset-0"
-            >
-              {activeFeature === "marketplace" && <MarketplaceVisualization state={systemState} />}
-              {activeFeature === "operations" && <OperationsVisualization state={systemState} />}
-              {activeFeature === "communication" && <CommunicationVisualization state={systemState} />}
-            </motion.div>
-          </AnimatePresence>
-          
-          {/* What's eliminated - overlay at bottom */}
-          <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background/90 via-background/60 to-transparent">
+          {/* Main visualization container */}
+          <div className="relative flex-1 aspect-[16/9] max-h-[600px] rounded-3xl border border-border/20 bg-background/40 backdrop-blur-sm overflow-hidden">
+            {/* System State Indicator - Top Right */}
+            <SystemStateIndicator state={systemState} />
+            
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeFeature}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                className="max-w-2xl mx-auto"
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.5 }}
+                className="absolute inset-0"
               >
-                <p className="text-xs uppercase tracking-wider text-muted-foreground/50 mb-3 text-center">
-                  What's Eliminated
-                </p>
-                <div className="flex flex-wrap justify-center gap-4">
-                  {Object.entries(activeData.content.removal).map(([key, value], idx) => (
-                    <motion.div
-                      key={key}
-                      initial={{ opacity: 0, x: 10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: idx * 0.1 }}
-                      className="flex items-center gap-2 text-sm bg-background/60 px-3 py-1.5 rounded-full border border-border/20"
-                    >
-                      <span className="w-1.5 h-1.5 rounded-full bg-accent/60 shrink-0" />
-                      <span className="text-muted-foreground/70">{value}</span>
-                    </motion.div>
-                  ))}
-                </div>
+                {activeFeature === "marketplace" && <MarketplaceVisualization state={systemState} />}
+                {activeFeature === "operations" && <OperationsVisualization state={systemState} />}
+                {activeFeature === "communication" && <CommunicationVisualization state={systemState} />}
               </motion.div>
             </AnimatePresence>
+            
+            {/* What's eliminated - overlay at bottom */}
+            <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background/90 via-background/60 to-transparent">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeFeature}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="max-w-2xl mx-auto"
+                >
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground/50 mb-3 text-center">
+                    What's Eliminated
+                  </p>
+                  <div className="flex flex-wrap justify-center gap-4">
+                    {Object.entries(activeData.content.removal).map(([key, value], idx) => (
+                      <motion.div
+                        key={key}
+                        initial={{ opacity: 0, x: 10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: idx * 0.1 }}
+                        className="flex items-center gap-2 text-sm bg-background/60 px-3 py-1.5 rounded-full border border-border/20"
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full bg-accent/60 shrink-0" />
+                        <span className="text-muted-foreground/70">{value}</span>
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </div>
         </div>
       </div>
@@ -411,7 +416,7 @@ const LiveExplanationPanel = ({
   ];
 
   return (
-    <div className="absolute top-1/2 -translate-y-1/2 left-4 z-20 w-56 bg-background/90 backdrop-blur-sm rounded-xl border border-border/30 overflow-hidden">
+    <div className="w-56 h-fit bg-background/90 backdrop-blur-sm rounded-xl border border-border/30 overflow-hidden">
       <div className="p-3 border-b border-border/20">
         <p className="text-[9px] uppercase tracking-widest text-muted-foreground/50">Live System Activity</p>
       </div>
@@ -936,20 +941,21 @@ const OperationsVisualization = ({ state }: { state: SystemState }) => {
         </motion.g>
       )}
 
-      {/* Execution PULSES at end */}
+      {/* Execution checkmark - to the right of the bar */}
       {state === "execution" && (
         <motion.g>
+          {/* Pulse rings around checkmark */}
           {[0, 1, 2].map((i) => (
             <motion.circle
               key={i}
-              cx={480}
+              cx={510}
               cy={150}
-              r="15"
+              r="12"
               fill="none"
               stroke="hsl(var(--primary))"
               strokeWidth="2"
               animate={{
-                r: [15, 30, 45],
+                r: [12, 24, 36],
                 opacity: [0.8, 0.4, 0],
               }}
               transition={{
@@ -959,7 +965,17 @@ const OperationsVisualization = ({ state }: { state: SystemState }) => {
               }}
             />
           ))}
-          <text x={480} y={155} textAnchor="middle" className="fill-primary text-xl">✓</text>
+          {/* Checkmark circle */}
+          <motion.circle
+            cx={510}
+            cy={150}
+            r="14"
+            fill="hsl(var(--primary))"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          />
+          <text x={510} y={155} textAnchor="middle" className="fill-primary-foreground text-sm font-bold">✓</text>
         </motion.g>
       )}
 
