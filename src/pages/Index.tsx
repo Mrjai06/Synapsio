@@ -7,17 +7,17 @@ import OpportunitySection from "@/components/premium/OpportunitySection";
 import RoadmapSection from "@/components/premium/RoadmapSection";
 import TeamSection from "@/components/premium/TeamSection";
 import Footer from "@/components/premium/Footer";
-import ScrollProgress from "@/components/premium/ScrollProgress";
+import ProgressNavbar from "@/components/ProgressNavbar";
 import BackgroundSystem from "@/components/premium/BackgroundSystem";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
+      {/* Progress navbar */}
+      <ProgressNavbar />
+      
       {/* Persistent animated background system */}
       <BackgroundSystem />
-      
-      {/* Scroll progress indicator */}
-      <ScrollProgress />
       
       {/* Continuous narrative flow - sits above background */}
       <main className="relative" style={{ zIndex: 1 }}>
