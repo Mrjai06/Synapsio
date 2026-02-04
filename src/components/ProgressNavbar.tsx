@@ -42,9 +42,17 @@ const ProgressNavbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const scrollToSection = (sectionId: string) => {
+  const scrollToSection = (sectionId: string, index: number) => {
     const element = document.getElementById(sectionId);
-    element?.scrollIntoView({ behavior: "smooth" });
+    if (element) {
+      // Immediately update active section and progress for visual feedback
+      setActiveSection(index);
+      const targetProgress = index / (sections.length - 1);
+      setProgress(targetProgress);
+      
+      // Then scroll to the section
+      element.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   return (
@@ -55,7 +63,7 @@ const ProgressNavbar = () => {
         
         {/* Filled progress - same width as dots */}
         <div 
-          className="absolute left-1/2 -translate-x-1/2 top-0 w-2 rounded-full bg-primary/50 transition-all duration-200 ease-out"
+          className="absolute left-1/2 -translate-x-1/2 top-0 w-2 rounded-full bg-primary/50 transition-all duration-500 ease-out"
           style={{ height: `${progress * 100}%` }}
         />
         
@@ -68,7 +76,7 @@ const ProgressNavbar = () => {
             return (
               <button
                 key={section.id}
-                onClick={() => scrollToSection(section.id)}
+                onClick={() => scrollToSection(section.id, index)}
                 className="group flex items-center gap-3 relative"
               >
                 {/* Label - appears on hover */}
