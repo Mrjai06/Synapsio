@@ -675,21 +675,21 @@ const OpportunitySection = () => {
             Competition
           </p>
           
-          <div className={`grid lg:grid-cols-2 gap-16 transition-all duration-1000 ${competitionVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+          <div className={`max-w-3xl mx-auto transition-all duration-1000 ${competitionVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
             {/* Comparison Table */}
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={competitionVisible ? { opacity: 1, x: 0 } : {}}
+              initial={{ opacity: 0, y: 20 }}
+              animate={competitionVisible ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: 0.2 }}
             >
-              <GlassPanel intensity="subtle" bordered className="p-6 rounded-xl overflow-hidden">
+              <GlassPanel intensity="subtle" bordered className="p-8 rounded-xl overflow-hidden">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-border/30">
                       {competitionTable.headers.map((header, i) => (
                         <th 
                           key={header} 
-                          className={`py-3 px-2 text-left text-xs font-medium ${i === 3 ? "text-primary" : "text-muted-foreground/60"}`}
+                          className={`py-4 px-4 text-left text-sm font-medium ${i === 3 ? "text-primary" : "text-muted-foreground/60"}`}
                         >
                           {header}
                         </th>
@@ -705,13 +705,13 @@ const OpportunitySection = () => {
                         animate={competitionVisible ? { opacity: 1, y: 0 } : {}}
                         transition={{ delay: 0.3 + rowIndex * 0.08 }}
                       >
-                        <td className="py-3 px-2 text-xs text-foreground">{row.feature}</td>
+                        <td className="py-4 px-4 text-sm text-foreground">{row.feature}</td>
                         {row.values.map((value, i) => (
-                          <td key={i} className={`py-3 px-2 text-xs ${i === 2 ? "text-primary" : "text-muted-foreground/60"}`}>
+                          <td key={i} className={`py-4 px-4 text-sm ${i === 2 ? "text-primary" : "text-muted-foreground/60"}`}>
                             {value === "Yes" ? (
-                              <Check className="w-4 h-4 text-primary" />
+                              <Check className="w-5 h-5 text-primary" />
                             ) : value === "No" ? (
-                              <X className="w-4 h-4 text-destructive/50" />
+                              <X className="w-5 h-5 text-destructive/50" />
                             ) : (
                               value
                             )}
@@ -725,7 +725,7 @@ const OpportunitySection = () => {
               
               {/* Synapsio tagline */}
               <motion.p
-                className="mt-6 text-sm text-foreground/80"
+                className="mt-8 text-sm text-foreground/80 text-center"
                 initial={{ opacity: 0 }}
                 animate={competitionVisible ? { opacity: 1 } : {}}
                 transition={{ delay: 0.8 }}
@@ -733,7 +733,6 @@ const OpportunitySection = () => {
                 Synapsio combines marketplace liquidity, autonomous execution and AI-native orchestration in <span className="text-primary">one platform</span>
               </motion.p>
             </motion.div>
-            
           </div>
         </div>
         
