@@ -388,10 +388,10 @@ const segmentLabels = [
 ];
 
 const segmentColors = [
-  "hsl(var(--foreground))",
-  "hsl(var(--muted) / 0.6)",
-  "hsl(var(--primary) / 0.4)",
-  "hsl(var(--muted-foreground) / 0.2)",
+  "hsl(var(--foreground))",           // AI-SCM Germany - bright white
+  "hsl(var(--muted-foreground) / 0.5)", // SCM Germany - gray
+  "hsl(var(--primary) / 0.7)",        // AI-SCM Global - strong teal
+  "hsl(var(--secondary) / 0.5)",      // SCM Global - copper/bronze
 ];
 
 // Interactive concentric circle for a single year
@@ -429,8 +429,8 @@ const GrowthCircle = ({ year, values, activeSegment, onSegmentClick }: {
                 cy={cy}
                 r={c.r}
                 fill={c.color}
-                stroke={isActive ? "hsl(var(--primary))" : "transparent"}
-                strokeWidth={isActive ? 2.5 : 0}
+                stroke={isActive ? "hsl(var(--primary))" : "hsl(var(--border) / 0.4)"}
+                strokeWidth={isActive ? 2.5 : 1.5}
                 className="cursor-pointer"
                 style={{ transformOrigin: `${cx}px ${cy}px` }}
                 initial={{ scale: 0, opacity: 0 }}
