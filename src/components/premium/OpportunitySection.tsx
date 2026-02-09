@@ -395,27 +395,30 @@ const segmentColors = [
 ];
 
 // Interactive concentric circle for a single year
+// Uses sqrt scale so small segments remain visible
 const GrowthCircle = ({ year, values, activeSegment, onSegmentClick }: { 
   year: string; 
   values: number[]; 
   activeSegment: number | null;
   onSegmentClick: (idx: number | null) => void;
 }) => {
-  const maxR = 140;
-  const cx = 160;
-  const cy = 160;
+  const maxR = 200;
+  const cx = 220;
+  const cy = 220;
 
-  const circles = [
-    { r: Math.max((values[3] / 100) * maxR * 2, 16), color: segmentColors[3], val: values[3], idx: 3 },
-    { r: Math.max((values[2] / 100) * maxR * 2, 16), color: segmentColors[2], val: values[2], idx: 2 },
-    { r: Math.max((values[1] / 100) * maxR * 2, 16), color: segmentColors[1], val: values[1], idx: 1 },
-    { r: Math.max((values[0] / 100) * maxR * 2, 12), color: segmentColors[0], val: values[0], idx: 0 },
-  ].sort((a, b) => b.r - a.r);
+  // sqrt scale: maps value range to radius range with minimum floor
+  const maxVal = Math.max(...values);
+  const circles = values.map((val, idx) => ({
+    r: Math.max(Math.sqrt(val / maxVal) * maxR, 28),
+    color: segmentColors[idx],
+    val,
+    idx,
+  })).sort((a, b) => b.r - a.r);
 
   return (
     <div className="flex flex-col items-center">
       <p className="text-2xl font-light text-foreground mb-6">{year}</p>
-      <svg viewBox="0 0 320 320" className="w-full max-w-[280px]">
+      <svg viewBox="0 0 440 440" className="w-full">
         {circles.map((c, i) => {
           const isActive = activeSegment === c.idx;
           const isOther = activeSegment !== null && activeSegment !== c.idx;
@@ -424,20 +427,20 @@ const GrowthCircle = ({ year, values, activeSegment, onSegmentClick }: {
               <motion.circle
                 cx={cx}
                 cy={cy}
-                r={c.r / 2}
+                r={c.r}
                 fill={c.color}
                 stroke={isActive ? "hsl(var(--primary))" : "transparent"}
-                strokeWidth={isActive ? 2 : 0}
+                strokeWidth={isActive ? 2.5 : 0}
                 className="cursor-pointer"
                 style={{ transformOrigin: `${cx}px ${cy}px` }}
                 initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: isOther ? 0.35 : 1 }}
+                animate={{ scale: 1, opacity: isOther ? 0.3 : 1 }}
                 transition={{ delay: 0.2 + i * 0.12, duration: 0.6, ease: "easeOut" }}
                 onClick={(e) => {
                   e.stopPropagation();
                   onSegmentClick(isActive ? null : c.idx);
                 }}
-                whileHover={{ scale: 1.04 }}
+                whileHover={{ scale: 1.03 }}
               />
             </motion.g>
           );
