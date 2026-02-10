@@ -107,6 +107,12 @@ const ProgressNavbar = () => {
           {sections.map((section, index) => {
             const isActive = index === activeSection;
             const isPast = index < activeSection;
+            const isFirst = index === 0;
+            const isLast = index === sections.length - 1;
+            const isEndpoint = isFirst || isLast;
+            const isPrev = index === activeSection - 1;
+            const isNext = index === activeSection + 1;
+            const isAdjacent = isPrev || isNext;
             
             return (
               <button
@@ -114,29 +120,33 @@ const ProgressNavbar = () => {
                 onClick={() => scrollToSection(section.id, index)}
                 className="group flex items-center gap-3 relative"
               >
-                {/* Label - appears on hover */}
+                {/* Label - active always visible, adjacent subtly visible, others on hover */}
                 <span 
                   className={`
                     text-[10px] tracking-wide uppercase transition-all duration-300 whitespace-nowrap
                     absolute right-full mr-3
                     ${isActive 
                       ? "opacity-50 text-foreground" 
-                      : "opacity-0 group-hover:opacity-40 text-muted-foreground"
+                      : isAdjacent
+                        ? "opacity-25 text-muted-foreground"
+                        : "opacity-0 group-hover:opacity-40 text-muted-foreground"
                     }
                   `}
                 >
                   {section.label}
                 </span>
                 
-                {/* Dot indicator - blends with bar */}
+                {/* Dot indicator */}
                 <div 
                   className={`
-                    dot-indicator w-2 h-2 rounded-full transition-all duration-500 relative z-10
-                    ${isActive 
-                      ? "bg-primary scale-125" 
-                      : isPast 
-                        ? "bg-primary/50" 
-                        : "bg-border/30 group-hover:bg-muted-foreground/30"
+                    dot-indicator rounded-full transition-all duration-500 relative z-10
+                    ${isEndpoint
+                      ? "w-3 h-3 bg-foreground"
+                      : isActive 
+                        ? "w-2 h-2 bg-primary scale-125" 
+                        : isPast 
+                          ? "w-2 h-2 bg-primary/50" 
+                          : "w-2 h-2 bg-border/30 group-hover:bg-muted-foreground/30"
                     }
                   `}
                 />
