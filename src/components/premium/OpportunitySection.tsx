@@ -11,46 +11,75 @@ const marketLayers = [
     label: "TAM", 
     title: "Global AI-powered supply-chain market",
     value: "$50B+",
-    description: "Revenue potential"
+    description: "Revenue potential",
+    opportunityPoints: [
+      {
+        category: "Global AI demand",
+        points: [
+          "Enterprise AI spending projected to exceed $500B by 2028",
+          "Supply chain digitization is the largest untapped vertical",
+          "Every Fortune 500 company is actively investing in AI-driven operations"
+        ]
+      },
+      {
+        category: "Market dynamics",
+        points: [
+          "Legacy systems create $50B+ replacement opportunity",
+          "Cross-border complexity drives demand for intelligent orchestration"
+        ]
+      }
+    ]
   },
   { 
     id: "sam", 
     label: "SAM", 
     title: "Initial target market (EU)",
     value: "$7B-20B",
-    description: "Revenue potential"
+    description: "Revenue potential",
+    opportunityPoints: [
+      {
+        category: "European advantage",
+        points: [
+          "EU regulatory environment (CSRD, CBAM) demands supply chain transparency",
+          "Strong manufacturing base with complex multi-tier supplier networks",
+          "Underserved by US-centric AI platforms — localization gap"
+        ]
+      },
+      {
+        category: "Adoption readiness",
+        points: [
+          "70% of EU enterprises plan AI integration in supply chain by 2027"
+        ]
+      }
+    ]
   },
   { 
     id: "som", 
     label: "SOM", 
     title: "Local market (DACH)",
     value: "$25-60M",
-    description: "5 Year revenue potential: ARR"
-  }
-];
-
-const opportunityPoints = [
-  {
-    category: "AI",
-    color: "primary",
-    points: [
-      "Supply chain spend on AI is growing with a ~35% CAGR increase",
-      "Shifting from pilots to core infrastructure in various industries",
-      "Operational budgets reallocating from legacy tools into AI platforms"
-    ]
-  },
-  {
-    category: "Focused entry",
-    color: "primary",
-    points: [
-      "DACH combines industrial density, logistics leadership, and early AI adoption"
-    ]
-  },
-  {
-    category: "Global scalability",
-    color: "primary",
-    points: [
-      "Asset-light SaaS model enables global expansion without proportional cost growth"
+    description: "5 Year revenue potential: ARR",
+    opportunityPoints: [
+      {
+        category: "Focused entry",
+        points: [
+          "DACH combines industrial density, logistics leadership, and early AI adoption"
+        ]
+      },
+      {
+        category: "AI momentum",
+        points: [
+          "Supply chain spend on AI is growing with a ~35% CAGR increase",
+          "Shifting from pilots to core infrastructure in various industries",
+          "Operational budgets reallocating from legacy tools into AI platforms"
+        ]
+      },
+      {
+        category: "Global scalability",
+        points: [
+          "Asset-light SaaS model enables global expansion without proportional cost growth"
+        ]
+      }
     ]
   }
 ];
@@ -638,27 +667,42 @@ const OpportunitySection = () => {
               </AnimatePresence>
             </div>
             
-            {/* Opportunity points */}
+            {/* Opportunity points - per segment */}
             <div className="space-y-8">
-              <h3 className="text-xl text-primary/80 mb-6">Opportunity:</h3>
-              {opportunityPoints.map((section, i) => (
-                <motion.div
-                  key={section.category}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={marketVisible ? { opacity: 1, x: 0 } : {}}
-                  transition={{ delay: 0.3 + i * 0.15 }}
-                >
-                  <h4 className="text-primary text-sm mb-3">{section.category}:</h4>
-                  <ul className="space-y-2">
-                    {section.points.map((point, j) => (
-                      <li key={j} className="text-sm text-muted-foreground/60 flex items-start gap-3">
-                        <span className="text-muted-foreground/40 mt-1">-</span>
-                        {point}
-                      </li>
+              <AnimatePresence mode="wait">
+                {activeMarketData && (
+                  <motion.div
+                    key={activeMarketData.id}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <h3 className="text-xl text-primary/80 mb-6">
+                      {activeMarketData.label} Opportunity:
+                    </h3>
+                    {activeMarketData.opportunityPoints.map((section: { category: string; points: string[] }, i: number) => (
+                      <motion.div
+                        key={section.category}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 + i * 0.1 }}
+                        className="mb-6"
+                      >
+                        <h4 className="text-primary text-sm mb-3">{section.category}:</h4>
+                        <ul className="space-y-2">
+                          {section.points.map((point: string, j: number) => (
+                            <li key={j} className="text-sm text-muted-foreground/60 flex items-start gap-3">
+                              <span className="text-muted-foreground/40 mt-1">-</span>
+                              {point}
+                            </li>
+                          ))}
+                        </ul>
+                      </motion.div>
                     ))}
-                  </ul>
-                </motion.div>
-              ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </div>
