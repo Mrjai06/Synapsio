@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { 
   Store, Cog, MessageSquare, 
   ArrowRight, DollarSign, Clock, AlertTriangle,
-  TrendingDown, Zap, Users, Circle, Play, CheckCircle
+  TrendingDown, Zap, Users, Circle, Play, CheckCircle, Plus, X
 } from "lucide-react";
 import { AmbientGlow } from "./DepthSystem";
 import { motion, AnimatePresence, useAnimationControls } from "framer-motion";
@@ -276,21 +276,16 @@ const FeaturesSection = () => {
                         )}
                       </AnimatePresence>
                       
-                      <AnimatePresence>
-                        {isActive && (
-                          <motion.div 
-                            initial={{ opacity: 1, scale: 1 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0 }}
-                            className="ml-auto shrink-0"
-                          >
-                            <svg className="w-5 h-5 text-accent/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                      {/* Plus / Close indicator */}
+                      {!isInactive && (
+                        <div className="ml-auto shrink-0">
+                          {isActive ? (
+                            <X className="w-4 h-4 text-accent/60" />
+                          ) : (
+                            <Plus className="w-4 h-4 text-muted-foreground/40" />
+                          )}
+                        </div>
+                      )}
                     </motion.div>
                     
                     <AnimatePresence mode="wait">
