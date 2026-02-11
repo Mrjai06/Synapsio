@@ -84,7 +84,7 @@ const ProgressNavbar = () => {
       <div className="relative" ref={containerRef}>
         {/* Background track - anchored to dot column center (right-[5.5px] = center of 12px dot wrapper) */}
         <div 
-          className="absolute right-[5px] w-[2px] rounded-full bg-border/20"
+          className="absolute right-[3px] w-[6px] rounded-full bg-border/20"
           style={{ 
             top: dotPositions[0] || 0,
             height: dotPositions.length > 0 
@@ -95,7 +95,7 @@ const ProgressNavbar = () => {
         
         {/* Filled progress */}
         <div 
-          className="absolute right-[5px] w-[2px] rounded-full bg-primary/50 transition-all duration-500 ease-out"
+          className="absolute right-[3px] w-[6px] rounded-full bg-primary/50 transition-all duration-500 ease-out"
           style={{ 
             top: dotPositions[0] || 0,
             height: Math.max(0, getProgressHeight() - (dotPositions[0] || 0))
@@ -141,7 +141,7 @@ const ProgressNavbar = () => {
                     className={`
                       dot-indicator rounded-full transition-all duration-500 relative z-10
                       ${isEndpoint
-                        ? "w-3 h-3 bg-foreground"
+                        ? "w-3 h-3 bg-primary"
                         : isActive 
                           ? "w-2.5 h-2.5 bg-primary" 
                           : isPast 
