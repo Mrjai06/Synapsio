@@ -433,9 +433,9 @@ const GrowthPieChart = ({ year, values, compareValues, activeSegment, onSegmentC
             return (
             <motion.g key={slice.idx}>
               {/* Invisible larger hit area for small slices */}
-              {slice.val / total < 0.08 && (
+              {slice.val / total < 0.12 && (
                 <motion.path
-                  d={describeArc(cx + dx, cy + dy, r + 20, slice.startAngle - 0.08, slice.endAngle + 0.08)}
+                  d={describeArc(cx + dx, cy + dy, r + 30, slice.startAngle - 0.15, slice.endAngle + 0.15)}
                   fill="transparent"
                   className="cursor-pointer"
                   onClick={(e) => {
@@ -447,8 +447,7 @@ const GrowthPieChart = ({ year, values, compareValues, activeSegment, onSegmentC
               <motion.path
                 d={describeArc(cx + dx, cy + dy, isActive ? r + 6 : r, slice.startAngle, slice.endAngle)}
                 fill={slice.color}
-                stroke="hsl(var(--background))"
-                strokeWidth={3}
+                stroke="none"
                 className="cursor-pointer"
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ 
