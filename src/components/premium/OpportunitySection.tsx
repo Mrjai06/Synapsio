@@ -447,7 +447,8 @@ const GrowthPieChart = ({ year, values, compareValues, activeSegment, onSegmentC
               <motion.path
                 d={describeArc(cx + dx, cy + dy, isActive ? r + 6 : r, slice.startAngle, slice.endAngle)}
                 fill={slice.color}
-                stroke="none"
+                stroke="hsl(var(--background))"
+                strokeWidth={2}
                 className="cursor-pointer"
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ 
@@ -462,6 +463,28 @@ const GrowthPieChart = ({ year, values, compareValues, activeSegment, onSegmentC
                 }}
                 whileHover={{ scale: 1.05 }}
               />
+              {/* White dot indicator on outer edge for small slices */}
+              {slice.val / total < 0.12 && (() => {
+                const dotMid = slice.startAngle + (slice.endAngle - slice.startAngle) / 2;
+                const dotR = (isActive ? r + 6 : r) + 8;
+                const dotX = cx + dx + dotR * Math.cos(dotMid);
+                const dotY = cy + dy + dotR * Math.sin(dotMid);
+                return (
+                  <motion.circle
+                    cx={dotX}
+                    cy={dotY}
+                    r={4}
+                    fill="hsl(var(--foreground))"
+                    className="cursor-pointer"
+                    animate={{ opacity: isOther ? 0.15 : 0.8 }}
+                    whileHover={{ scale: 1.4 }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSegmentClick(isActive ? null : slice.idx);
+                    }}
+                  />
+                );
+              })()}
               {/* Outer stroke highlight for small or active slices */}
               {(slice.val / total < 0.05 || isActive) && (
                 <motion.path
