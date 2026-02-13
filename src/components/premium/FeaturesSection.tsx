@@ -157,6 +157,10 @@ const FeaturesSection = () => {
 
   return (
     <section data-features-section className="relative py-32 md:py-48 overflow-hidden">
+      {/* Smooth edge transitions */}
+      <div className="absolute top-0 left-0 right-0 h-48 pointer-events-none bg-gradient-to-b from-background via-background/50 to-transparent z-[1]" />
+      <div className="absolute bottom-0 left-0 right-0 h-48 pointer-events-none bg-gradient-to-t from-background via-background/50 to-transparent z-[1]" />
+      
       <AmbientGlow color="primary" size="xl" intensity="medium" position="center" />
       <AmbientGlow color="accent" size="md" intensity="subtle" position="right" className="top-1/3" />
 
