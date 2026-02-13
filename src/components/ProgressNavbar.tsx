@@ -7,7 +7,7 @@ const ProgressNavbar = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   
   const sections = [
-    { id: "preface", label: "Preface" },
+    { id: "preface", label: "Intro" },
     { id: "problem", label: "Challenge" },
     { id: "solution", label: "Solution" },
     { id: "product", label: "Product" },
@@ -80,9 +80,11 @@ const ProgressNavbar = () => {
 
   return (
     <nav className="fixed right-6 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col items-center gap-4">
-      {/* Brand mark - centered above nav */}
-      <a href="#hero" className="opacity-40 hover:opacity-70 transition-opacity duration-500 flex justify-center w-full mb-1">
-        <img src={synapsioLogo} alt="Synapsio" className="h-5 w-auto" />
+      {/* Brand mark - aligned with dot column */}
+      <a href="#hero" className="opacity-40 hover:opacity-70 transition-opacity duration-500 flex justify-end w-full mb-2">
+        <div className="w-3 flex justify-center flex-shrink-0">
+          <img src={synapsioLogo} alt="Synapsio" className="h-4 w-auto" />
+        </div>
       </a>
       <div className="relative" ref={containerRef}>
         {/* Background track - anchored to dot column center (right-[5.5px] = center of 12px dot wrapper) */}

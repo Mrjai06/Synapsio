@@ -25,7 +25,7 @@ const PrefaceSection = () => {
           <p 
             className={`text-[10px] tracking-[0.4em] uppercase text-primary/50 mb-10 transition-all duration-1000 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
           >
-            Preface
+            Intro
           </p>
           
           <p 
