@@ -3,20 +3,22 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FloatingSurface, AmbientGlow } from "./DepthSystem";
 import { TestimonialCarousel } from "@/components/ui/profile-card-testimonial-carousel";
+import jakobImg from "@/assets/team/jakob.png";
+import luisImg from "@/assets/team/luis.png";
 
 const team = [
   {
     name: "Jakob Ibrahim",
     title: "CEO & Co-founder",
     description: "• Student at TU Berlin - BSci in computer science\n• Sales and marketing advisor",
-    imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80",
+    imageUrl: jakobImg,
     linkedinUrl: "#"
   },
   {
     name: "Luis Boy",
     title: "COO & Co-founder",
     description: "• E-Commerce operations coordinator at Götze Gold",
-    imageUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80",
+    imageUrl: luisImg,
     linkedinUrl: "#"
   },
   {
