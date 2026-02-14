@@ -61,7 +61,7 @@ const VisionSection = () => {
               <Button 
                 size="lg" 
                 variant="ghost"
-                className="text-muted-foreground/60 hover:text-foreground hover:bg-card/20 rounded-full px-10 py-7 text-sm tracking-wide font-normal border border-border/20 hover:border-border/40 transition-all duration-1000 backdrop-blur-sm"
+                className="text-foreground/90 hover:text-foreground hover:bg-card/50 rounded-full px-10 py-7 text-sm tracking-wide font-normal border border-border/60 hover:border-border/80 transition-all duration-1000 backdrop-blur-md bg-card/20"
               >
                 Get in Touch
               </Button>
