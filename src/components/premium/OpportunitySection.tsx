@@ -461,7 +461,7 @@ const StackedAreaChart = ({ whyNowVisible }: { whyNowVisible: boolean }) => {
                   d={buildAreaPath(key)}
                   fill={seg.color}
                   stroke="hsl(var(--background))"
-                  strokeWidth="1.5"
+                  strokeWidth="3"
                   paintOrder="stroke fill"
                   className="cursor-pointer"
                   filter={seg.isHighlight && !isOther ? "url(#areaGlow)" : undefined}
