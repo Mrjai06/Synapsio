@@ -76,6 +76,11 @@ const Index = () => {
         </section>
       </main>
       
+      {/* Disclaimer */}
+      <div className="w-full text-center px-6 py-6 text-xs text-muted-foreground/50 italic">
+        This Website is a Demonstration and Representation of our Idea and is by no means a finished product
+      </div>
+
       {/* Footer */}
       <Footer />
     </div>
