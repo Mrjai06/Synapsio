@@ -4,6 +4,7 @@ import synapsioLogo from "@/assets/synapsio-logo.png";
 const ProgressNavbar = () => {
   const [activeSection, setActiveSection] = useState(0);
   const [dotPositions, setDotPositions] = useState<number[]>([]);
+  const [trackX, setTrackX] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   
   const sections = [
@@ -22,16 +23,25 @@ const ProgressNavbar = () => {
       if (containerRef.current) {
         const buttons = containerRef.current.querySelectorAll('button');
         const positions: number[] = [];
+        let dotCenterX: number | null = null;
+        const containerRect = containerRef.current!.getBoundingClientRect();
         buttons.forEach((btn) => {
           const dot = btn.querySelector('.dot-indicator');
           if (dot) {
             const rect = dot.getBoundingClientRect();
-            const containerRect = containerRef.current!.getBoundingClientRect();
-            // Get center of dot relative to container
+            // Get center of dot relative to container (vertical)
             positions.push(rect.top - containerRect.top + rect.height / 2);
+            // Get center of dot relative to container (horizontal) — same for all dots
+            if (dotCenterX === null) {
+              dotCenterX = rect.left - containerRect.left + rect.width / 2;
+            }
           }
         });
         setDotPositions(positions);
+        if (dotCenterX !== null) {
+          // Convert to right-offset: containerWidth - centerX - half track width (3px)
+          setTrackX(containerRect.width - dotCenterX - 3);
+        }
       }
     };
 
@@ -85,25 +95,31 @@ const ProgressNavbar = () => {
         <img src={synapsioLogo} alt="Synapsio" className="h-auto w-6 mr-[-6px]" />
       </a>
       <div className="relative" ref={containerRef}>
-        {/* Background track - anchored to dot column center (right-[5.5px] = center of 12px dot wrapper) */}
-        <div 
-          className="absolute right-[3px] w-[6px] rounded-full bg-border/20"
-          style={{ 
-            top: dotPositions[0] || 0,
-            height: dotPositions.length > 0 
-              ? (dotPositions[dotPositions.length - 1] - dotPositions[0]) 
-              : '100%'
-          }}
-        />
+        {/* Background track - centered exactly on the dot column */}
+        {trackX !== null && (
+          <div 
+            className="absolute w-[6px] rounded-full bg-border/20"
+            style={{ 
+              right: trackX,
+              top: dotPositions[0] || 0,
+              height: dotPositions.length > 0 
+                ? (dotPositions[dotPositions.length - 1] - dotPositions[0]) 
+                : '100%'
+            }}
+          />
+        )}
         
         {/* Filled progress */}
-        <div 
-          className="absolute right-[3px] w-[6px] rounded-full bg-primary/50 transition-all duration-500 ease-out"
-          style={{ 
-            top: dotPositions[0] || 0,
-            height: Math.max(0, getProgressHeight() - (dotPositions[0] || 0))
-          }}
-        />
+        {trackX !== null && (
+          <div 
+            className="absolute w-[6px] rounded-full bg-primary/50 transition-all duration-500 ease-out"
+            style={{ 
+              right: trackX,
+              top: dotPositions[0] || 0,
+              height: Math.max(0, getProgressHeight() - (dotPositions[0] || 0))
+            }}
+          />
+        )}
         
         {/* Section indicators */}
         <div className="relative flex flex-col gap-6">
