@@ -22,7 +22,13 @@ const HeroSection = () => {
   }, []);
   const contentOpacity = 1 - scrollProgress * 1.5;
   const contentTranslate = scrollProgress * 40;
-  return <section ref={sectionRef} className="relative min-h-[110vh] flex items-center justify-center overflow-hidden bg-background" style={{ zIndex: 2 }}>
+  return <section ref={sectionRef} className="relative min-h-[110vh] flex items-center justify-center overflow-hidden" style={{ zIndex: 2 }}>
+      {/* Deep background fill - only behind canvas, fades at bottom */}
+      <div className="absolute inset-0 bg-background" style={{ 
+        maskImage: "linear-gradient(to bottom, black 0%, black 60%, transparent 100%)",
+        WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 60%, transparent 100%)"
+      }} />
+      
       {/* Neural synapse animated background */}
       <CosmicSynapseCanvas className="absolute inset-0 opacity-60" />
       
@@ -102,9 +108,9 @@ const HeroSection = () => {
         </div>
       </div>
       
-      {/* Bottom transition */}
-      <div className="absolute bottom-0 left-0 right-0 h-[50vh] pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-transparent" />
+      {/* Bottom transition - fully transparent at the edge */}
+      <div className="absolute bottom-0 left-0 right-0 h-[70vh] pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-t from-transparent via-transparent to-transparent" />
       </div>
     </section>;
 };
