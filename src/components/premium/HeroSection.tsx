@@ -50,8 +50,8 @@ const HeroSection = () => {
           animationDelay: "0.2s",
           animationDuration: "1.2s"
         }}>
-          <img src={synapsioLogo} alt="Synapsio" className="h-20 w-auto opacity-60" />
-          <span className="tracking-[0.5em] uppercase text-muted-foreground/40 font-light text-6xl font-mono">
+          <img src={synapsioLogo} alt="Synapsio" className="h-20 w-auto opacity-90" />
+          <span className="tracking-[0.5em] uppercase text-foreground/80 font-light text-6xl font-mono">
             Synapsio
           </span>
         </div>
