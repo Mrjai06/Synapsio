@@ -41,29 +41,23 @@ const HeroSection = () => {
         background: `radial-gradient(ellipse at 50% 40%, transparent 0%, hsl(var(--background) / ${0.2 + scrollProgress * 0.5}) 70%)`
       }} />
 
-      {/* TOP: Branding */}
-      <div className="absolute top-0 left-0 right-0 z-10 px-8 lg:px-20 xl:px-28 pt-28 transition-all duration-700" style={{
+      {/* TOP: Branding + Headline centered */}
+      <div className="absolute top-0 left-0 right-0 z-10 px-4 lg:px-8 pt-24 flex flex-col items-center text-center gap-4 transition-all duration-700" style={{
         opacity: Math.max(0, contentOpacity),
         transform: `translateY(${contentTranslate}px)`
       }}>
-        <div className="animate-fade-in flex items-center gap-5" style={{
+        <div className="animate-fade-in flex items-center gap-4" style={{
           animationDelay: "0.2s",
           animationDuration: "1.2s"
         }}>
-          <img src={synapsioLogo} alt="Synapsio" className="h-16 w-auto opacity-60" />
-          <span className="tracking-[0.5em] uppercase text-muted-foreground/40 font-light text-5xl font-mono">
+          <img src={synapsioLogo} alt="Synapsio" className="h-12 w-auto opacity-60" />
+          <span className="tracking-[0.5em] uppercase text-muted-foreground/40 font-light text-4xl font-mono">
             Synapsio
           </span>
         </div>
-      </div>
 
-      {/* MIDDLE: Headline — full viewport width, stretched */}
-      <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 z-10 px-3 lg:px-6 transition-all duration-700" style={{
-        opacity: Math.max(0, contentOpacity),
-        transform: `translateY(calc(-50% + ${contentTranslate}px))`
-      }}>
         <h1 className="w-full animate-fade-in leading-[0.85] text-center" style={{
-          fontSize: "clamp(4rem, 13.5vw, 18rem)",
+          fontSize: "clamp(3.5rem, 12vw, 16rem)",
           letterSpacing: "-0.04em",
           animationDelay: "0.4s",
           animationDuration: "1.4s"
@@ -73,17 +67,17 @@ const HeroSection = () => {
         </h1>
       </div>
 
-      {/* BOTTOM: Subtitle left + CTA right */}
-      <div className="absolute bottom-0 left-0 right-0 z-10 px-8 lg:px-20 xl:px-28 pb-24 flex flex-col sm:flex-row items-center justify-between gap-8 transition-all duration-700" style={{
+      {/* BOTTOM: Subtitle + CTA centered */}
+      <div className="absolute bottom-0 left-0 right-0 z-10 px-8 pb-20 flex flex-col items-center gap-6 transition-all duration-700" style={{
         opacity: Math.max(0, contentOpacity),
         transform: `translateY(${contentTranslate}px)`
       }}>
-        <p className="text-lg md:text-xl max-w-md font-light leading-[1.7] animate-fade-in text-primary/70" style={{
+        <p className="text-lg md:text-xl max-w-xl font-light leading-[1.7] animate-fade-in text-primary/70 text-center" style={{
           animationDelay: "0.6s",
           animationDuration: "1.4s"
         }}>A fully automated AI-based SCM-solution used for the management and creation of supply-chains</p>
 
-        <div className="animate-fade-in flex-shrink-0" style={{
+        <div className="animate-fade-in" style={{
           animationDelay: "0.8s",
           animationDuration: "1.4s"
         }}>
