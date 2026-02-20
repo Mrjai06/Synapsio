@@ -42,7 +42,7 @@ const HeroSection = () => {
       }} />
 
       {/* CENTER: Branding centered on sphere */}
-      <div className="absolute inset-0 z-10 px-4 lg:px-8 flex flex-col items-center justify-center text-center transition-all duration-700" style={{
+      <div className="absolute inset-0 z-10 px-4 lg:px-8 flex flex-col items-center justify-center text-center -mt-16 transition-all duration-700" style={{
         opacity: Math.max(0, contentOpacity),
         transform: `translateY(${contentTranslate}px)`
       }}>
