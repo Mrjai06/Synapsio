@@ -972,11 +972,13 @@ const OpportunitySection = () => {
                     content: (
                       <GlassPanel intensity="subtle" bordered className="rounded-xl p-6 md:p-8 relative">
                         {companyLogos[business.name] && (
-                          <img
-                            src={companyLogos[business.name]}
-                            alt={`${business.name} logo`}
-                            className="absolute top-4 right-4 w-8 h-8 object-contain rounded-md opacity-60"
-                          />
+                          <div className="absolute top-4 right-4 w-12 h-12 rounded-lg bg-background/80 border border-border/20 flex items-center justify-center p-1.5">
+                            <img
+                              src={companyLogos[business.name]}
+                              alt={`${business.name} logo`}
+                              className="w-full h-full object-contain"
+                            />
+                          </div>
                         )}
                         <div className="flex items-center gap-3 mb-6">
                           <span className="text-[10px] tracking-[0.2em] uppercase text-muted-foreground/40 px-3 py-1 rounded-full border border-border/20 bg-secondary/20">
