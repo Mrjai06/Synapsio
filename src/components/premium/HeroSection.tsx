@@ -41,8 +41,8 @@ const HeroSection = () => {
         background: `radial-gradient(ellipse at 50% 40%, transparent 0%, hsl(var(--background) / ${0.2 + scrollProgress * 0.5}) 70%)`
       }} />
 
-      {/* TOP: Branding + Headline centered */}
-      <div className="absolute inset-0 z-10 px-4 lg:px-8 flex flex-col items-center justify-center text-center gap-6 transition-all duration-700" style={{
+      {/* CENTER: Branding centered on sphere */}
+      <div className="absolute inset-0 z-10 px-4 lg:px-8 flex flex-col items-center justify-center text-center transition-all duration-700" style={{
         opacity: Math.max(0, contentOpacity),
         transform: `translateY(${contentTranslate}px)`
       }}>
@@ -55,7 +55,13 @@ const HeroSection = () => {
             Synapsio
           </span>
         </div>
+      </div>
 
+      {/* TOP: Headline at previous position */}
+      <div className="absolute top-0 left-0 right-0 z-10 px-4 lg:px-8 pt-36 flex flex-col items-center text-center transition-all duration-700" style={{
+        opacity: Math.max(0, contentOpacity),
+        transform: `translateY(${contentTranslate}px)`
+      }}>
         <h1 className="w-full animate-fade-in leading-[0.85] text-center whitespace-nowrap" style={{
           fontSize: "clamp(1rem, 5.2vw, 8rem)",
           letterSpacing: "-0.04em",
