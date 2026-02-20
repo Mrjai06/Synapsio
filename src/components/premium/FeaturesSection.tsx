@@ -1296,7 +1296,7 @@ const CommunicationVisualization = ({ state }: { state: SystemState }) => {
         
         <rect x={companyA.x - 40} y={companyA.y - 55} width="80" height="50" rx="8" fill="hsl(var(--primary))" opacity="0.15" />
         <text x={companyA.x} y={companyA.y - 35} textAnchor="middle" className="fill-primary text-[10px] font-medium uppercase">
-          Your AI
+          Synapsio Instance 1
         </text>
         <motion.circle
           cx={companyA.x}
@@ -1343,7 +1343,7 @@ const CommunicationVisualization = ({ state }: { state: SystemState }) => {
         
         <rect x={companyB.x - 40} y={companyB.y - 55} width="80" height="50" rx="8" fill="hsl(var(--accent))" opacity="0.15" />
         <text x={companyB.x} y={companyB.y - 35} textAnchor="middle" className="fill-accent text-[10px] font-medium uppercase">
-          Their AI
+          Synapsio Instance 2
         </text>
         <motion.circle
           cx={companyB.x}
