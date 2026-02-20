@@ -27,13 +27,13 @@ const AnimatedTabs = ({
 
   return (
     <div className={cn("w-full", className)}>
-      <div className="flex flex-wrap gap-1 rounded-lg bg-secondary/30 p-1 backdrop-blur-sm border border-border/20">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={cn(
-              "relative px-4 py-2 text-sm font-medium rounded-md outline-none transition-colors",
+        <div className="flex overflow-x-auto gap-1 rounded-lg bg-secondary/30 p-1 backdrop-blur-sm border border-border/20 scrollbar-none">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={cn(
+                "relative px-3 py-2 text-xs font-medium rounded-md outline-none transition-colors whitespace-nowrap flex-shrink-0",
               activeTab === tab.id
                 ? "text-primary-foreground"
                 : "text-muted-foreground/60 hover:text-muted-foreground"
