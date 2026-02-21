@@ -77,7 +77,7 @@ const Footer = () => {
                 </span>
               </div>
               <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                Intelligent orchestration for modern supply chains. Transforming complexity into clarity.
+                Connections you can rely on.
               </p>
               <p className="mt-6 text-xs text-muted-foreground/60">
                 © {new Date().getFullYear()} Synapsio. All rights reserved.
