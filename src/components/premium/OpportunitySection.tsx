@@ -321,10 +321,10 @@ const marketLandscapeSystems = [
 
 // Business Model Data
 const subscriptionTiers = [
-  { name: "Getting Started", description: "For small businesses starting out", icon: "🌱" },
-  { name: "Base", description: "For growing businesses with moderate volume", icon: "📦" },
-  { name: "Advanced", description: "For established businesses with high volume", icon: "🚀" },
-  { name: "Enterprise", description: "Tailored solutions for large-scale operations", icon: "🏢", highlighted: true },
+  { name: "Getting Started", description: "For small businesses starting out", icon: Zap },
+  { name: "Base", description: "For growing businesses with moderate volume", icon: Layers },
+  { name: "Advanced", description: "For established businesses with high volume", icon: Building2 },
+  { name: "Enterprise", description: "Tailored solutions for large-scale operations", icon: Building2, highlighted: true },
 ];
 
 const volumeBands = [
@@ -1036,7 +1036,7 @@ const OpportunitySection = () => {
                           : "border-border/15 bg-card/20"
                       }`}
                     >
-                      <span className="text-xl">{tier.icon}</span>
+                      <tier.icon className="w-5 h-5 text-primary/70" />
                       <div>
                         <p className={`text-sm font-medium ${tier.highlighted ? "text-foreground" : "text-foreground/80"}`}>{tier.name}</p>
                         <p className="text-xs text-muted-foreground/50">{tier.description}</p>
