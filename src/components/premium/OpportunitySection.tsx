@@ -970,7 +970,7 @@ const OpportunitySection = () => {
                     id: `${system.id}-${business.name.toLowerCase()}`,
                     label: business.name,
                     content: (
-                      <GlassPanel intensity="subtle" bordered className="rounded-xl p-6 md:p-8 relative">
+                      <GlassPanel intensity="subtle" bordered className="rounded-xl p-8 md:p-12 relative min-h-[20rem]">
                         {companyLogos[business.name] && (
                           <div className="absolute top-4 right-4 w-12 h-12 rounded-lg bg-background/80 border border-border/20 flex items-center justify-center p-1.5">
                             <img
@@ -986,15 +986,15 @@ const OpportunitySection = () => {
                           </span>
                         </div>
                         
-                        <h4 className="text-xl font-medium text-primary mb-1">{business.name}</h4>
-                        <p className="text-xs text-muted-foreground/40 mb-6">{system.description}</p>
+                        <h4 className="text-2xl font-medium text-primary mb-2">{business.name}</h4>
+                        <p className="text-sm text-muted-foreground/40 mb-8">{system.description}</p>
                         
-                        <div className="grid md:grid-cols-2 gap-6">
+                        <div className="grid md:grid-cols-2 gap-8">
                           <div>
-                            <p className="text-xs uppercase tracking-wider text-muted-foreground/40 mb-3">Facts</p>
-                            <ul className="space-y-2">
+                            <p className="text-sm uppercase tracking-wider text-muted-foreground/40 mb-4">Facts</p>
+                            <ul className="space-y-3">
                               {business.facts.map((fact, i) => (
-                                <li key={i} className="text-xs text-muted-foreground/60 flex items-start gap-2">
+                                <li key={i} className="text-sm text-muted-foreground/60 flex items-start gap-2">
                                   <span className="text-primary/60 mt-0.5">•</span>
                                   {fact}
                                 </li>
@@ -1002,10 +1002,10 @@ const OpportunitySection = () => {
                             </ul>
                           </div>
                           <div>
-                            <p className="text-xs uppercase tracking-wider text-muted-foreground/40 mb-3">Arguments</p>
-                            <ul className="space-y-2">
+                            <p className="text-sm uppercase tracking-wider text-muted-foreground/40 mb-4">Arguments</p>
+                            <ul className="space-y-3">
                               {business.arguments.map((arg, i) => (
-                                <li key={i} className="text-xs text-muted-foreground/60 flex items-start gap-2">
+                                <li key={i} className="text-sm text-muted-foreground/60 flex items-start gap-2">
                                   <span className="text-destructive/60 mt-0.5">-</span>
                                   {arg}
                                 </li>
