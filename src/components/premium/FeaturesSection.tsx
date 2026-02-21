@@ -966,7 +966,7 @@ const OperationsVisualization = ({ state }: { state: SystemState }) => {
         rx="3"
         fill={state === "idle" ? "hsl(var(--foreground))" : state === "decision" ? "hsl(var(--accent))" : "hsl(var(--primary))"}
         animate={{
-          width: state === "idle" ? 80 : state === "decision" ? 220 : 430
+          width: state === "idle" ? 40 : state === "decision" ? 220 : 430
         }}
         transition={{ duration: 0.8, ease: "easeOut" }}
       />
@@ -1035,7 +1035,7 @@ const OperationsVisualization = ({ state }: { state: SystemState }) => {
           fill={state === "idle" ? "hsl(var(--foreground))" : state === "decision" ? "hsl(var(--accent))" : "hsl(var(--primary))"}
           filter="url(#ops-glow)"
           animate={{
-            cx: state === "idle" ? [60, 140] : state === "decision" ? [140, 280] : [280, 490],
+            cx: state === "idle" ? [60, 100] : state === "decision" ? [140, 280] : [280, 490],
             opacity: [0, 1, 1, 0],
           }}
           transition={{
