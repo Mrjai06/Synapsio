@@ -49,7 +49,6 @@ const features = [
       decision: "When to replenish, how much, and which route",
       constraint: "Optimize service levels while minimizing working capital",
       removal: {
-        cost: "Reduces safety stock by 30% through precision forecasting",
         risk: "Prevents stockouts before they happen",
         time: "Continuous optimization vs. weekly planning cycles"
       },
