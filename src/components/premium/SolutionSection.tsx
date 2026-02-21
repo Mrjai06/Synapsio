@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
-import { ChevronLeft, ChevronRight, Database, Brain, Zap, TrendingUp } from "lucide-react";
+import { ChevronLeft, ChevronRight, Database, Brain, Zap } from "lucide-react";
 import { AmbientGlow } from "./DepthSystem";
 import { Button } from "@/components/ui/button";
 
@@ -30,22 +30,6 @@ const slides = [
       steps: ["Data In", "AI Analysis", "Decision", "Action"]
     },
     icon: Brain,
-  },
-  {
-    id: "why",
-    label: "Why It Matters",
-    title: "From Reactive",
-    subtitle: "to Proactive",
-    description: "Reduces stockouts by 40%, cuts logistics costs by 25%, and transforms supply chain from a cost center into a competitive advantage.",
-    diagram: {
-      type: "impact",
-      metrics: [
-        { value: "-40%", label: "Stockouts" },
-        { value: "-25%", label: "Logistics Cost" },
-        { value: "+15%", label: "Margin" }
-      ]
-    },
-    icon: TrendingUp,
   },
 ];
 
@@ -100,7 +84,7 @@ const ConnectionDiagram = ({ elements, center }: { elements: string[]; center: s
 
       {/* Surrounding nodes - glass card style matching Problem section */}
       {elements.map((el, i) => {
-        const nodeIcons = [Database, Brain, Zap, TrendingUp];
+        const nodeIcons = [Database, Brain, Zap, Database];
         const Icon = nodeIcons[i % nodeIcons.length];
         return (
           <motion.div
@@ -150,32 +134,6 @@ const FlowDiagram = ({ steps }: { steps: string[] }) => (
               <ChevronRight className="w-4 h-4 text-primary/40" />
             </motion.div>
           )}
-        </motion.div>
-      ))}
-    </div>
-  </div>
-);
-
-// Impact metrics diagram
-const ImpactDiagram = ({ metrics }: { metrics: { value: string; label: string }[] }) => (
-  <div className="relative w-full h-64 flex items-center justify-center">
-    <div className="flex items-center gap-8 md:gap-12">
-      {metrics.map((metric, i) => (
-        <motion.div
-          key={metric.label}
-          className="text-center rounded-2xl bg-card/30 backdrop-blur-xl border border-border/20 px-8 py-6"
-          style={{ boxShadow: '0 0.5rem 1.5rem hsl(var(--background) / 0.6)' }}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 + i * 0.15 }}
-          whileHover={{ scale: 1.05, y: -4 }}
-        >
-          <div className="text-3xl md:text-4xl font-light text-primary mb-2">
-            {metric.value}
-          </div>
-          <div className="text-xs text-muted-foreground/60 uppercase tracking-wider">
-            {metric.label}
-          </div>
         </motion.div>
       ))}
     </div>
@@ -295,9 +253,6 @@ const SolutionSection = () => {
                 )}
                 {slide.diagram.type === "flow" && (
                   <FlowDiagram steps={slide.diagram.steps!} />
-                )}
-                {slide.diagram.type === "impact" && (
-                  <ImpactDiagram metrics={slide.diagram.metrics!} />
                 )}
               </motion.div>
             </AnimatePresence>
