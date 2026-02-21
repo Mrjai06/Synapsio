@@ -59,9 +59,9 @@ const comparisonData: { scenario: string; description: string; without: Comparis
     outcome: {
       title: "Outcome",
       points: [
-        "11% lower inventory exposure",
-        "0% unplanned production interruptions",
-        "18% faster response to network changes",
+        "Significantly lower inventory exposure",
+        "Near-zero unplanned production interruptions",
+        "Dramatically faster response to network changes",
         "Coordinated, real-time autonomous execution",
       ],
       sentiment: "positive",
