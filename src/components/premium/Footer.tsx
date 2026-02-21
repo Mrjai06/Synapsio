@@ -57,7 +57,7 @@ const Footer = () => {
           <div className="mb-8 h-px w-full bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         </AnimatedContainer>
 
-        <div className="flex flex-col gap-12 lg:flex-row lg:justify-between">
+        <div className="flex flex-col gap-12 lg:flex-row lg:justify-center lg:gap-24">
           {/* Brand Section */}
           <AnimatedContainer delay={0.1}>
             <div className="max-w-sm">
