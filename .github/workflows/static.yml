@@ -31,6 +31,8 @@ jobs:
         run: bun install
       - name: Build
         run: bun run build
+      - name: Copy index.html to 404.html for SPA routing
+        run: cp dist/index.html dist/404.html
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact
