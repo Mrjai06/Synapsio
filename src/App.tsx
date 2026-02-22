@@ -16,7 +16,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
+        <BrowserRouter basename="/Synapsio">
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/type-scale" element={<TypeScale />} />
