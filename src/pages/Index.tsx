@@ -66,7 +66,7 @@ const Index = () => {
       </main>
       
       {/* Disclaimer */}
-      <div className="w-full text-center px-6 py-6 text-xs text-muted-foreground/50 italic">
+      <div className="w-full text-center px-6 py-6 pb-20 lg:pb-6 text-xs text-muted-foreground/50 italic">
         This website is a demonstration and representation of our idea and is by no means a finished product
       </div>
 

@@ -184,7 +184,7 @@ const FeaturesSection = () => {
         {/* Feature Cards - Default 3-column, expands on click */}
         <div className="relative mb-12" ref={cardsRef}>
           <motion.div 
-            className="flex gap-4 items-stretch"
+            className="flex flex-col md:flex-row gap-4 items-stretch"
             layout
             transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
           >
@@ -314,7 +314,7 @@ const FeaturesSection = () => {
                         className="overflow-hidden"
                       >
                         <div className="px-5 pb-5">
-                          <div className="grid md:grid-cols-[1fr_1fr_1fr] gap-6 border-t border-accent/20 pt-4">
+                          <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr] gap-6 border-t border-accent/20 pt-4">
                             {/* Left: Headline & Details */}
                             <div className="space-y-4">
                               <p className="text-base text-foreground/90 leading-relaxed font-light">

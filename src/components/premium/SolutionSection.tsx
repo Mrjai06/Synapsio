@@ -48,7 +48,7 @@ const ConnectionDiagram = ({ elements, center }: { elements: string[]; center: s
   });
 
   return (
-    <div className="relative mx-auto" style={{ width: 420, height: 360 }}>
+    <div className="relative mx-auto w-full max-w-[420px] aspect-[420/360]">
       {/* Connection lines */}
       <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 420 360" style={{ zIndex: 0 }}>
         {positions.map((pos, i) => (
