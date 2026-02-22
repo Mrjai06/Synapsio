@@ -46,12 +46,12 @@ const HeroSection = () => {
         opacity: Math.max(0, contentOpacity),
         transform: `translateY(${contentTranslate}px)`
       }}>
-        <div className="animate-fade-in flex items-center gap-5" style={{
+        <div className="animate-fade-in flex items-center gap-3 md:gap-5" style={{
           animationDelay: "0.2s",
           animationDuration: "1.2s"
         }}>
-          <img src={synapsioLogo} alt="Synapsio" className="h-20 w-auto opacity-90" />
-          <span className="tracking-[0.5em] uppercase text-foreground/80 font-light text-6xl font-mono">
+          <img src={synapsioLogo} alt="Synapsio" className="h-10 md:h-20 w-auto opacity-90" />
+          <span className="tracking-[0.2em] md:tracking-[0.5em] uppercase text-foreground/80 font-light text-2xl md:text-6xl font-mono">
             Synapsio
           </span>
         </div>
@@ -62,8 +62,8 @@ const HeroSection = () => {
         opacity: Math.max(0, contentOpacity),
         transform: `translateY(${contentTranslate}px)`
       }}>
-        <h1 className="w-full animate-fade-in leading-[0.85] text-center whitespace-nowrap" style={{
-          fontSize: "clamp(1rem, 5.2vw, 8rem)",
+        <h1 className="w-full animate-fade-in leading-[0.85] text-center" style={{
+          fontSize: "clamp(1.2rem, 5.2vw, 8rem)",
           letterSpacing: "-0.04em",
           animationDelay: "0.4s",
           animationDuration: "1.4s"

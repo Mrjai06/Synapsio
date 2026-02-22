@@ -265,8 +265,9 @@ const ProblemSection = () => {
                         type: "spring",
                         stiffness: 200,
                       }}
-                      onMouseEnter={() => setActiveNode(index)}
-                      onMouseLeave={() => setActiveNode(null)}
+                    onMouseEnter={() => setActiveNode(index)}
+                    onMouseLeave={() => setActiveNode(null)}
+                    onClick={() => setActiveNode(activeNode === index ? null : index)}
                       style={{ cursor: "pointer" }}
                     >
                       {/* Glass card background */}
