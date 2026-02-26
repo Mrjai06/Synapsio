@@ -11,10 +11,10 @@ import {
 } from "@/components/ui/tooltip";
 
 const nodeDescriptions: Record<string, string> = {
-  ERP: "Enterprise Resource Planning — the core system managing finances, inventory, and operations. Synapsio connects to your ERP to read and optimize data in real time.",
-  WMS: "Warehouse Management System — controls storage, picking, and shipping. Synapsio orchestrates WMS actions for smarter fulfillment.",
-  TMS: "Transport Management System — plans and tracks shipments. Synapsio optimizes routes and carrier selection automatically.",
-  Marketplace: "Synapsio's built-in sourcing hub — discover new suppliers and create resilient supply chains without leaving the platform.",
+  ERP: "Enterprise Resource Planning — Synapsio includes a built-in ERP module to manage finances, inventory, and operations all within one platform.",
+  WMS: "Warehouse Management System — integrated directly into Synapsio to handle storage, picking, and shipping without external tools.",
+  TMS: "Transport Management System — Synapsio's native TMS plans routes, selects carriers, and tracks shipments automatically.",
+  Marketplace: "Synapsio's built-in sourcing hub — discover new suppliers, compare offers, and build resilient supply chains without leaving the platform.",
 };
 
 // Carousel slides data
