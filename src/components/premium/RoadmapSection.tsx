@@ -52,7 +52,7 @@ const roadmapData = [
           </span>
         </div>
         <FloatingSurface elevation="low" className="rounded-2xl">
-          <GlassPanel intensity="subtle" bordered className="rounded-2xl p-6 md:p-8 opacity-60">
+          <GlassPanel intensity="subtle" bordered className="rounded-2xl p-6 md:p-8 opacity-80">
             <h4 className="text-xl font-medium text-foreground mb-3">Intelligence Layer</h4>
             <p className="text-sm text-muted-foreground/60 leading-relaxed mb-6">
               Operational automation in recurring workflows.
@@ -90,7 +90,7 @@ const roadmapData = [
           </span>
         </div>
         <FloatingSurface elevation="low" className="rounded-2xl">
-          <GlassPanel intensity="subtle" bordered className="rounded-2xl p-6 md:p-8 opacity-60">
+          <GlassPanel intensity="subtle" bordered className="rounded-2xl p-6 md:p-8 opacity-80">
             <h4 className="text-xl font-medium text-foreground mb-3">Automation Suite</h4>
             <p className="text-sm text-muted-foreground/60 leading-relaxed mb-6">
               Self-optimizing supply-coordination and autonomous decision-making.
@@ -132,7 +132,7 @@ const roadmapData = [
           </span>
         </div>
         <FloatingSurface elevation="low" className="rounded-2xl">
-          <GlassPanel intensity="subtle" bordered className="rounded-2xl p-6 md:p-8 opacity-60">
+          <GlassPanel intensity="subtle" bordered className="rounded-2xl p-6 md:p-8 opacity-80">
             <h4 className="text-xl font-medium text-foreground mb-3">Scale & Expand</h4>
             <p className="text-sm text-muted-foreground/60 leading-relaxed mb-6">
               Multi-region deployment, advanced analytics, and ecosystem partnerships.

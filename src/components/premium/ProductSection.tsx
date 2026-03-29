@@ -190,7 +190,7 @@ const ProductSection = () => {
           </motion.div>
 
           {/* Side by Side Comparison */}
-          <div className="grid lg:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 gap-8">
             {/* Without Synapsio */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}

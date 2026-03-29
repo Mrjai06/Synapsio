@@ -22,13 +22,12 @@ const footerLinks: FooterSection[] = [
     links: [
       { title: 'Solution', href: '#solution' },
       { title: 'Roadmap', href: '#roadmap' },
-      { title: 'Demo', href: '#demo' },
+      { title: 'Product', href: 'https://app.synapsio.solutions' },
     ],
   },
   {
     label: 'Legal',
     links: [
-      
       { title: 'Privacy Policy', href: '/privacy-policy-synapsio.pdf' },
       { title: 'Terms of Service', href: '/terms-of-service-synapsio.pdf' },
       { title: 'Imprint', href: '/Imprint-Synapsio.pdf' },
@@ -39,7 +38,7 @@ const footerLinks: FooterSection[] = [
     links: [
       { title: 'LinkedIn', href: 'https://www.linkedin.com/company/synapsioai/', icon: Linkedin },
       { title: 'Email', href: 'mailto:contact@synapsio.co.site', icon: Mail },
-      { title: 'Website', href: '#', icon: Globe },
+      { title: 'App', href: 'https://app.synapsio.solutions', icon: Globe },
     ],
   },
 ];
@@ -98,7 +97,7 @@ const Footer = () => {
                           )}
                           <span className="relative">
                             {link.title}
-                            <span className="absolute -bottom-0.5 left-0 h-px w-0 bg-primary transition-all duration-300 group-hover:w-full" />
+                            <span className="absolute -bottom-0.5 left-0 h-[2px] w-0 bg-primary transition-all duration-300 group-hover:w-full" />
                           </span>
                         </a>
                       </li>

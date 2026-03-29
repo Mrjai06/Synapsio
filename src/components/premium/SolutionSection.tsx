@@ -82,7 +82,7 @@ const ConnectionDiagram = ({ elements, center }: { elements: string[]; center: s
   return (
     <TooltipProvider>
       <div className="w-full flex items-center justify-center py-4">
-        <div className="grid grid-cols-3 grid-rows-3 gap-3 md:gap-4" style={{ width: 'clamp(220px, 100%, 340px)' }}>
+        <div className="grid grid-cols-3 grid-rows-3 gap-3 md:gap-4" style={{ width: 'clamp(220px, 100%, 420px)' }}>
           {renderNode(0, 0.3)}
           <div />
           {renderNode(1, 0.4)}

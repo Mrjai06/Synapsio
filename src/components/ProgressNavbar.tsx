@@ -74,7 +74,11 @@ const ProgressNavbar = () => {
     const element = document.getElementById(sectionId);
     if (element) {
       setActiveSection(index);
-      element.scrollIntoView({ behavior: "smooth" });
+      // On mobile, offset by bottom navbar height (~70px) so content isn't hidden behind it
+      const isMobile = window.innerWidth < 1024;
+      const yOffset = isMobile ? -70 : 0;
+      const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
+      window.scrollTo({ top: y, behavior: "smooth" });
     }
   };
 
@@ -101,7 +105,7 @@ const ProgressNavbar = () => {
                 <div className={`rounded-full transition-all duration-500 ${
                   isActive ? "w-2 h-2 bg-primary" : "w-1.5 h-1.5 bg-muted-foreground/50"
                 }`} />
-                <span className={`text-[9px] tracking-wide uppercase whitespace-nowrap transition-colors duration-300 ${
+                <span className={`text-[10px] tracking-wide uppercase whitespace-nowrap transition-colors duration-300 ${
                   isActive ? "text-foreground" : "text-muted-foreground"
                 }`}>
                   {section.label}
@@ -173,7 +177,7 @@ const ProgressNavbar = () => {
                         ? "opacity-50 text-foreground" 
                         : isAdjacent
                           ? "opacity-25 text-muted-foreground"
-                          : "opacity-0 group-hover:opacity-40 text-muted-foreground"
+                          : "opacity-20 group-hover:opacity-60 text-muted-foreground"
                       }
                     `}
                   >

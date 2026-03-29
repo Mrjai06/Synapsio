@@ -63,7 +63,7 @@ const HeroSection = () => {
         transform: `translateY(${contentTranslate}px)`
       }}>
         <h1 className="w-full animate-fade-in leading-[0.85] text-center" style={{
-          fontSize: "clamp(1.2rem, 5.2vw, 8rem)",
+          fontSize: "clamp(1.8rem, 4.5vw, 5rem)",
           letterSpacing: "-0.04em",
           animationDelay: "0.4s",
           animationDuration: "1.4s"
