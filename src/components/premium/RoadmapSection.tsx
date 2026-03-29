@@ -9,24 +9,24 @@ const roadmapData = [
     content: (
       <div>
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-xs tracking-wider px-3 py-1 rounded-full border bg-primary/10 text-primary border-primary/20">
-            In Progress
+          <span className="text-xs tracking-wider px-3 py-1 rounded-full border bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+            Launched
           </span>
-          <span className="flex items-center gap-1.5 text-xs text-primary/70">
-            <Clock className="w-3 h-3" />
-            Current Phase
+          <span className="flex items-center gap-1.5 text-xs text-emerald-400/70">
+            <Check className="w-3 h-3" />
+            MVP Live
           </span>
         </div>
         <FloatingSurface elevation="medium" glow glowColor="primary" className="rounded-2xl">
           <GlassPanel intensity="medium" bordered className="rounded-2xl p-6 md:p-8">
             <h4 className="text-xl font-medium text-foreground mb-3">Foundation</h4>
             <p className="text-sm text-muted-foreground/60 leading-relaxed mb-6">
-              Core platform architecture and investor-ready traction.
+              Core platform shipped and live. Pilot deployments underway.
             </p>
             <div className="space-y-2">
               <div className="flex items-center gap-3 text-sm">
-                <ArrowRight className="w-3 h-3 text-primary/50 flex-shrink-0" />
-                <span className="text-muted-foreground/40">AI-Native B2B marketplace and SCM-Core MVP</span>
+                <Check className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                <span className="text-muted-foreground/70">SCM-Core MVP — live at app.synapsio.solutions</span>
               </div>
               <div className="flex items-center gap-3 text-sm">
                 <ArrowRight className="w-3 h-3 text-primary/50 flex-shrink-0" />

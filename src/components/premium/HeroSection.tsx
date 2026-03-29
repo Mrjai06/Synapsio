@@ -83,7 +83,7 @@ const HeroSection = () => {
         transform: `translateY(${contentTranslate}px)`
       }}>
 
-        <div className="animate-fade-in" style={{
+        <div className="animate-fade-in flex flex-col sm:flex-row items-center gap-4" style={{
           animationDelay: "0.8s",
           animationDuration: "1.4s"
         }}>
@@ -91,6 +91,14 @@ const HeroSection = () => {
             <a href="/Synapsio_Pitch.pdf" target="_blank" rel="noopener noreferrer">
               <Button size="lg" className="group bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-12 py-8 text-sm tracking-wide font-normal transition-all duration-1000 hover:scale-[1.02]">
                 View Pitchdeck
+                <ArrowRight className="ml-3 h-4 w-4 transition-transform duration-700 group-hover:translate-x-1" />
+              </Button>
+            </a>
+          </FloatingSurface>
+          <FloatingSurface elevation="low" className="rounded-full">
+            <a href="https://app.synapsio.solutions" target="_blank" rel="noopener noreferrer">
+              <Button size="lg" variant="outline" className="group rounded-full px-12 py-8 text-sm tracking-wide font-normal transition-all duration-1000 hover:scale-[1.02]">
+                Try the app
                 <ArrowRight className="ml-3 h-4 w-4 transition-transform duration-700 group-hover:translate-x-1" />
               </Button>
             </a>
