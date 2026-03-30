@@ -28,12 +28,10 @@ const comparisonData: { scenario: string; description: string; without: Comparis
   without: {
     title: "Traditional Operating Model",
     steps: [
-      { icon: FileSpreadsheet, text: "Demand increase handled by separate planning team", tooltip: "Planning operates in silos, reacting to signals days after they occur." },
-      { icon: Eye, text: "Supplier delay escalated via email and meetings", tooltip: "Manual escalation chains slow down response and fragment accountability." },
-      { icon: BarChart3, text: "Production schedule adjusted manually", tooltip: "Planners reconcile spreadsheets across sites without real-time visibility." },
-      { icon: RefreshCw, text: "Logistics re-optimizes routes independently", tooltip: "Transport planning operates detached from production and procurement decisions." },
-      { icon: TrendingDown, text: "New supplier onboarding requires weeks of coordination", tooltip: "Qualification, compliance, and integration processes run sequentially across departments." },
-      { icon: FileSpreadsheet, text: "Decisions made sequentially across departments", tooltip: "Each function optimizes locally, missing network-wide opportunities." },
+      { icon: FileSpreadsheet, text: "Demand changes handled by separate planning teams in silos", tooltip: "Planning operates in silos, reacting to signals days after they occur." },
+      { icon: Eye, text: "Supplier delays escalated via email and meetings", tooltip: "Manual escalation chains slow down response and fragment accountability." },
+      { icon: TrendingDown, text: "New supplier onboarding takes weeks of coordination", tooltip: "Qualification, compliance, and integration processes run sequentially across departments." },
+      { icon: FileSpreadsheet, text: "Decisions made sequentially, each department optimizing locally", tooltip: "Each function optimizes locally, missing network-wide opportunities." },
     ],
     outcome: {
       title: "Outcome",
@@ -49,12 +47,10 @@ const comparisonData: { scenario: string; description: string; without: Comparis
   with: {
     title: "Autonomous Operating Model (Synapsio)",
     steps: [
-      { icon: Activity, text: "AI continuously monitors demand, capacity, pricing, and risk", tooltip: "Thousands of signals ingested in real time across all network nodes." },
-      { icon: Shield, text: "Supplier delays automatically re-simulated across network", tooltip: "Every disruption triggers instant scenario analysis across the full supply graph." },
-      { icon: Gauge, text: "Production dynamically rebalanced across sites", tooltip: "Capacity allocation shifts automatically based on real-time constraints." },
-      { icon: Zap, text: "Transport plans adjusted in real time", tooltip: "Logistics adapts continuously to production and demand changes." },
-      { icon: Lock, text: "New suppliers integrated directly into optimization model", tooltip: "Onboarding feeds directly into the decision engine — no manual handoffs." },
-      { icon: Brain, text: "Orders prioritized by margin, SLA, and risk exposure", tooltip: "Multi-objective optimization balances competing priorities autonomously." },
+      { icon: Activity, text: "AI monitors demand, capacity, pricing, and risk in real time", tooltip: "Thousands of signals ingested in real time across all network nodes." },
+      { icon: Shield, text: "Supplier disruptions automatically re-simulated across the network", tooltip: "Every disruption triggers instant scenario analysis across the full supply graph." },
+      { icon: Lock, text: "New suppliers integrated directly into the optimization model", tooltip: "Onboarding feeds directly into the decision engine — no manual handoffs." },
+      { icon: Brain, text: "Orders prioritized autonomously by margin, SLA, and risk", tooltip: "Multi-objective optimization balances competing priorities autonomously." },
     ],
     outcome: {
       title: "Outcome",

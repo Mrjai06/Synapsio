@@ -167,7 +167,7 @@ const FeaturesSection = () => {
               headerVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
-            The Product
+            Competitive Moat
           </p>
           <h2
             className={`text-4xl md:text-5xl lg:text-[3.5rem] font-light tracking-[-0.02em] mb-8 leading-[1.08] transition-all duration-1000 ${
@@ -175,9 +175,9 @@ const FeaturesSection = () => {
             }`}
             style={{ transitionDelay: "100ms" }}
           >
-            <span className="text-foreground">Decisions automated,</span>
+            <span className="text-foreground">What no ERP or SCM tool</span>
             <br />
-            <span className="text-muted-foreground/30">not delegated</span>
+            <span className="text-muted-foreground/30">can do today</span>
           </h2>
         </div>
 

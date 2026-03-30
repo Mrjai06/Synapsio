@@ -945,69 +945,61 @@ const OpportunitySection = () => {
           <p className="text-xs tracking-[0.25em] uppercase text-muted-foreground/35 mb-16">
             Market Landscape
           </p>
-          
-          <div className={`max-w-5xl mx-auto transition-all duration-1000 ${landscapeVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={landscapeVisible ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: 0.2 }}
-            >
-              <AnimatedTabs
-                tabs={marketLandscapeSystems.flatMap((system) =>
-                  system.businesses.map((business) => ({
-                    id: `${system.id}-${business.name.toLowerCase()}`,
-                    label: business.name,
-                    content: (
-                      <GlassPanel intensity="subtle" bordered className="rounded-xl p-8 md:p-12 relative min-h-[20rem]">
-                        {companyLogos[business.name] && (
-                          <div className="absolute top-4 right-4 w-12 h-12 rounded-lg bg-background/80 border border-border/20 flex items-center justify-center p-1.5">
-                            <img
-                              src={companyLogos[business.name]}
-                              alt={`${business.name} logo`}
-                              className="w-full h-full object-contain"
-                            />
-                          </div>
-                        )}
-                        <div className="flex items-center gap-3 mb-6">
-                          <span className="text-[0.625rem] tracking-[0.2em] uppercase text-muted-foreground/40 px-3 py-1 rounded-full border border-border/20 bg-secondary/20">
-                            {system.systemType}
-                          </span>
-                        </div>
-                        
-                        <h4 className="text-2xl font-medium text-primary mb-2">{business.name}</h4>
-                        <p className="text-sm text-muted-foreground/40 mb-8">{system.description}</p>
-                        
-                        <div className="grid md:grid-cols-2 gap-8">
-                          <div>
-                            <p className="text-sm uppercase tracking-wider text-muted-foreground/40 mb-4">Facts</p>
-                            <ul className="space-y-3">
-                              {business.facts.map((fact, i) => (
-                                <li key={i} className="text-sm text-muted-foreground/60 flex items-start gap-2">
-                                  <span className="text-primary/60 mt-0.5">•</span>
-                                  {fact}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                          <div>
-                            <p className="text-sm uppercase tracking-wider text-muted-foreground/40 mb-4">Arguments</p>
-                            <ul className="space-y-3">
-                              {business.arguments.map((arg, i) => (
-                                <li key={i} className="text-sm text-muted-foreground/60 flex items-start gap-2">
-                                  <span className="text-destructive/60 mt-0.5">-</span>
-                                  {arg}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
-                      </GlassPanel>
-                    ),
-                  }))
-                )}
-                defaultTab="erp-sap"
-              />
-            </motion.div>
+
+          <div className={`max-w-4xl mx-auto transition-all duration-1000 ${landscapeVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+            <GlassPanel intensity="subtle" bordered className="rounded-2xl p-8 md:p-12">
+              <p className="text-[0.625rem] tracking-[0.3em] uppercase text-muted-foreground/40 mb-10 text-center">
+                Competitive positioning — AI automation vs. SME accessibility
+              </p>
+
+              {/* 2-Axis Positioning Map */}
+              <svg viewBox="0 0 500 380" className="w-full max-w-2xl mx-auto">
+                {/* Quadrant fills */}
+                <rect x="60" y="20" width="185" height="160" fill="hsl(var(--secondary) / 0.04)" />
+                <rect x="245" y="20" width="215" height="160" fill="hsl(var(--secondary) / 0.04)" />
+                <rect x="60" y="180" width="185" height="155" fill="hsl(var(--secondary) / 0.04)" />
+                <rect x="245" y="180" width="215" height="155" fill="hsl(var(--primary) / 0.05)" />
+
+                {/* Axes */}
+                <line x1="60" y1="180" x2="460" y2="180" stroke="hsl(var(--border))" strokeWidth="0.8" strokeOpacity="0.5" />
+                <line x1="245" y1="20" x2="245" y2="335" stroke="hsl(var(--border))" strokeWidth="0.8" strokeOpacity="0.5" />
+
+                {/* Axis labels */}
+                <text x="260" y="365" textAnchor="middle" className="fill-muted-foreground/30" style={{ fontSize: "11px" }}>SME Accessibility →</text>
+                <text x="14" y="180" textAnchor="middle" dominantBaseline="central" transform="rotate(-90,14,180)" className="fill-muted-foreground/30" style={{ fontSize: "11px" }}>AI-Native Automation →</text>
+
+                {/* Quadrant labels */}
+                <text x="152" y="36" textAnchor="middle" className="fill-muted-foreground/20" style={{ fontSize: "9px" }}>Enterprise-only, AI-capable</text>
+                <text x="352" y="36" textAnchor="middle" className="fill-primary/25" style={{ fontSize: "9px" }}>Accessible &amp; AI-native</text>
+                <text x="152" y="320" textAnchor="middle" className="fill-muted-foreground/20" style={{ fontSize: "9px" }}>Enterprise, legacy</text>
+                <text x="352" y="320" textAnchor="middle" className="fill-muted-foreground/20" style={{ fontSize: "9px" }}>SME-friendly, limited AI</text>
+
+                {/* Competitors */}
+                {/* SAP: high enterprise, low AI-native */}
+                <circle cx="110" cy="270" r="6" fill="hsl(var(--muted-foreground))" fillOpacity="0.35" />
+                <text x="110" y="290" textAnchor="middle" className="fill-muted-foreground/50" style={{ fontSize: "10px" }}>SAP</text>
+
+                {/* Kinaxis: enterprise-only, partial AI */}
+                <circle cx="130" cy="120" r="6" fill="hsl(var(--muted-foreground))" fillOpacity="0.35" />
+                <text x="130" y="140" textAnchor="middle" className="fill-muted-foreground/50" style={{ fontSize: "10px" }}>Kinaxis</text>
+
+                {/* o9 Solutions: enterprise, strong AI */}
+                <circle cx="180" cy="65" r="6" fill="hsl(var(--muted-foreground))" fillOpacity="0.35" />
+                <text x="180" y="85" textAnchor="middle" className="fill-muted-foreground/50" style={{ fontSize: "10px" }}>o9</text>
+
+                {/* Tacto: SME-accessible, low AI */}
+                <circle cx="320" cy="280" r="6" fill="hsl(var(--muted-foreground))" fillOpacity="0.35" />
+                <text x="320" y="300" textAnchor="middle" className="fill-muted-foreground/50" style={{ fontSize: "10px" }}>Tacto</text>
+
+                {/* Synapsio: top-right — high SME, high AI */}
+                <circle cx="400" cy="55" r="9" fill="hsl(var(--primary))" fillOpacity="0.9" style={{ filter: "drop-shadow(0 0 10px hsl(var(--primary) / 0.5))" }} />
+                <text x="400" y="78" textAnchor="middle" className="fill-primary" style={{ fontSize: "11px", fontWeight: 600 }}>Synapsio</text>
+              </svg>
+
+              <p className="text-center text-xs text-muted-foreground/30 mt-8 max-w-md mx-auto leading-relaxed">
+                Synapsio is the only platform combining SME accessibility with full AI-native autonomous execution — no competitor occupies this position today.
+              </p>
+            </GlassPanel>
           </div>
         </div>
         
