@@ -988,8 +988,16 @@ const OpportunitySection = () => {
                 <text x="180" y="85" textAnchor="middle" className="fill-muted-foreground/50" style={{ fontSize: "10px" }}>o9</text>
 
                 {/* Tacto: SME-accessible, low AI */}
-                <circle cx="320" cy="280" r="6" fill="hsl(var(--muted-foreground))" fillOpacity="0.35" />
-                <text x="320" y="300" textAnchor="middle" className="fill-muted-foreground/50" style={{ fontSize: "10px" }}>Tacto</text>
+                <circle cx="310" cy="272" r="6" fill="hsl(var(--muted-foreground))" fillOpacity="0.35" />
+                <text x="310" y="292" textAnchor="middle" className="fill-muted-foreground/50" style={{ fontSize: "10px" }}>Tacto</text>
+
+                {/* Omnea: mid-market, some AI (intake-to-procure) */}
+                <circle cx="205" cy="148" r="6" fill="hsl(var(--muted-foreground))" fillOpacity="0.35" />
+                <text x="205" y="168" textAnchor="middle" className="fill-muted-foreground/50" style={{ fontSize: "10px" }}>Omnea</text>
+
+                {/* Opply: high SME (marketplace), minimal AI */}
+                <circle cx="385" cy="298" r="6" fill="hsl(var(--muted-foreground))" fillOpacity="0.35" />
+                <text x="385" y="318" textAnchor="middle" className="fill-muted-foreground/50" style={{ fontSize: "10px" }}>Opply</text>
 
                 {/* Synapsio: top-right — high SME, high AI */}
                 <circle cx="400" cy="55" r="9" fill="hsl(var(--primary))" fillOpacity="0.9" style={{ filter: "drop-shadow(0 0 10px hsl(var(--primary) / 0.5))" }} />

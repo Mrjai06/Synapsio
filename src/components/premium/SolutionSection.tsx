@@ -1,9 +1,8 @@
-import { useState, useRef } from "react";
-import { motion, AnimatePresence, useInView } from "framer-motion";
-import { ChevronLeft, ChevronRight, Database, Brain, Zap } from "lucide-react";
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
+import { Database, Brain, Zap } from "lucide-react";
 import synapsioLogo from "@/assets/synapsio-logo.png";
 import { AmbientGlow } from "./DepthSystem";
-import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
@@ -146,24 +145,17 @@ const FlowDiagram = ({ steps }: { steps: string[] }) => (
 );
 
 const SolutionSection = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
-
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-
-  const slide = slides[currentSlide];
-  const Icon = slide.icon;
 
   return (
     <section ref={sectionRef} className="relative py-32 md:py-48">
       <AmbientGlow color="primary" size="xl" intensity="medium" position="center" />
-      
+
       <div className="relative z-10 container mx-auto px-6 lg:px-20 xl:px-28">
         {/* Header */}
         <div className="max-w-2xl mb-16 md:mb-20">
-          <motion.p 
+          <motion.p
             className="text-[0.625rem] tracking-[0.4em] uppercase text-primary/50 mb-10"
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -171,7 +163,7 @@ const SolutionSection = () => {
           >
             The Solution
           </motion.p>
-          <motion.h2 
+          <motion.h2
             className="text-4xl md:text-5xl lg:text-[3.5rem] font-light tracking-[-0.02em] mb-8 leading-[1.08]"
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -183,109 +175,53 @@ const SolutionSection = () => {
           </motion.h2>
         </div>
 
-        {/* Carousel */}
-        <motion.div
-          className="relative"
-          initial={{ opacity: 0, y: 40 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        >
-          {/* Slide indicators */}
-          <div className="flex items-center gap-6 mb-12">
-            {slides.map((s, i) => (
-              <button
-                key={s.id}
-                onClick={() => setCurrentSlide(i)}
-                className={`flex items-center gap-3 transition-all duration-300 ${
-                  i === currentSlide 
-                    ? "opacity-100" 
-                    : "opacity-40 hover:opacity-60"
-                }`}
-              >
-                <span className={`w-8 h-px transition-all duration-300 ${
-                  i === currentSlide ? "bg-primary" : "bg-border"
-                }`} />
-                <span className="text-xs tracking-wider uppercase">{s.label}</span>
-              </button>
-            ))}
-          </div>
-
-          {/* Slide content */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-20 items-center min-h-0 lg:min-h-[25rem]">
-            {/* Text content */}
-            <AnimatePresence mode="wait">
+        {/* Static side-by-side layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
+          {slides.map((slide, i) => {
+            const Icon = slide.icon;
+            return (
               <motion.div
                 key={slide.id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20 }}
-                transition={{ duration: 0.4 }}
-                className="space-y-6"
+                initial={{ opacity: 0, y: 30 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ duration: 0.7, delay: 0.2 + i * 0.15 }}
+                className="flex flex-col gap-6 bg-card/20 backdrop-blur-xl border border-border/20 rounded-3xl p-8 md:p-10"
+                style={{ boxShadow: '0 0.5rem 2rem hsl(var(--background) / 0.4)' }}
               >
+                {/* Label */}
                 <div className="inline-flex items-center gap-3 text-primary/60">
                   <Icon className="w-5 h-5" />
                   <span className="text-xs tracking-widest uppercase">{slide.label}</span>
                 </div>
-                
-                <h3 className="text-3xl md:text-4xl font-light leading-tight">
+
+                {/* Title */}
+                <h3 className="text-2xl md:text-3xl font-light leading-tight">
                   {slide.title}
                   <br />
-                  <span className="text-muted-foreground/60">{slide.subtitle}</span>
+                  <span className="text-muted-foreground/50">{slide.subtitle}</span>
                 </h3>
-                
-                <p className="text-lg text-muted-foreground/70 font-light leading-relaxed max-w-lg">
+
+                {/* Description */}
+                <p className="text-base text-muted-foreground/65 font-light leading-relaxed">
                   {slide.description}
                 </p>
-              </motion.div>
-            </AnimatePresence>
 
-            {/* Diagram */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`diagram-${slide.id}`}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.4 }}
-                className="relative bg-card/30 backdrop-blur-xl border border-border/20 rounded-3xl p-6 md:p-10"
-                style={{ boxShadow: '0 0.5rem 2rem hsl(var(--background) / 0.5)' }}
-              >
-                {slide.diagram.type === "connect" && (
-                  <ConnectionDiagram 
-                    elements={slide.diagram.elements!} 
-                    center={slide.diagram.center!} 
-                  />
-                )}
-                {slide.diagram.type === "flow" && (
-                  <FlowDiagram steps={slide.diagram.steps!} />
-                )}
+                {/* Diagram */}
+                <div className="mt-auto pt-4 border-t border-border/10">
+                  {slide.diagram.type === "connect" && (
+                    <ConnectionDiagram
+                      elements={slide.diagram.elements!}
+                      center={slide.diagram.center!}
+                    />
+                  )}
+                  {slide.diagram.type === "flow" && (
+                    <FlowDiagram steps={slide.diagram.steps!} />
+                  )}
+                </div>
               </motion.div>
-            </AnimatePresence>
-          </div>
-
-          {/* Navigation arrows */}
-          <div className="flex items-center gap-4 mt-12">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={prevSlide}
-              className="w-10 h-10 rounded-full border-border/50 hover:border-primary/50 hover:bg-primary/5"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={nextSlide}
-              className="w-10 h-10 rounded-full border-border/50 hover:border-primary/50 hover:bg-primary/5"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-            <span className="ml-4 text-xs text-muted-foreground/50">
-              {currentSlide + 1} / {slides.length}
-            </span>
-          </div>
-        </motion.div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

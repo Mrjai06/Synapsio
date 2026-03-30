@@ -170,6 +170,95 @@ const ProductSection = () => {
       <AmbientGlow color="primary" size="md" intensity="subtle" position="right" className="top-1/4" />
       <AmbientGlow color="accent" size="md" intensity="subtle" position="left" className="bottom-1/4" />
 
+      {/* Traction block */}
+      <div className="relative z-10 container mx-auto px-8 lg:px-20 xl:px-28 mb-24">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {[
+            { value: "Q1 2026", label: "MVP Live since", sub: "app.synapsio.solutions" },
+            { value: "GDPR", label: "Compliant", sub: "Hosted in EU · Frankfurt" },
+            { value: "Pilot", label: "Customers onboarding", sub: "Reach out to join the first cohort" },
+          ].map((kpi, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: i * 0.1 }}
+              className="rounded-2xl border border-border/20 bg-card/20 backdrop-blur-sm px-6 py-5 flex flex-col gap-1"
+            >
+              <span className="text-2xl font-light text-primary">{kpi.value}</span>
+              <span className="text-sm text-foreground/70">{kpi.label}</span>
+              <span className="text-xs text-muted-foreground/40">{kpi.sub}</span>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* MVP App Preview */}
+      <div className="relative z-10 container mx-auto px-8 lg:px-20 xl:px-28 mb-32">
+        <p className="text-xs tracking-[0.25em] uppercase text-muted-foreground/35 mb-8">The Platform</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {[
+            {
+              name: "Dashboard",
+              description: "Real-time KPIs, AI activity feed, low-stock alerts, and pending approval queue — everything in one view.",
+              path: "/dashboard",
+              accent: "primary",
+            },
+            {
+              name: "Inventory",
+              description: "Full product catalog with demand forecasting, reorder suggestions, and AI-driven stock optimization.",
+              path: "/inventory",
+              accent: "primary",
+            },
+            {
+              name: "Intelligence",
+              description: "Market risk alerts, supply disruption signals, and AI-generated insights scanned across your supplier network.",
+              path: "/intelligence",
+              accent: "primary",
+            },
+            {
+              name: "Suppliers",
+              description: "Supplier directory with reliability scores, order history, API-ordering capability, and autonomous onboarding.",
+              path: "/suppliers",
+              accent: "primary",
+            },
+          ].map((screen, i) => (
+            <motion.a
+              key={screen.name}
+              href="https://app.synapsio.solutions"
+              target="_blank"
+              rel="noopener noreferrer"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: i * 0.08 }}
+              className="group block rounded-2xl border border-border/20 bg-card/20 backdrop-blur-sm overflow-hidden hover:border-primary/30 transition-colors duration-500"
+            >
+              {/* Mock screen header bar */}
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-border/15 bg-background/30">
+                <div className="flex gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-border/40" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-border/40" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-border/40" />
+                </div>
+                <span className="ml-2 text-[10px] text-muted-foreground/30 tracking-wide font-mono">
+                  app.synapsio.solutions{screen.path}
+                </span>
+              </div>
+              {/* Content */}
+              <div className="p-6">
+                <p className="text-[0.625rem] tracking-[0.3em] uppercase text-primary/50 mb-2">{screen.name}</p>
+                <p className="text-sm text-muted-foreground/60 leading-relaxed mb-4">{screen.description}</p>
+                <span className="text-xs text-primary/50 group-hover:text-primary transition-colors duration-300">
+                  → Try it live
+                </span>
+              </div>
+            </motion.a>
+          ))}
+        </div>
+      </div>
+
       <FeaturesSection />
 
       {/* Before/After Comparison */}

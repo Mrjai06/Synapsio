@@ -22,7 +22,7 @@ const features = [
       decision: "Which supplier to use for each order",
       constraint: "Balance cost, lead time, quality, and risk exposure",
       removal: {
-        cost: "Eliminates 40+ hours/week of manual RFQ processing",
+        cost: "Replaces manual RFQ processing (est. 20–40 hrs/week for mid-size procurement teams)",
         risk: "Real-time supplier health monitoring vs. quarterly reviews",
         time: "Seconds to match vs. weeks of evaluation"
       },
@@ -376,6 +376,22 @@ const FeaturesSection = () => {
                                   <span className="text-muted-foreground/70">{item}</span>
                                 </motion.div>
                               ))}
+                              <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 0.5 }}
+                                className="pt-3 mt-1 border-t border-border/10"
+                              >
+                                <a
+                                  href="https://app.synapsio.solutions"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-xs text-primary/60 hover:text-primary transition-colors duration-300 flex items-center gap-1"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  → See it in the app
+                                </a>
+                              </motion.div>
                             </div>
                           </div>
                         </div>
