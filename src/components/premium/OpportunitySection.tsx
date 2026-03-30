@@ -996,8 +996,8 @@ const OpportunitySection = () => {
                 <text x="205" y="168" textAnchor="middle" className="fill-muted-foreground/50" style={{ fontSize: "10px" }}>Omnea</text>
 
                 {/* Opply: high SME (marketplace), minimal AI */}
-                <circle cx="385" cy="298" r="6" fill="hsl(var(--muted-foreground))" fillOpacity="0.35" />
-                <text x="385" y="318" textAnchor="middle" className="fill-muted-foreground/50" style={{ fontSize: "10px" }}>Opply</text>
+                <circle cx="385" cy="275" r="6" fill="hsl(var(--muted-foreground))" fillOpacity="0.35" />
+                <text x="385" y="263" textAnchor="middle" className="fill-muted-foreground/50" style={{ fontSize: "10px" }}>Opply</text>
 
                 {/* Synapsio: top-right — high SME, high AI */}
                 <circle cx="400" cy="55" r="9" fill="hsl(var(--primary))" fillOpacity="0.9" style={{ filter: "drop-shadow(0 0 10px hsl(var(--primary) / 0.5))" }} />

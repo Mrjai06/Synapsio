@@ -207,7 +207,7 @@ const SolutionSection = () => {
                 </p>
 
                 {/* Diagram */}
-                <div className="mt-auto pt-4 border-t border-border/10">
+                <div className="pt-4 border-t border-border/10">
                   {slide.diagram.type === "connect" && (
                     <ConnectionDiagram
                       elements={slide.diagram.elements!}
