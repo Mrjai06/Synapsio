@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { Database, Brain, Zap } from "lucide-react";
+import { ChevronRight, Database, Brain, Zap } from "lucide-react";
 import synapsioLogo from "@/assets/synapsio-logo.png";
 import { AmbientGlow } from "./DepthSystem";
 import {
