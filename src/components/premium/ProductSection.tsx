@@ -243,7 +243,7 @@ const ProductSection = () => {
             <span className="ml-2 text-[10px] text-muted-foreground/30 font-mono tracking-wide">app.synapsio.solutions/dashboard</span>
             <span className="ml-auto text-[10px] text-primary/40 group-hover:text-primary/70 transition-colors">→ Try it live</span>
           </div>
-          <img src={dashboardImg} alt="Synapsio Dashboard" className="w-full object-cover object-top" style={{ maxHeight: "420px" }} />
+          <img src={dashboardImg} alt="Synapsio Dashboard" className="w-full h-auto block" />
           <div className="px-5 py-3 flex items-center justify-between border-t border-border/10 bg-background/20">
             <div>
               <p className="text-[0.625rem] tracking-[0.3em] uppercase text-primary/50 mb-0.5">Dashboard</p>
@@ -280,7 +280,7 @@ const ProductSection = () => {
                 <span className="ml-2 text-[10px] text-muted-foreground/30 font-mono tracking-wide">app.synapsio.solutions{screen.path}</span>
                 <span className="ml-auto text-[10px] text-primary/40 group-hover:text-primary/70 transition-colors">→ Try it live</span>
               </div>
-              <img src={screen.img} alt={`Synapsio ${screen.name}`} className="w-full object-cover object-top" style={{ maxHeight: "380px" }} />
+              <img src={screen.img} alt={`Synapsio ${screen.name}`} className="w-full h-auto block" />
               <div className="px-5 py-3 border-t border-border/10 bg-background/20">
                 <p className="text-[0.625rem] tracking-[0.3em] uppercase text-primary/50 mb-0.5">{screen.name}</p>
                 <p className="text-xs text-muted-foreground/50">{screen.caption}</p>

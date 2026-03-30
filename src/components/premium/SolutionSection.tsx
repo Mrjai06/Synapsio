@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { ChevronRight, Database, Brain, Zap } from "lucide-react";
+import { Database, Brain, Zap, ChevronRight } from "lucide-react";
 import synapsioLogo from "@/assets/synapsio-logo.png";
 import { AmbientGlow } from "./DepthSystem";
 import {
@@ -17,55 +17,26 @@ const nodeDescriptions: Record<string, string> = {
   Marketplace: "Synapsio's built-in sourcing hub — discover new suppliers, compare offers, and build resilient supply chains without leaving the platform.",
 };
 
-// Carousel slides data
-const slides = [
-  {
-    id: "what",
-    label: "What It Is",
-    title: "The Intelligence Layer",
-    subtitle: "for Supply Chains",
-    description: "Synapsio is an AI-powered platform that connects every node of your supply chain—ERP systems, warehouses, carriers, and our internal marketplace —into a unified, self-optimizing network.",
-    diagram: {
-      type: "connect",
-      elements: ["ERP", "WMS", "TMS", "Marketplace"],
-      center: "Synapsio"
-    },
-    icon: Database,
-  },
-  {
-    id: "how",
-    label: "What It Does",
-    title: "Predict. Optimize.",
-    subtitle: "Create. Execute.",
-    description: "Continuously analyzes millions of data points to forecast demand, optimize inventory placement, orchestrate fulfillment and create new supply-chains — all in real-time, without manual intervention.",
-    diagram: {
-      type: "flow",
-      steps: ["Data In", "AI Analysis", "Decision", "Action"]
-    },
-    icon: Brain,
-  },
-];
+const nodeIcons = [Database, Brain, Zap, Database];
+const nodeElements = ["ERP", "WMS", "TMS", "Marketplace"];
 
-// Simple connection diagram
-const ConnectionDiagram = ({ elements, center }: { elements: string[]; center: string }) => {
-  const nodeIcons = [Database, Brain, Zap, Database];
-
+const ConnectionDiagram = () => {
   const renderNode = (index: number, delay: number) => {
     const Icon = nodeIcons[index];
-    const label = elements[index];
+    const label = nodeElements[index];
     return (
       <Tooltip delayDuration={200}>
         <TooltipTrigger asChild>
           <motion.div
-            className="rounded-2xl bg-card/30 backdrop-blur-xl border border-border/20 flex flex-col items-center justify-center gap-1 md:gap-2 cursor-pointer hover:border-primary/40 transition-colors duration-300 group aspect-square"
+            className="rounded-xl bg-card/30 backdrop-blur-xl border border-border/20 flex flex-col items-center justify-center gap-1 cursor-pointer hover:border-primary/40 transition-colors duration-300 group aspect-square"
             style={{ boxShadow: '0 0.5rem 1.5rem hsl(var(--background) / 0.6)' }}
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.4, delay }}
-            whileHover={{ scale: 1.06, y: -4 }}
+            whileHover={{ scale: 1.06, y: -3 }}
           >
-            <Icon className="w-4 h-4 md:w-5 md:h-5 text-muted-foreground/60 group-hover:text-primary transition-colors duration-300" />
-            <span className="text-[10px] md:text-xs font-medium text-muted-foreground/70 group-hover:text-foreground transition-colors duration-300">{label}</span>
+            <Icon className="w-4 h-4 text-muted-foreground/60 group-hover:text-primary transition-colors duration-300" />
+            <span className="text-[10px] font-medium text-muted-foreground/70 group-hover:text-foreground transition-colors duration-300">{label}</span>
           </motion.div>
         </TooltipTrigger>
         <TooltipContent
@@ -80,29 +51,26 @@ const ConnectionDiagram = ({ elements, center }: { elements: string[]; center: s
 
   return (
     <TooltipProvider>
-      <div className="w-full flex items-center justify-center py-2">
-        <div className="grid grid-cols-3 grid-rows-3 gap-2 md:gap-3" style={{ width: 'clamp(180px, 100%, 320px)' }}>
+      <div className="w-full flex items-center justify-center">
+        <div className="grid grid-cols-3 grid-rows-3 gap-2" style={{ width: 'clamp(160px, 100%, 260px)' }}>
           {renderNode(0, 0.3)}
           <div />
           {renderNode(1, 0.4)}
-
           <div />
           <motion.div
-            className="relative z-10 rounded-3xl bg-card/50 backdrop-blur-2xl border border-primary/40 flex flex-col items-center justify-center gap-2 aspect-square"
+            className="relative z-10 rounded-2xl bg-card/50 backdrop-blur-2xl border border-primary/40 flex flex-col items-center justify-center gap-1.5 aspect-square"
             style={{
-              boxShadow: '0 0 3rem hsl(var(--primary) / 0.2), 0 0 1.5rem hsl(var(--primary) / 0.1), 0 1rem 3rem hsl(var(--background) / 0.6)',
-              transform: 'translateZ(0)',
+              boxShadow: '0 0 2rem hsl(var(--primary) / 0.2), 0 0 1rem hsl(var(--primary) / 0.1)',
             }}
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
             whileHover={{ scale: 1.05 }}
           >
-            <img src={synapsioLogo} alt="Synapsio" className="w-7 h-7 md:w-8 md:h-8 object-contain" />
-            <span className="text-xs md:text-sm font-semibold text-primary">{center}</span>
+            <img src={synapsioLogo} alt="Synapsio" className="w-6 h-6 object-contain" />
+            <span className="text-[10px] font-semibold text-primary">Synapsio</span>
           </motion.div>
           <div />
-
           {renderNode(2, 0.5)}
           <div />
           {renderNode(3, 0.6)}
@@ -112,37 +80,60 @@ const ConnectionDiagram = ({ elements, center }: { elements: string[]; center: s
   );
 };
 
-// Flow diagram
-const FlowDiagram = ({ steps }: { steps: string[] }) => (
-  <div className="relative w-full py-4 flex items-center justify-center">
-    <div className="flex flex-wrap md:flex-nowrap items-center justify-center gap-3 md:gap-4">
-      {steps.map((step, i) => (
-        <motion.div
-          key={step}
-          className="flex items-center"
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.4, delay: 0.2 + i * 0.15 }}
-        >
-          <div className="w-14 h-14 md:w-20 md:h-20 rounded-2xl bg-card/30 backdrop-blur-xl border border-border/20 flex items-center justify-center"
-            style={{ boxShadow: '0 0.5rem 1.5rem hsl(var(--background) / 0.6)' }}>
-            <span className="text-[10px] md:text-xs font-medium text-muted-foreground/70 text-center px-1 md:px-2">{step}</span>
+const flowSteps = [
+  { label: "Data In", desc: "ERP feeds, carrier APIs, demand signals, supplier data" },
+  { label: "AI Analysis", desc: "Demand forecast · risk simulation · cost modeling" },
+  { label: "Decision", desc: "Optimal action selected across all constraints" },
+  { label: "Action", desc: "Order placed, supplier notified, route updated" },
+];
+
+const AiFlowDiagram = () => (
+  <div className="w-full flex flex-col gap-2">
+    {flowSteps.map((step, i) => (
+      <motion.div
+        key={step.label}
+        initial={{ opacity: 0, x: 12 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.4, delay: 0.2 + i * 0.1 }}
+        className="flex items-start gap-3"
+      >
+        <div className="flex flex-col items-center">
+          <div className="w-7 h-7 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
+            <span className="text-[10px] font-semibold text-primary">{i + 1}</span>
           </div>
-          {i < steps.length - 1 && (
-            <motion.div
-              className="mx-1 md:mx-2"
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3, delay: 0.4 + i * 0.15 }}
-            >
-              <ChevronRight className="w-3 h-3 md:w-4 md:h-4 text-primary/40" />
-            </motion.div>
+          {i < flowSteps.length - 1 && (
+            <div className="w-px h-4 bg-primary/15 mt-1" />
           )}
-        </motion.div>
-      ))}
-    </div>
+        </div>
+        <div className="pb-1">
+          <p className="text-xs font-medium text-foreground/80 leading-none mb-1">{step.label}</p>
+          <p className="text-[11px] text-muted-foreground/50 leading-relaxed">{step.desc}</p>
+        </div>
+      </motion.div>
+    ))}
   </div>
 );
+
+const cards = [
+  {
+    id: "what",
+    label: "What It Is",
+    icon: Database,
+    title: "The Intelligence Layer",
+    subtitle: "for Supply Chains",
+    description: "Synapsio connects every node of your supply chain — ERP systems, warehouses, carriers, and our internal marketplace — into a unified, self-optimizing network.",
+    visual: <ConnectionDiagram />,
+  },
+  {
+    id: "how",
+    label: "What It Does",
+    icon: Brain,
+    title: "Predict. Optimize.",
+    subtitle: "Create. Execute.",
+    description: "Continuously analyzes millions of data points to forecast demand, optimize inventory, orchestrate fulfillment, and create new supply chains — all in real-time.",
+    visual: <AiFlowDiagram />,
+  },
+];
 
 const SolutionSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
@@ -154,9 +145,9 @@ const SolutionSection = () => {
 
       <div className="relative z-10 container mx-auto px-6 lg:px-20 xl:px-28">
         {/* Header */}
-        <div className="max-w-2xl mb-16 md:mb-20">
+        <div className="max-w-2xl mb-14 md:mb-16">
           <motion.p
-            className="text-[0.625rem] tracking-[0.4em] uppercase text-primary/50 mb-10"
+            className="text-[0.625rem] tracking-[0.4em] uppercase text-primary/50 mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8 }}
@@ -164,7 +155,7 @@ const SolutionSection = () => {
             The Solution
           </motion.p>
           <motion.h2
-            className="text-4xl md:text-5xl lg:text-[3.5rem] font-light tracking-[-0.02em] mb-8 leading-[1.08]"
+            className="text-4xl md:text-5xl lg:text-[3.5rem] font-light tracking-[-0.02em] leading-[1.08]"
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.1 }}
@@ -175,48 +166,38 @@ const SolutionSection = () => {
           </motion.h2>
         </div>
 
-        {/* Static side-by-side layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
-          {slides.map((slide, i) => {
-            const Icon = slide.icon;
+        {/* Two horizontal cards stacked */}
+        <div className="flex flex-col gap-5">
+          {cards.map((card, i) => {
+            const Icon = card.icon;
             return (
               <motion.div
-                key={slide.id}
-                initial={{ opacity: 0, y: 30 }}
+                key={card.id}
+                initial={{ opacity: 0, y: 24 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.7, delay: 0.2 + i * 0.15 }}
-                className="flex flex-col gap-4 bg-card/20 backdrop-blur-xl border border-border/20 rounded-3xl p-6 md:p-8"
+                transition={{ duration: 0.7, delay: 0.2 + i * 0.12 }}
+                className="flex flex-col lg:flex-row gap-0 bg-card/20 backdrop-blur-xl border border-border/20 rounded-3xl overflow-hidden"
                 style={{ boxShadow: '0 0.5rem 2rem hsl(var(--background) / 0.4)' }}
               >
-                {/* Label */}
-                <div className="inline-flex items-center gap-3 text-primary/60">
-                  <Icon className="w-5 h-5" />
-                  <span className="text-xs tracking-widest uppercase">{slide.label}</span>
+                {/* Text side */}
+                <div className="flex-1 flex flex-col gap-4 p-6 md:p-8 lg:p-10">
+                  <div className="inline-flex items-center gap-2.5 text-primary/60">
+                    <Icon className="w-4 h-4" />
+                    <span className="text-[10px] tracking-widest uppercase">{card.label}</span>
+                  </div>
+                  <h3 className="text-2xl md:text-3xl font-light leading-tight">
+                    {card.title}
+                    <br />
+                    <span className="text-muted-foreground/50">{card.subtitle}</span>
+                  </h3>
+                  <p className="text-sm text-muted-foreground/65 font-light leading-relaxed max-w-sm">
+                    {card.description}
+                  </p>
                 </div>
 
-                {/* Title */}
-                <h3 className="text-2xl md:text-3xl font-light leading-tight">
-                  {slide.title}
-                  <br />
-                  <span className="text-muted-foreground/50">{slide.subtitle}</span>
-                </h3>
-
-                {/* Description */}
-                <p className="text-base text-muted-foreground/65 font-light leading-relaxed">
-                  {slide.description}
-                </p>
-
-                {/* Diagram */}
-                <div className="pt-4 border-t border-border/10">
-                  {slide.diagram.type === "connect" && (
-                    <ConnectionDiagram
-                      elements={slide.diagram.elements!}
-                      center={slide.diagram.center!}
-                    />
-                  )}
-                  {slide.diagram.type === "flow" && (
-                    <FlowDiagram steps={slide.diagram.steps!} />
-                  )}
+                {/* Visual side */}
+                <div className="flex-shrink-0 lg:w-72 xl:w-80 flex items-center justify-center p-6 md:p-8 border-t border-border/10 lg:border-t-0 lg:border-l bg-background/10">
+                  {card.visual}
                 </div>
               </motion.div>
             );
