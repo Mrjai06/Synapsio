@@ -48,7 +48,7 @@ const roadmapData = [
       <div>
         <div className="flex items-center gap-3 mb-4">
           <span className="text-xs tracking-wider px-3 py-1 rounded-full border bg-muted/50 text-muted-foreground/50 border-border/20">
-            Upcoming
+            Seed round milestone
           </span>
         </div>
         <FloatingSurface elevation="low" className="rounded-2xl">
@@ -86,7 +86,7 @@ const roadmapData = [
       <div>
         <div className="flex items-center gap-3 mb-4">
           <span className="text-xs tracking-wider px-3 py-1 rounded-full border bg-muted/50 text-muted-foreground/50 border-border/20">
-            Upcoming
+            Seed round milestone
           </span>
         </div>
         <FloatingSurface elevation="low" className="rounded-2xl">
@@ -128,7 +128,7 @@ const roadmapData = [
       <div>
         <div className="flex items-center gap-3 mb-4">
           <span className="text-xs tracking-wider px-3 py-1 rounded-full border bg-muted/50 text-muted-foreground/50 border-border/20">
-            Upcoming
+            Post-funding
           </span>
         </div>
         <FloatingSurface elevation="low" className="rounded-2xl">

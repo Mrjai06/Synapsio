@@ -8,11 +8,11 @@ const ProgressNavbar = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   
   const sections = [
-    { id: "preface", label: "Intro" },
+    { id: "hero", label: "Intro" },
+    { id: "opportunity", label: "Opportunity" },
     { id: "problem", label: "Challenge" },
     { id: "solution", label: "Solution" },
     { id: "product", label: "Product" },
-    { id: "opportunity", label: "Opportunity" },
     { id: "roadmap", label: "Roadmap" },
     { id: "team", label: "Team & Vision" },
   ];

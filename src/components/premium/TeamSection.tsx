@@ -24,7 +24,7 @@ const team = [
   {
     name: "CTO (Hiring)",
     title: "Co-founder & CTO",
-    description: "• We're actively recruiting a technical co-founder\n• Deep expertise in backend systems, AI/ML pipelines, or cloud infrastructure\n• Reach out: jakob@synapsio.solutions",
+    description: "• We're actively recruiting a technical co-founder\n• Deep expertise in backend systems, AI/ML pipelines, or cloud infrastructure\n• Reach out: contact@synapsio.co.site",
     imageUrl: ""
   }
 ];
