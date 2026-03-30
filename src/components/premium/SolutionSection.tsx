@@ -80,8 +80,8 @@ const ConnectionDiagram = ({ elements, center }: { elements: string[]; center: s
 
   return (
     <TooltipProvider>
-      <div className="w-full flex items-center justify-center py-4">
-        <div className="grid grid-cols-3 grid-rows-3 gap-3 md:gap-4" style={{ width: 'clamp(220px, 100%, 420px)' }}>
+      <div className="w-full flex items-center justify-center py-2">
+        <div className="grid grid-cols-3 grid-rows-3 gap-2 md:gap-3" style={{ width: 'clamp(180px, 100%, 320px)' }}>
           {renderNode(0, 0.3)}
           <div />
           {renderNode(1, 0.4)}
@@ -114,7 +114,7 @@ const ConnectionDiagram = ({ elements, center }: { elements: string[]; center: s
 
 // Flow diagram
 const FlowDiagram = ({ steps }: { steps: string[] }) => (
-  <div className="relative w-full py-8 flex items-center justify-center">
+  <div className="relative w-full py-4 flex items-center justify-center">
     <div className="flex flex-wrap md:flex-nowrap items-center justify-center gap-3 md:gap-4">
       {steps.map((step, i) => (
         <motion.div
@@ -124,7 +124,7 @@ const FlowDiagram = ({ steps }: { steps: string[] }) => (
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.4, delay: 0.2 + i * 0.15 }}
         >
-          <div className="w-16 h-16 md:w-24 md:h-24 rounded-2xl bg-card/30 backdrop-blur-xl border border-border/20 flex items-center justify-center"
+          <div className="w-14 h-14 md:w-20 md:h-20 rounded-2xl bg-card/30 backdrop-blur-xl border border-border/20 flex items-center justify-center"
             style={{ boxShadow: '0 0.5rem 1.5rem hsl(var(--background) / 0.6)' }}>
             <span className="text-[10px] md:text-xs font-medium text-muted-foreground/70 text-center px-1 md:px-2">{step}</span>
           </div>
@@ -185,7 +185,7 @@ const SolutionSection = () => {
                 initial={{ opacity: 0, y: 30 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.7, delay: 0.2 + i * 0.15 }}
-                className="flex flex-col gap-6 bg-card/20 backdrop-blur-xl border border-border/20 rounded-3xl p-8 md:p-10"
+                className="flex flex-col gap-4 bg-card/20 backdrop-blur-xl border border-border/20 rounded-3xl p-6 md:p-8"
                 style={{ boxShadow: '0 0.5rem 2rem hsl(var(--background) / 0.4)' }}
               >
                 {/* Label */}

@@ -175,6 +175,28 @@ const ProductSection = () => {
       <AmbientGlow color="primary" size="md" intensity="subtle" position="right" className="top-1/4" />
       <AmbientGlow color="accent" size="md" intensity="subtle" position="left" className="bottom-1/4" />
 
+      {/* Section headline */}
+      <div className="relative z-10 container mx-auto px-8 lg:px-20 xl:px-28 mb-16">
+        <motion.p
+          className="text-[0.625rem] tracking-[0.4em] uppercase text-primary/50 mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          The Product
+        </motion.p>
+        <motion.h2
+          className="text-4xl md:text-5xl lg:text-[3.5rem] font-light tracking-[-0.02em] leading-[1.08]"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.1 }}
+        >
+          <span className="text-foreground">See it in action</span>
+        </motion.h2>
+      </div>
+
       {/* Traction block */}
       <div className="relative z-10 container mx-auto px-8 lg:px-20 xl:px-28 mb-24">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -201,8 +223,6 @@ const ProductSection = () => {
 
       {/* MVP App Preview */}
       <div className="relative z-10 container mx-auto px-8 lg:px-20 xl:px-28 mb-32">
-        <p className="text-xs tracking-[0.25em] uppercase text-muted-foreground/35 mb-8">The Platform</p>
-
         {/* Dashboard — full width */}
         <motion.a
           href="https://app.synapsio.solutions"
@@ -260,7 +280,7 @@ const ProductSection = () => {
                 <span className="ml-2 text-[10px] text-muted-foreground/30 font-mono tracking-wide">app.synapsio.solutions{screen.path}</span>
                 <span className="ml-auto text-[10px] text-primary/40 group-hover:text-primary/70 transition-colors">→ Try it live</span>
               </div>
-              <img src={screen.img} alt={`Synapsio ${screen.name}`} className="w-full object-cover object-top" style={{ maxHeight: "260px" }} />
+              <img src={screen.img} alt={`Synapsio ${screen.name}`} className="w-full object-cover object-top" style={{ maxHeight: "380px" }} />
               <div className="px-5 py-3 border-t border-border/10 bg-background/20">
                 <p className="text-[0.625rem] tracking-[0.3em] uppercase text-primary/50 mb-0.5">{screen.name}</p>
                 <p className="text-xs text-muted-foreground/50">{screen.caption}</p>
