@@ -1,4 +1,5 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { X, Maximize2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { CheckCircle, Zap, Brain, TrendingDown, FileSpreadsheet, Eye, BarChart3, RefreshCw, Lock, Activity, Shield, Gauge } from "lucide-react";
 import { FloatingSurface, GlassPanel, AmbientGlow } from "./DepthSystem";
@@ -154,9 +155,53 @@ const OutcomeList = ({
   );
 };
 
+interface LightboxItem { img: string; name: string; caption: string; }
+
+const Lightbox = ({ item, onClose }: { item: LightboxItem; onClose: () => void }) => {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onClose]);
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-10"
+      style={{ background: "hsl(var(--background) / 0.92)", backdropFilter: "blur(20px)" }}
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-6xl"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <p className="text-[0.625rem] tracking-[0.3em] uppercase text-primary/60 mb-0.5">{item.name}</p>
+            <p className="text-xs text-muted-foreground/50">{item.caption}</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="flex items-center gap-1.5 text-xs text-muted-foreground/50 hover:text-foreground transition-colors duration-200 ml-4 flex-shrink-0"
+          >
+            <X className="w-4 h-4" /> Close
+          </button>
+        </div>
+        <img
+          src={item.img}
+          alt={item.name}
+          className="w-full h-auto rounded-2xl border border-border/20"
+          style={{ boxShadow: "0 2rem 6rem hsl(var(--background) / 0.8)" }}
+        />
+        <p className="text-center text-[10px] text-muted-foreground/30 mt-4">Click outside or press Esc to close</p>
+      </div>
+    </div>
+  );
+};
+
 const ProductSection = () => {
   const [comparisonVisible, setComparisonVisible] = useState(false);
+  const [lightbox, setLightbox] = useState<LightboxItem | null>(null);
   const comparisonRef = useRef<HTMLDivElement>(null);
+  const openLightbox = useCallback((item: LightboxItem) => setLightbox(item), []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -170,6 +215,8 @@ const ProductSection = () => {
   }, []);
 
   return (
+    <>
+    {lightbox && <Lightbox item={lightbox} onClose={() => setLightbox(null)} />}
     <section className="relative py-32 md:py-48">
       <AmbientGlow color="secondary" size="xl" intensity="medium" position="center" />
       <AmbientGlow color="primary" size="md" intensity="subtle" position="right" className="top-1/4" />
@@ -224,33 +271,47 @@ const ProductSection = () => {
       {/* MVP App Preview */}
       <div className="relative z-10 container mx-auto px-8 lg:px-20 xl:px-28 mb-32">
         {/* Dashboard — full width */}
-        <motion.a
-          href="https://app.synapsio.solutions"
-          target="_blank"
-          rel="noopener noreferrer"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-          className="group block rounded-2xl border border-border/20 bg-card/20 overflow-hidden hover:border-primary/30 transition-colors duration-500 mb-5"
-        >
-          <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border/10 bg-background/40">
-            <div className="flex gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-border/40" />
-              <span className="w-2 h-2 rounded-full bg-border/40" />
-              <span className="w-2 h-2 rounded-full bg-border/40" />
-            </div>
-            <span className="ml-2 text-[10px] text-muted-foreground/30 font-mono tracking-wide">app.synapsio.solutions/dashboard</span>
-            <span className="ml-auto text-[10px] text-primary/40 group-hover:text-primary/70 transition-colors">→ Try it live</span>
-          </div>
-          <img src={dashboardImg} alt="Synapsio Dashboard" className="w-full h-auto block" />
-          <div className="px-5 py-3 flex items-center justify-between border-t border-border/10 bg-background/20">
-            <div>
-              <p className="text-[0.625rem] tracking-[0.3em] uppercase text-primary/50 mb-0.5">Dashboard</p>
-              <p className="text-xs text-muted-foreground/50">Real-time KPIs · AI activity feed · Approval queue · Synapsio Impact metrics</p>
-            </div>
-          </div>
-        </motion.a>
+        {(() => {
+          const dashItem = { img: dashboardImg, name: "Dashboard", caption: "Real-time KPIs · AI activity feed · Approval queue · Synapsio Impact metrics" };
+          return (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7 }}
+              className="group rounded-2xl border border-border/20 bg-card/20 overflow-hidden hover:border-primary/30 transition-colors duration-500 mb-5 cursor-zoom-in"
+              onClick={() => openLightbox(dashItem)}
+            >
+              <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border/10 bg-background/40">
+                <div className="flex gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-border/40" />
+                  <span className="w-2 h-2 rounded-full bg-border/40" />
+                  <span className="w-2 h-2 rounded-full bg-border/40" />
+                </div>
+                <span className="ml-2 text-[10px] text-muted-foreground/30 font-mono tracking-wide">app.synapsio.solutions/dashboard</span>
+                <span className="ml-auto flex items-center gap-1 text-[10px] text-primary/40 group-hover:text-primary/70 transition-colors">
+                  <Maximize2 className="w-3 h-3" /> Expand
+                </span>
+              </div>
+              <img src={dashboardImg} alt="Synapsio Dashboard" className="w-full h-auto block" />
+              <div className="px-5 py-3 flex items-center justify-between border-t border-border/10 bg-background/20">
+                <div>
+                  <p className="text-[0.625rem] tracking-[0.3em] uppercase text-primary/50 mb-0.5">Dashboard</p>
+                  <p className="text-xs text-muted-foreground/50">{dashItem.caption}</p>
+                </div>
+                <a
+                  href="https://app.synapsio.solutions"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={e => e.stopPropagation()}
+                  className="text-[10px] text-muted-foreground/30 hover:text-primary/60 transition-colors ml-4 flex-shrink-0"
+                >
+                  → Try live
+                </a>
+              </div>
+            </motion.div>
+          );
+        })()}
 
         {/* 2×2 grid — Orders, Inventory, Intelligence, Suppliers */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -260,16 +321,14 @@ const ProductSection = () => {
             { name: "Intelligence", path: "/intelligence", img: intelligenceImg, caption: "Anomaly detection · Severity-ranked AI insights · Reorder alerts · Market signals" },
             { name: "Suppliers", path: "/suppliers", img: suppliersImg, caption: "Supplier risk scoring · Lead times · Order history · API connection status" },
           ].map((screen, i) => (
-            <motion.a
+            <motion.div
               key={screen.name}
-              href="https://app.synapsio.solutions"
-              target="_blank"
-              rel="noopener noreferrer"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: i * 0.08 }}
-              className="group block rounded-2xl border border-border/20 bg-card/20 overflow-hidden hover:border-primary/30 transition-colors duration-500"
+              className="group rounded-2xl border border-border/20 bg-card/20 overflow-hidden hover:border-primary/30 transition-colors duration-500 cursor-zoom-in"
+              onClick={() => openLightbox({ img: screen.img, name: screen.name, caption: screen.caption })}
             >
               <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border/10 bg-background/40">
                 <div className="flex gap-1.5">
@@ -278,14 +337,27 @@ const ProductSection = () => {
                   <span className="w-2 h-2 rounded-full bg-border/40" />
                 </div>
                 <span className="ml-2 text-[10px] text-muted-foreground/30 font-mono tracking-wide">app.synapsio.solutions{screen.path}</span>
-                <span className="ml-auto text-[10px] text-primary/40 group-hover:text-primary/70 transition-colors">→ Try it live</span>
+                <span className="ml-auto flex items-center gap-1 text-[10px] text-primary/40 group-hover:text-primary/70 transition-colors">
+                  <Maximize2 className="w-3 h-3" /> Expand
+                </span>
               </div>
               <img src={screen.img} alt={`Synapsio ${screen.name}`} className="w-full h-auto block" />
-              <div className="px-5 py-3 border-t border-border/10 bg-background/20">
-                <p className="text-[0.625rem] tracking-[0.3em] uppercase text-primary/50 mb-0.5">{screen.name}</p>
-                <p className="text-xs text-muted-foreground/50">{screen.caption}</p>
+              <div className="px-5 py-3 flex items-center justify-between border-t border-border/10 bg-background/20">
+                <div>
+                  <p className="text-[0.625rem] tracking-[0.3em] uppercase text-primary/50 mb-0.5">{screen.name}</p>
+                  <p className="text-xs text-muted-foreground/50">{screen.caption}</p>
+                </div>
+                <a
+                  href="https://app.synapsio.solutions"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={e => e.stopPropagation()}
+                  className="text-[10px] text-muted-foreground/30 hover:text-primary/60 transition-colors ml-4 flex-shrink-0"
+                >
+                  → Try live
+                </a>
               </div>
-            </motion.a>
+            </motion.div>
           ))}
         </div>
       </div>
@@ -363,6 +435,7 @@ const ProductSection = () => {
       </div>
 
     </section>
+    </>
   );
 };
 
