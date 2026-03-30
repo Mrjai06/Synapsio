@@ -28,20 +28,20 @@ const VisionSection = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
           >
-            Ready to transform your supply chain?
+            Ready to see Synapsio in action?
           </motion.h2>
-          
-          <motion.p 
+
+          <motion.p
             className="text-lg text-muted-foreground/40 mb-14 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.1 }}
           >
-            Join forward-thinking enterprises building resilient, intelligent operations.
+            We're onboarding a small number of pilot customers. Get a personal walkthrough of the platform.
           </motion.p>
-          
-          <motion.div 
+
+          <motion.div
             className="flex flex-col sm:flex-row gap-5 justify-center"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -49,16 +49,47 @@ const VisionSection = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <FloatingSurface elevation="high" glow glowColor="primary" className="rounded-full">
-              <a href="/Synapsio_Pitch.pdf" target="_blank" rel="noopener noreferrer">
-                <Button 
-                  size="lg" 
+              <a href="mailto:jakob@synapsio.solutions?subject=Synapsio%20Pilot%20Request" rel="noopener noreferrer">
+                <Button
+                  size="lg"
                   className="group bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-10 py-7 text-sm tracking-wide font-normal transition-all duration-1000 hover:scale-[1.02]"
+                >
+                  Request Intro
+                  <ArrowRight className="ml-3 h-4 w-4 transition-transform duration-700 group-hover:translate-x-1" />
+                </Button>
+              </a>
+            </FloatingSurface>
+            <FloatingSurface elevation="low" className="rounded-full">
+              <a href="/Synapsio_Pitch.pdf" target="_blank" rel="noopener noreferrer">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="group rounded-full px-10 py-7 text-sm tracking-wide font-normal transition-all duration-1000 hover:scale-[1.02]"
                 >
                   View Pitchdeck
                   <ArrowRight className="ml-3 h-4 w-4 transition-transform duration-700 group-hover:translate-x-1" />
                 </Button>
               </a>
             </FloatingSurface>
+          </motion.div>
+
+          {/* Trust strip */}
+          <motion.div
+            className="mt-16 flex flex-col sm:flex-row items-center justify-center gap-6 text-xs text-muted-foreground/30 tracking-wide"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, delay: 0.5 }}
+          >
+            <span>GDPR-compliant</span>
+            <span className="hidden sm:block w-px h-4 bg-border/30" />
+            <span>Hosted in EU (Frankfurt)</span>
+            <span className="hidden sm:block w-px h-4 bg-border/30" />
+            <span>Built on Supabase + OpenAI</span>
+            <span className="hidden sm:block w-px h-4 bg-border/30" />
+            <a href="https://app.synapsio.solutions" target="_blank" rel="noopener noreferrer" className="hover:text-muted-foreground/60 transition-colors">
+              Live demo available →
+            </a>
           </motion.div>
         </div>
       </div>

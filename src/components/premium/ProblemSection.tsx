@@ -35,7 +35,7 @@ const problemNodes: ProblemNode[] = [
     impacts: [
       "No end-to-end visibility across the chain",
       "More manual work required to plan supply chains",
-      "Supply chain inefficiencies increase operational costs by up to 20%"
+      "Supply chain inefficiencies increase operational costs by up to 20% (Deloitte)"
     ],
     position: { x: 0.975, y: 0.345 },
   },
@@ -61,7 +61,7 @@ const problemNodes: ProblemNode[] = [
     impacts: [
       "Higher volatility in global trade",
       "Supply disruptions and planning uncertainty",
-      "The Economist Intelligence Unit estimates poor supply-chain management costs $1 Trillion annually",
+      "Poor supply-chain management costs $1 Trillion annually in lost revenue (Economist Intelligence Unit)",
       "New environmental and economic regulations for supply chains create difficulties for supply-chain planning"
     ],
     position: { x: 0.205, y: 0.905 },
@@ -73,7 +73,7 @@ const problemNodes: ProblemNode[] = [
     shortTitle: "Criminality",
     description: "Criminal activity and human error introduce unpredictable disruptions, from fraud and cyberattacks to costly operational mistakes.",
     impacts: [
-      "Cybercrime costs supply chains billions annually",
+      "Software supply chain attacks projected to cost $60B annually by 2025 (Cybersecurity Ventures)",
       "Human error, such as miscounts, poor forecasting and communication lapses cause significant operational disruptions and losses",
       "Lack of traceability enables fraud and counterfeiting"
     ],

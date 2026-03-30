@@ -31,36 +31,36 @@ const companyLogos: Record<string, string> = {
 
 // Market Opportunity Data (Pyramid)
 const marketLayers = [
-  { 
-    id: "tam", 
-    label: "TAM", 
-    title: "Global AI-powered supply-chain market",
-    value: "$50B+",
-    description: "Revenue potential",
+  {
+    id: "tam",
+    label: "TAM",
+    title: "Global AI-powered supply-chain market by 2030",
+    value: "~$41–51B",
+    description: "Projected market size by 2030",
     opportunityPoints: [
       {
         category: "Global AI demand",
         points: [
-          "Enterprise AI spending projected to exceed $500B by 2028",
-          "Supply chain digitization is the largest untapped vertical",
+          "Global enterprise AI spend projected to reach $632B by 2028 (IDC, 2024)",
+          "Supply chain digitization is the largest single AI investment vertical",
           "Every Fortune 500 company is actively investing in AI-driven operations"
         ]
       },
       {
         category: "Market dynamics",
         points: [
-          "Legacy systems create $50B+ replacement opportunity",
+          "AI in supply chain growing at ~35% CAGR 2025–2030 (Mordor Intelligence, 2025)",
           "Cross-border complexity drives demand for intelligent orchestration"
         ]
       }
     ]
   },
-  { 
-    id: "sam", 
-    label: "SAM", 
-    title: "Initial target market (EU)",
-    value: "$7B-20B",
-    description: "Revenue potential",
+  {
+    id: "sam",
+    label: "SAM",
+    title: "Initial target market (EU SCM tech)",
+    value: "~$8–20B",
+    description: "EU supply chain software market",
     opportunityPoints: [
       {
         category: "European advantage",
@@ -73,14 +73,14 @@ const marketLayers = [
       {
         category: "Adoption readiness",
         points: [
-          "70% of EU enterprises plan AI integration in supply chain by 2027"
+          "70% of large organizations globally will adopt AI supply chain forecasting by 2030 (Gartner, 2025)"
         ]
       }
     ]
   },
-  { 
-    id: "som", 
-    label: "SOM", 
+  {
+    id: "som",
+    label: "SOM",
     title: "Local market (DACH)",
     value: "$25-60M",
     description: "5 Year revenue potential: ARR",
@@ -94,7 +94,7 @@ const marketLayers = [
       {
         category: "AI momentum",
         points: [
-          "Supply chain spend on AI is growing with a ~35% CAGR increase",
+          "AI in supply chain growing ~35% CAGR through 2030 (Mordor Intelligence, 2025)",
           "Shifting from pilots to core infrastructure in various industries",
           "Operational budgets reallocating from legacy tools into AI platforms"
         ]
@@ -123,8 +123,8 @@ const whyNowData = {
     "SCM-Budgets are shifting toward AI-Based Solutions",
     "Early Platforms move toward AI-native architectures"
   ],
-  shiftHighlight: "Global AI spend in supply chain expected to grow >35% CAGR until 2030",
-  shiftSource: "Gartner, IDC, 2025",
+  shiftHighlight: "Global AI spend in supply chain expected to grow ~35% CAGR through 2030",
+  shiftSource: "Mordor Intelligence, 2025",
   
   pressure: [
     "Increasing operational complexity in global supply chains",

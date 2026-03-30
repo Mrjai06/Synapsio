@@ -22,9 +22,9 @@ const team = [
     linkedinUrl: "https://www.linkedin.com/in/luis-boy-a6b787378/"
   },
   {
-    name: "You?",
+    name: "CTO (Hiring)",
     title: "Co-founder & CTO",
-    description: "• We're looking for a technical co-founder\n• Adept in programming and software engineering\n• Ready to build the future of supply chain AI",
+    description: "• We're actively recruiting a technical co-founder\n• Deep expertise in backend systems, AI/ML pipelines, or cloud infrastructure\n• Reach out: jakob@synapsio.solutions",
     imageUrl: ""
   }
 ];

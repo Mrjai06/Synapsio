@@ -68,13 +68,13 @@ const HeroSection = () => {
           animationDelay: "0.4s",
           animationDuration: "1.4s"
         }}>
-          <span className="text-foreground font-light">Connections </span>
-          <span className="text-primary font-light">you can rely on</span>
+          <span className="text-foreground font-light">The autonomous intelligence layer </span>
+          <span className="text-primary font-light">for supply chains</span>
         </h1>
         <p className="text-lg md:text-xl max-w-xl font-light leading-[1.7] animate-fade-in text-primary/70 text-center" style={{
           animationDelay: "0.6s",
           animationDuration: "1.4s"
-        }}>A fully automated AI-based SCM-solution used for the management and creation of supply-chains</p>
+        }}>AI-native supply chain management — from reordering to supplier negotiation, fully automated.</p>
       </div>
 
       {/* BOTTOM: CTA centered */}
