@@ -4,6 +4,11 @@ import { CheckCircle, Zap, Brain, TrendingDown, FileSpreadsheet, Eye, BarChart3,
 import { FloatingSurface, GlassPanel, AmbientGlow } from "./DepthSystem";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import FeaturesSection from "./FeaturesSection";
+import dashboardImg from "@/assets/screenshots/dashboard.png";
+import inventoryImg from "@/assets/screenshots/inventory.png";
+import intelligenceImg from "@/assets/screenshots/intelligence.png";
+import suppliersImg from "@/assets/screenshots/suppliers.png";
+import ordersImg from "@/assets/screenshots/orders.png";
 
 interface ComparisonStep {
   icon: React.ElementType;
@@ -197,32 +202,43 @@ const ProductSection = () => {
       {/* MVP App Preview */}
       <div className="relative z-10 container mx-auto px-8 lg:px-20 xl:px-28 mb-32">
         <p className="text-xs tracking-[0.25em] uppercase text-muted-foreground/35 mb-8">The Platform</p>
+
+        {/* Dashboard — full width */}
+        <motion.a
+          href="https://app.synapsio.solutions"
+          target="_blank"
+          rel="noopener noreferrer"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+          className="group block rounded-2xl border border-border/20 bg-card/20 overflow-hidden hover:border-primary/30 transition-colors duration-500 mb-5"
+        >
+          <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border/10 bg-background/40">
+            <div className="flex gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-border/40" />
+              <span className="w-2 h-2 rounded-full bg-border/40" />
+              <span className="w-2 h-2 rounded-full bg-border/40" />
+            </div>
+            <span className="ml-2 text-[10px] text-muted-foreground/30 font-mono tracking-wide">app.synapsio.solutions/dashboard</span>
+            <span className="ml-auto text-[10px] text-primary/40 group-hover:text-primary/70 transition-colors">→ Try it live</span>
+          </div>
+          <img src={dashboardImg} alt="Synapsio Dashboard" className="w-full object-cover object-top" style={{ maxHeight: "420px" }} />
+          <div className="px-5 py-3 flex items-center justify-between border-t border-border/10 bg-background/20">
+            <div>
+              <p className="text-[0.625rem] tracking-[0.3em] uppercase text-primary/50 mb-0.5">Dashboard</p>
+              <p className="text-xs text-muted-foreground/50">Real-time KPIs · AI activity feed · Approval queue · Synapsio Impact metrics</p>
+            </div>
+          </div>
+        </motion.a>
+
+        {/* 2×2 grid — Orders, Inventory, Intelligence, Suppliers */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {[
-            {
-              name: "Dashboard",
-              description: "Real-time KPIs, AI activity feed, low-stock alerts, and pending approval queue — everything in one view.",
-              path: "/dashboard",
-              accent: "primary",
-            },
-            {
-              name: "Inventory",
-              description: "Full product catalog with demand forecasting, reorder suggestions, and AI-driven stock optimization.",
-              path: "/inventory",
-              accent: "primary",
-            },
-            {
-              name: "Intelligence",
-              description: "Market risk alerts, supply disruption signals, and AI-generated insights scanned across your supplier network.",
-              path: "/intelligence",
-              accent: "primary",
-            },
-            {
-              name: "Suppliers",
-              description: "Supplier directory with reliability scores, order history, API-ordering capability, and autonomous onboarding.",
-              path: "/suppliers",
-              accent: "primary",
-            },
+            { name: "Orders", path: "/orders", img: ordersImg, caption: "Purchase order tracking · Status stepper · AI reasoning · Email + API ordering" },
+            { name: "Inventory", path: "/inventory", img: inventoryImg, caption: "40 products tracked · Risk badges · Demand/day · Days left · Per-supplier breakdown" },
+            { name: "Intelligence", path: "/intelligence", img: intelligenceImg, caption: "Anomaly detection · Severity-ranked AI insights · Reorder alerts · Market signals" },
+            { name: "Suppliers", path: "/suppliers", img: suppliersImg, caption: "Supplier risk scoring · Lead times · Order history · API connection status" },
           ].map((screen, i) => (
             <motion.a
               key={screen.name}
@@ -233,26 +249,21 @@ const ProductSection = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: i * 0.08 }}
-              className="group block rounded-2xl border border-border/20 bg-card/20 backdrop-blur-sm overflow-hidden hover:border-primary/30 transition-colors duration-500"
+              className="group block rounded-2xl border border-border/20 bg-card/20 overflow-hidden hover:border-primary/30 transition-colors duration-500"
             >
-              {/* Mock screen header bar */}
-              <div className="flex items-center gap-2 px-4 py-3 border-b border-border/15 bg-background/30">
+              <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border/10 bg-background/40">
                 <div className="flex gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-border/40" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-border/40" />
-                  <span className="w-2.5 h-2.5 rounded-full bg-border/40" />
+                  <span className="w-2 h-2 rounded-full bg-border/40" />
+                  <span className="w-2 h-2 rounded-full bg-border/40" />
+                  <span className="w-2 h-2 rounded-full bg-border/40" />
                 </div>
-                <span className="ml-2 text-[10px] text-muted-foreground/30 tracking-wide font-mono">
-                  app.synapsio.solutions{screen.path}
-                </span>
+                <span className="ml-2 text-[10px] text-muted-foreground/30 font-mono tracking-wide">app.synapsio.solutions{screen.path}</span>
+                <span className="ml-auto text-[10px] text-primary/40 group-hover:text-primary/70 transition-colors">→ Try it live</span>
               </div>
-              {/* Content */}
-              <div className="p-6">
-                <p className="text-[0.625rem] tracking-[0.3em] uppercase text-primary/50 mb-2">{screen.name}</p>
-                <p className="text-sm text-muted-foreground/60 leading-relaxed mb-4">{screen.description}</p>
-                <span className="text-xs text-primary/50 group-hover:text-primary transition-colors duration-300">
-                  → Try it live
-                </span>
+              <img src={screen.img} alt={`Synapsio ${screen.name}`} className="w-full object-cover object-top" style={{ maxHeight: "260px" }} />
+              <div className="px-5 py-3 border-t border-border/10 bg-background/20">
+                <p className="text-[0.625rem] tracking-[0.3em] uppercase text-primary/50 mb-0.5">{screen.name}</p>
+                <p className="text-xs text-muted-foreground/50">{screen.caption}</p>
               </div>
             </motion.a>
           ))}
