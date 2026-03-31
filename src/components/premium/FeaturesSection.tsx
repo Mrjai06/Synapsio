@@ -636,33 +636,442 @@ const LiveExplanationPanel = ({
 
 // ============================================================
 // MARKETPLACE VISUALIZATION
-// Supplier leaderboard — score bars animate on decision, PO confirmation on execution
+// Radial supplier network — AI hub evaluates all, selects winner instantly
 // ============================================================
 const MarketplaceVisualization = ({ state }: { state: SystemState }) => {
-  const suppliers = [
-    { name: "AltaSupply GmbH", cost: "€4.20", lead: "3d", risk: "LOW",  riskClr: "#3A8080", score: 92, pct: 0.92 },
-    { name: "NordTrade AG",    cost: "€4.85", lead: "5d", risk: "MED",  riskClr: "#F0A500", score: 84, pct: 0.84 },
-    { name: "BayernLogistik", cost: "€5.10", lead: "4d", risk: "MED",  riskClr: "#F0A500", score: 78, pct: 0.78 },
-    { name: "FastParts Ltd",  cost: "€6.30", lead: "2d", risk: "HIGH", riskClr: "#E8845A", score: 65, pct: 0.65 },
+  const cx = 275, cy = 178;
+  const scores = [92, 84, 65, 71, 78, 58, 83, 69, 76];
+  const nodes = [
+    { id: 0, x: 110, y: 88,  winner: true,  name: "AltaSupply GmbH" },
+    { id: 1, x: 415, y: 80,  winner: false, name: "NordTrade AG" },
+    { id: 2, x: 448, y: 190, winner: false, name: "FastParts Ltd" },
+    { id: 3, x: 390, y: 290, winner: false, name: "ChemSource EU" },
+    { id: 4, x: 150, y: 292, winner: false, name: "BayernLogistik" },
+    { id: 5, x: 88,  y: 200, winner: false, name: "AsiaLink GmbH" },
+    { id: 6, x: 148, y: 60,  winner: false, name: "TechParts AG" },
+    { id: 7, x: 284, y: 38,  winner: false, name: "EuroTrade B.V." },
+    { id: 8, x: 400, y: 56,  winner: false, name: "ScandiSupply" },
   ];
 
-  // layout constants
-  const tX = 30, tY = 72, rH = 54;
-  const cName = 42, cCost = 195, cLead = 268, cRisk = 328, bX = 394, bW = 82, cScore = 492;
+  // no layout constants needed — network layout
 
   return (
     <svg className="absolute inset-0 w-full h-full" viewBox="0 0 550 400" preserveAspectRatio="xMidYMid meet">
       <defs>
         <filter id="mp-glow">
-          <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-          <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          <feGaussianBlur stdDeviation="6" result="cb"/><feMerge><feMergeNode in="cb"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="mp-glow-sm">
+          <feGaussianBlur stdDeviation="3" result="cb"/><feMerge><feMergeNode in="cb"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <radialGradient id="hub-aura" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.18" />
+          <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+
+      {/* Hub ambient glow */}
+      <motion.circle cx={cx} cy={cy} fill="url(#hub-aura)"
+        animate={{ r: [88, 105, 88] }}
+        transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
+      />
+
+      {/* Scanning rings during decision */}
+      {state === "decision" && [0, 0.6, 1.2].map((delay, i) => (
+        <motion.circle key={i} cx={cx} cy={cy} fill="none"
+          stroke="hsl(var(--accent))" strokeWidth="1.5"
+          animate={{ r: [12, 215], opacity: [0.75, 0] }}
+          transition={{ duration: 1.8, delay, repeat: Infinity, ease: "easeOut" }}
+        />
+      ))}
+
+      {/* Connection lines */}
+      {nodes.map((n) => {
+        const isWinner = n.winner && state === "execution";
+        const isFaded = !n.winner && state === "execution";
+        return (
+          <motion.line key={`l-${n.id}`}
+            x1={n.x} y1={n.y} x2={cx} y2={cy}
+            stroke={isWinner ? "hsl(var(--primary))" : "hsl(var(--border))"}
+            strokeWidth={isWinner ? 2.5 : 0.8}
+            strokeDasharray={isWinner ? "none" : "3 6"}
+            animate={{ strokeOpacity: isWinner ? [0.6, 1, 0.6] : isFaded ? 0.04 : state === "decision" ? 0.3 : 0.15 }}
+            transition={{ duration: 1.5, repeat: isWinner ? Infinity : 0 }}
+          />
+        );
+      })}
+
+      {/* Supplier dots */}
+      {nodes.map((n, i) => {
+        const isWinner = n.winner && state === "execution";
+        const isFaded = !n.winner && state === "execution";
+        return (
+          <motion.g key={n.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4, delay: i * 0.06 }}>
+            {isWinner && (
+              <motion.circle cx={n.x} cy={n.y} fill="hsl(var(--primary))" fillOpacity="0.18" filter="url(#mp-glow)"
+                animate={{ r: [14, 22, 14] }} transition={{ duration: 1.5, repeat: Infinity }} />
+            )}
+            <motion.circle cx={n.x} cy={n.y}
+              fill={isWinner ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))"}
+              filter={isWinner ? "url(#mp-glow)" : "none"}
+              animate={{
+                r: isWinner ? [9, 12, 9] : state === "decision" ? [5, 7, 5] : 5,
+                fillOpacity: isFaded ? 0.1 : isWinner ? 1 : state === "idle" ? 0.4 : 0.55,
+              }}
+              transition={{ duration: isWinner ? 1.5 : 0.5, delay: state === "decision" ? i * 0.07 : 0, repeat: Infinity }}
+            />
+            {/* Score flash during decision */}
+            {state === "decision" && (
+              <motion.text x={n.x} y={n.y - 12} textAnchor="middle" fontSize="10"
+                fill="hsl(var(--accent))" fontFamily="inherit" fontWeight="700"
+                animate={{ opacity: [0, 1, 1, 0] }}
+                transition={{ duration: 0.55, delay: i * 0.07, repeat: Infinity, repeatDelay: nodes.length * 0.07 }}>
+                {scores[i]}
+              </motion.text>
+            )}
+            {/* Winner callout */}
+            {isWinner && (
+              <motion.g initial={{ opacity: 0, scale: 0.7 }} animate={{ opacity: 1, scale: 1 }}
+                transition={{ type: "spring", stiffness: 280, delay: 0.1 }}>
+                <rect x={n.x - 43} y={n.y - 32} width="86" height="18" rx="9" fill="hsl(var(--primary))" />
+                <text x={n.x} y={n.y - 19} textAnchor="middle" fontSize="9"
+                  fill="hsl(var(--background))" fontFamily="inherit" fontWeight="700">BEST MATCH · 92</text>
+                <text x={n.x} y={n.y + 24} textAnchor="middle" fontSize="10"
+                  fill="hsl(var(--primary))" fontFamily="inherit" fontWeight="500">{n.name}</text>
+              </motion.g>
+            )}
+          </motion.g>
+        );
+      })}
+
+      {/* Central AI hub */}
+      <motion.circle cx={cx} cy={cy} r="44"
+        fill="hsl(var(--background))"
+        stroke="hsl(var(--primary))"
+        strokeWidth={state === "decision" ? 2.5 : 1.5}
+        strokeOpacity={state === "decision" ? 1 : 0.55}
+        filter={state === "decision" ? "url(#mp-glow-sm)" : "none"}
+        animate={state === "decision" ? { scale: [1, 1.06, 1] } : { scale: 1 }}
+        transition={{ duration: 0.8, repeat: state === "decision" ? Infinity : 0 }}
+      />
+      <text x={cx} y={cy - 8} textAnchor="middle" fontSize="11"
+        fill="hsl(var(--primary))" fontFamily="inherit" fontWeight="700">SYNAPSIO</text>
+      <motion.text x={cx} y={cy + 10} textAnchor="middle" fontSize="9"
+        fill="hsl(var(--primary))" fillOpacity="0.7" fontFamily="inherit"
+        animate={state === "decision" ? { fillOpacity: [0.4, 1, 0.4] } : {}}
+        transition={{ duration: 0.7, repeat: state === "decision" ? Infinity : 0 }}>
+        {state === "idle" ? "Monitoring" : state === "decision" ? "Evaluating..." : "✓ Matched"}
+      </motion.text>
+
+      {/* State label */}
+      <text x={cx} y="334" textAnchor="middle" fontSize="9"
+        fill="hsl(var(--muted-foreground))" fillOpacity="0.3" fontFamily="inherit" letterSpacing="2">
+        {state === "idle" ? "MONITORING 47 SUPPLIERS IN REAL-TIME"
+          : state === "decision" ? "AI SCORING — COST · RISK · CAPACITY · LEAD TIME"
+          : "OPTIMAL MATCH FOUND IN 0.3s"}
+      </text>
+
+      {/* Execution PO confirmation */}
+      {state === "execution" && (
+        <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
+          <rect x="88" y="350" width="374" height="38" rx="12"
+            fill="hsl(var(--primary))" fillOpacity="0.11"
+            stroke="hsl(var(--primary))" strokeOpacity="0.38" strokeWidth="1.5" />
+          <text x="148" y="365" fontSize="9" fill="hsl(var(--primary))" fillOpacity="0.65"
+            fontFamily="inherit" letterSpacing="2">PO ISSUED AUTOMATICALLY</text>
+          <text x="148" y="381" fontSize="12" fill="hsl(var(--primary))"
+            fontFamily="inherit" fontWeight="500">AltaSupply GmbH · 1,200 units · €5,040</text>
+          <text x="442" y="374" textAnchor="middle" fontSize="22" fill="hsl(var(--primary))" fontFamily="inherit">✓</text>
+        </motion.g>
+      )}
+    </svg>
+  );
+};
+
+// ============================================================
+// OPERATIONS VISUALIZATION
+// Horizontal pipeline — order flows from alert to delivery automatically
+// ============================================================
+const OperationsVisualization = ({ state }: { state: SystemState }) => {
+  const stages = [
+    { label: "Stock Alert",  sub: "Threshold hit",   x: 62  },
+    { label: "AI Decides",   sub: "0.3s",             x: 174 },
+    { label: "PO Created",   sub: "Automated",        x: 286 },
+    { label: "In Transit",   sub: "Route optimized",  x: 398 },
+    { label: "Delivered",    sub: "Confirmed",         x: 490 },
+  ];
+  const nodeY = 152;
+  const activeIdx = state === "idle" ? 0 : state === "decision" ? 1 : 4;
+
+  return (
+    <svg className="absolute inset-0 w-full h-full" viewBox="0 0 550 400" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <filter id="pipe-glow">
+          <feGaussianBlur stdDeviation="5" result="cb"/><feMerge><feMergeNode in="cb"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
 
-      {/* Header */}
-      <text x="275" y="38" textAnchor="middle" fontSize="9" fill="hsl(var(--muted-foreground))" fillOpacity="0.4" fontFamily="inherit" letterSpacing="3">AI SUPPLIER EVALUATION · REQUEST #4721</text>
+      {/* Context label */}
+      <text x="275" y="45" textAnchor="middle" fontSize="11"
+        fill="hsl(var(--foreground))" fillOpacity="0.55" fontFamily="inherit" fontWeight="400">
+        Order #4721 · DC-West inventory threshold breached
+      </text>
 
-      {/* Table header row */}
+      {/* Pipeline connecting lines */}
+      {stages.slice(0, -1).map((s, i) => {
+        const nextX = stages[i + 1].x;
+        const done = i < activeIdx || state === "execution";
+        return (
+          <motion.line key={i}
+            x1={s.x + 27} y1={nodeY} x2={nextX - 27} y2={nodeY}
+            stroke={done ? "hsl(var(--primary))" : "hsl(var(--border))"}
+            strokeWidth={2}
+            animate={{ strokeOpacity: done ? (state === "execution" ? [0.5, 0.9, 0.5] : 0.6) : 0.2 }}
+            transition={{ duration: 1.5, delay: i * 0.1, repeat: state === "execution" ? Infinity : 0 }}
+          />
+        );
+      })}
+
+      {/* Stage nodes */}
+      {stages.map((s, i) => {
+        const done = i < activeIdx || state === "execution";
+        const current = i === activeIdx && state !== "execution";
+        const clr = done ? "hsl(var(--primary))" : current ? "hsl(var(--accent))" : "hsl(var(--border))";
+        return (
+          <motion.g key={i}
+            animate={current ? { y: [0, -3, 0] } : {}}
+            transition={{ duration: 1.2, repeat: current ? Infinity : 0 }}
+          >
+            {current && (
+              <motion.circle cx={s.x} cy={nodeY} fill="hsl(var(--accent))" fillOpacity="0.12"
+                animate={{ r: [28, 38, 28] }} transition={{ duration: 1, repeat: Infinity }} />
+            )}
+            <motion.circle cx={s.x} cy={nodeY} r="26"
+              fill="hsl(var(--background))" stroke={clr}
+              strokeWidth={current ? 2.5 : done ? 2 : 1}
+              strokeOpacity={done || current ? 1 : 0.25}
+              filter={current || (done && state === "execution") ? "url(#pipe-glow)" : "none"}
+              animate={done && state === "execution" ? { strokeOpacity: [0.7, 1, 0.7] } : {}}
+              transition={{ duration: 1.5, delay: i * 0.12, repeat: state === "execution" ? Infinity : 0 }}
+            />
+            <text x={s.x} y={nodeY + 6} textAnchor="middle" fontSize="14"
+              fill={done ? "hsl(var(--primary))" : current ? "hsl(var(--accent))" : "hsl(var(--border))"}
+              fontFamily="inherit" fontWeight="700"
+              fillOpacity={done || current ? 1 : 0.3}>
+              {done ? "✓" : current ? (i === 0 ? "!" : "◎") : "○"}
+            </text>
+            <text x={s.x} y={nodeY + 44} textAnchor="middle" fontSize="11"
+              fill="hsl(var(--foreground))"
+              fillOpacity={done || current ? 0.85 : 0.28}
+              fontFamily="inherit" fontWeight={current ? "600" : "400"}>
+              {s.label}
+            </text>
+            <text x={s.x} y={nodeY + 58} textAnchor="middle" fontSize="9"
+              fill="hsl(var(--muted-foreground))"
+              fillOpacity={done || current ? 0.5 : 0.18}
+              fontFamily="inherit">
+              {current && state === "decision" ? "Working..." : s.sub}
+            </text>
+          </motion.g>
+        );
+      })}
+
+      {/* Flowing token during execution */}
+      {state === "execution" && [0, 1].map((i) => (
+        <motion.circle key={i} cy={nodeY} r="7"
+          fill="hsl(var(--primary))" filter="url(#pipe-glow)"
+          animate={{ cx: [stages[0].x, stages[4].x], opacity: [0, 1, 1, 0] }}
+          transition={{ duration: 2.2, delay: i * 1.1, repeat: Infinity, ease: "linear" }}
+        />
+      ))}
+
+      {/* Comparison block */}
+      <g>
+        <rect x="62" y="242" width="426" height="74" rx="12"
+          fill="hsl(var(--border))" fillOpacity="0.05"
+          stroke="hsl(var(--border))" strokeOpacity="0.1" strokeWidth="1" />
+        {/* Traditional */}
+        <text x="155" y="266" textAnchor="middle" fontSize="9"
+          fill="hsl(var(--muted-foreground))" fillOpacity="0.4" fontFamily="inherit" letterSpacing="1.5">TRADITIONAL</text>
+        <text x="155" y="291" textAnchor="middle" fontSize="20"
+          fill="#E8845A" fontFamily="inherit" fontWeight="300">3–5 days</text>
+        <text x="155" y="307" textAnchor="middle" fontSize="9"
+          fill="hsl(var(--muted-foreground))" fillOpacity="0.32" fontFamily="inherit">manual, email-based</text>
+        {/* Divider */}
+        <line x1="275" y1="250" x2="275" y2="308"
+          stroke="hsl(var(--border))" strokeOpacity="0.18" strokeWidth="1" />
+        <text x="275" y="285" textAnchor="middle" fontSize="10"
+          fill="hsl(var(--muted-foreground))" fillOpacity="0.28" fontFamily="inherit">vs</text>
+        {/* Synapsio */}
+        <text x="395" y="266" textAnchor="middle" fontSize="9"
+          fill="hsl(var(--primary))" fillOpacity="0.55" fontFamily="inherit" letterSpacing="1.5">SYNAPSIO</text>
+        <motion.text x="395" y="291" textAnchor="middle" fontSize="20"
+          fill="hsl(var(--primary))" fontFamily="inherit" fontWeight="300"
+          animate={state === "execution" ? { fillOpacity: [0.8, 1, 0.8] } : { fillOpacity: 0.8 }}
+          transition={{ duration: 1.5, repeat: state === "execution" ? Infinity : 0 }}>
+          0.8 seconds
+        </motion.text>
+        <text x="395" y="307" textAnchor="middle" fontSize="9"
+          fill="hsl(var(--primary))" fillOpacity="0.4" fontFamily="inherit">fully automated</text>
+      </g>
+    </svg>
+  );
+};
+
+// ============================================================
+// COMMUNICATION VISUALIZATION
+// Live AI-to-AI negotiation chat — messages appear as state advances
+// ============================================================
+const CommunicationVisualization = ({ state }: { state: SystemState }) => {
+  const lX = 62, rX = 488, aiY = 62;
+
+  type MsgSide = "synapsio" | "partner";
+  const messages: { from: MsgSide; line1: string; line2?: string; time: string; thinking?: boolean }[] = [
+    { from: "partner",  line1: "Capacity issue on order #4721",  line2: "Max available: 4,200 units",    time: "09:41:32" },
+    { from: "synapsio", line1: "Evaluating alternatives...",                                              time: "09:41:32", thinking: true },
+    { from: "synapsio", line1: "Proposal: 4,800 units @ €4.32",  line2: "DAP Hamburg · Net-30 · 4 days", time: "09:41:32" },
+    { from: "partner",  line1: "Accepted. Contracts updated.",    line2: "Confirmed automatically",        time: "09:41:33" },
+  ];
+
+  const visible = state === "idle" ? 1 : state === "decision" ? 3 : 4;
+  const msgW = 195, msgStartY = 112, msgGapY = 58;
+  const leftX = 108, rightX = 247;
+
+  return (
+    <svg className="absolute inset-0 w-full h-full" viewBox="0 0 550 400" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <filter id="chat-glow">
+          <feGaussianBlur stdDeviation="5" result="cb"/><feMerge><feMergeNode in="cb"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      {/* Left AI node — Synapsio */}
+      <motion.g animate={state === "decision" ? { scale: [1, 1.05, 1] } : { scale: 1 }}
+        transition={{ duration: 1.2, repeat: state === "decision" ? Infinity : 0 }}>
+        <circle cx={lX} cy={aiY} r="30" fill="hsl(var(--background))"
+          stroke="hsl(var(--primary))" strokeWidth="1.5" strokeOpacity="0.6" />
+        <motion.circle cx={lX} cy={aiY} r="30" fill="none"
+          stroke="hsl(var(--primary))" strokeWidth="1"
+          animate={state === "execution" ? { r: [30, 44], opacity: [0.7, 0] } : {}}
+          transition={{ duration: 1.4, repeat: state === "execution" ? Infinity : 0 }} />
+        <circle cx={lX} cy={aiY - 5} r="7" fill="none" stroke="hsl(var(--primary))" strokeWidth="1.5" strokeOpacity="0.8" />
+        <circle cx={lX} cy={aiY + 5} r="4" fill="hsl(var(--primary))" fillOpacity="0.35" />
+        <text x={lX} y={aiY + 48} textAnchor="middle" fontSize="9"
+          fill="hsl(var(--primary))" fontFamily="inherit" fontWeight="600">SYNAPSIO AI</text>
+        <text x={lX} y={aiY + 59} textAnchor="middle" fontSize="8"
+          fill="hsl(var(--muted-foreground))" fillOpacity="0.4" fontFamily="inherit">Your Agent</text>
+        {state === "execution" && (
+          <motion.g initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 300 }}>
+            <circle cx={lX + 22} cy={aiY - 22} r="10" fill="hsl(var(--primary))" />
+            <text x={lX + 22} y={aiY - 17} textAnchor="middle" fontSize="10"
+              fill="hsl(var(--background))" fontFamily="inherit" fontWeight="bold">✓</text>
+          </motion.g>
+        )}
+      </motion.g>
+
+      {/* Right AI node — Partner */}
+      <motion.g animate={state === "idle" ? { scale: [1, 1.05, 1] } : { scale: 1 }}
+        transition={{ duration: 1.5, repeat: state === "idle" ? Infinity : 0 }}>
+        {state === "idle" && (
+          <motion.circle cx={rX} cy={aiY} r="30" fill="none"
+            stroke="hsl(var(--accent))" strokeWidth="2"
+            animate={{ r: [30, 46], opacity: [0.8, 0] }}
+            transition={{ duration: 1.2, repeat: Infinity }} />
+        )}
+        <circle cx={rX} cy={aiY} r="30" fill="hsl(var(--background))"
+          stroke="hsl(var(--accent))" strokeWidth="1.5" strokeOpacity="0.6" />
+        <circle cx={rX} cy={aiY - 5} r="7" fill="none" stroke="hsl(var(--accent))" strokeWidth="1.5" strokeOpacity="0.8" />
+        <circle cx={rX} cy={aiY + 5} r="4" fill="hsl(var(--accent))" fillOpacity="0.35" />
+        <text x={rX} y={aiY + 48} textAnchor="middle" fontSize="9"
+          fill="hsl(var(--accent))" fontFamily="inherit" fontWeight="600">PARTNER AI</text>
+        <text x={rX} y={aiY + 59} textAnchor="middle" fontSize="8"
+          fill="hsl(var(--muted-foreground))" fillOpacity="0.4" fontFamily="inherit">Partner Agent</text>
+        {state === "execution" && (
+          <motion.g initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 300, delay: 0.3 }}>
+            <circle cx={rX - 22} cy={aiY - 22} r="10" fill="hsl(var(--primary))" />
+            <text x={rX - 22} y={aiY - 17} textAnchor="middle" fontSize="10"
+              fill="hsl(var(--background))" fontFamily="inherit" fontWeight="bold">✓</text>
+          </motion.g>
+        )}
+      </motion.g>
+
+      {/* Connecting line between agents */}
+      <line x1={lX + 30} y1={aiY} x2={rX - 30} y2={aiY}
+        stroke="hsl(var(--border))" strokeOpacity="0.2" strokeWidth="1" strokeDasharray="5 6" />
+
+      {/* Negotiation particles during decision */}
+      {state === "decision" && [0, 1, 2].map((i) => (
+        <motion.circle key={`p-${i}`} cy={aiY} r="4"
+          fill="hsl(var(--primary))" fillOpacity="0.85" filter="url(#chat-glow)"
+          animate={{ cx: [lX + 30, rX - 30], opacity: [0, 1, 1, 0] }}
+          transition={{ duration: 0.6, delay: i * 0.22, repeat: Infinity, ease: "easeOut" }} />
+      ))}
+      {state === "decision" && [0, 1].map((i) => (
+        <motion.circle key={`pr-${i}`} cy={aiY + 8} r="4"
+          fill="hsl(var(--accent))" fillOpacity="0.8"
+          animate={{ cx: [rX - 30, lX + 30], opacity: [0, 1, 1, 0] }}
+          transition={{ duration: 0.6, delay: i * 0.35 + 0.15, repeat: Infinity, ease: "easeOut" }} />
+      ))}
+
+      {/* Message bubbles */}
+      {messages.slice(0, visible).map((msg, i) => {
+        const isLeft = msg.from === "synapsio";
+        const by = msgStartY + i * msgGapY;
+        const bx = isLeft ? leftX : rightX;
+        const clr = isLeft ? "hsl(var(--primary))" : "hsl(var(--accent))";
+        const h = msg.line2 ? 50 : 36;
+        return (
+          <motion.g key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.05 }}>
+            <rect x={bx} y={by} width={msgW} height={h} rx="10"
+              fill={clr} fillOpacity="0.09"
+              stroke={clr} strokeOpacity="0.25" strokeWidth="1" />
+            <text x={bx + 10} y={by + 13} fontSize="8" fill={clr} fillOpacity="0.65"
+              fontFamily="inherit" fontWeight="600" letterSpacing="1">
+              {isLeft ? "SYNAPSIO AI" : "PARTNER AI"} · {msg.time}
+            </text>
+            {msg.thinking ? (
+              <motion.text x={bx + 10} y={by + 28} fontSize="11"
+                fill="hsl(var(--foreground))" fontFamily="inherit" fillOpacity="0.75"
+                animate={{ fillOpacity: [0.4, 1, 0.4] }} transition={{ duration: 1.1, repeat: Infinity }}>
+                {msg.line1}
+              </motion.text>
+            ) : (
+              <text x={bx + 10} y={by + 28} fontSize="11"
+                fill="hsl(var(--foreground))" fontFamily="inherit" fillOpacity="0.85">{msg.line1}</text>
+            )}
+            {msg.line2 && (
+              <text x={bx + 10} y={by + 42} fontSize="9" fill={clr} fillOpacity="0.55" fontFamily="inherit">{msg.line2}</text>
+            )}
+          </motion.g>
+        );
+      })}
+
+      {/* Resolution banner */}
+      {state === "execution" && (
+        <motion.g initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
+          <rect x="108" y="352" width={msgW * 2 + rightX - leftX - msgW} height="30" rx="10"
+            fill="hsl(var(--primary))" fillOpacity="0.11"
+            stroke="hsl(var(--primary))" strokeOpacity="0.38" strokeWidth="1.5" />
+          <text x="275" y="372" textAnchor="middle" fontSize="11"
+            fill="hsl(var(--primary))" fontFamily="inherit" fontWeight="500">
+            ✓ Resolved in 1.2s · No human required
+          </text>
+        </motion.g>
+      )}
+
+      {/* Bottom context */}
+      <text x="275" y="393" textAnchor="middle" fontSize="9"
+        fill="hsl(var(--muted-foreground))" fillOpacity="0.25" fontFamily="inherit">
+        Traditional: 3–5 days of email back-and-forth
+      </text>
+    </svg>
+  );
+};
+
+export default FeaturesSection;
       <rect x={tX} y={tY} width="490" height="28" rx="5" fill="hsl(var(--border))" fillOpacity="0.08" />
       <line x1={tX} y1={tY + 28} x2={tX + 490} y2={tY + 28} stroke="hsl(var(--border))" strokeOpacity="0.2" strokeWidth="1" />
       <text x={cName}  y={tY + 19} fontSize="9" fill="hsl(var(--muted-foreground))" fillOpacity="0.45" fontFamily="inherit" letterSpacing="1.5">SUPPLIER</text>
