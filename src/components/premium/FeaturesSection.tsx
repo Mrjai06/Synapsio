@@ -442,36 +442,6 @@ const FeaturesSection = () => {
                   </motion.div>
                 </AnimatePresence>
 
-                {/* What's eliminated - overlay at bottom */}
-                <div className="absolute bottom-0 left-0 right-0 pt-8 md:pt-16 pb-4 md:pb-6 px-3 md:px-6 bg-gradient-to-t from-background/90 via-background/60 to-transparent">
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={activeFeature}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 10 }}
-                      className="max-w-2xl mx-auto"
-                    >
-                      <p className="text-xs uppercase tracking-wider text-muted-foreground/50 mb-3 text-center">
-                        What's Eliminated
-                      </p>
-                      <div className="flex flex-col md:flex-row flex-wrap justify-center gap-2 md:gap-4">
-                        {Object.entries(activeData.content.removal).map(([key, value], idx) => (
-                          <motion.div
-                            key={key}
-                            initial={{ opacity: 0, x: 10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: idx * 0.1 }}
-                            className="flex items-center gap-2 text-xs md:text-sm bg-background/60 px-3 py-1.5 rounded-full border border-border/20"
-                          >
-                            <span className="w-1.5 h-1.5 rounded-full bg-accent/60 shrink-0" />
-                            <span className="text-muted-foreground/70 line-clamp-1">{value}</span>
-                          </motion.div>
-                        ))}
-                      </div>
-                    </motion.div>
-                  </AnimatePresence>
-                </div>
               </div>
             </motion.div>
           )}
@@ -925,12 +895,12 @@ const OperationsVisualization = ({ state }: { state: SystemState }) => {
 const CommunicationVisualization = ({ state }: { state: SystemState }) => {
   const lX = 62, rX = 488, aiY = 62;
 
-  type MsgSide = "synapsio" | "partner";
+  type MsgSide = "synapsio" | "supplier";
   const messages: { from: MsgSide; line1: string; line2?: string; time: string; thinking?: boolean }[] = [
-    { from: "partner",  line1: "Capacity issue on order #4721",  line2: "Max available: 4,200 units",    time: "09:41:32" },
+    { from: "supplier", line1: "Capacity issue on order #4721",  line2: "Max available: 4,200 units",    time: "09:41:32" },
     { from: "synapsio", line1: "Evaluating alternatives...",                                              time: "09:41:32", thinking: true },
     { from: "synapsio", line1: "Proposal: 4,800 units @ €4.32",  line2: "DAP Hamburg · Net-30 · 4 days", time: "09:41:32" },
-    { from: "partner",  line1: "Accepted. Contracts updated.",    line2: "Confirmed automatically",        time: "09:41:33" },
+    { from: "supplier", line1: "Accepted. Contracts updated.",    line2: "Confirmed automatically",        time: "09:41:33" },
   ];
 
   const visible = state === "idle" ? 1 : state === "decision" ? 3 : 4;
@@ -984,9 +954,9 @@ const CommunicationVisualization = ({ state }: { state: SystemState }) => {
         <circle cx={rX} cy={aiY - 5} r="7" fill="none" stroke="hsl(var(--accent))" strokeWidth="1.5" strokeOpacity="0.8" />
         <circle cx={rX} cy={aiY + 5} r="4" fill="hsl(var(--accent))" fillOpacity="0.35" />
         <text x={rX} y={aiY + 48} textAnchor="middle" fontSize="9"
-          fill="hsl(var(--accent))" fontFamily="inherit" fontWeight="600">PARTNER AI</text>
+          fill="hsl(var(--accent))" fontFamily="inherit" fontWeight="600">SUPPLIER AI</text>
         <text x={rX} y={aiY + 59} textAnchor="middle" fontSize="8"
-          fill="hsl(var(--muted-foreground))" fillOpacity="0.4" fontFamily="inherit">Partner Agent</text>
+          fill="hsl(var(--muted-foreground))" fillOpacity="0.4" fontFamily="inherit">Synapsio Agent</text>
         {state === "execution" && (
           <motion.g initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
             transition={{ type: "spring", stiffness: 300, delay: 0.3 }}>
@@ -1030,7 +1000,7 @@ const CommunicationVisualization = ({ state }: { state: SystemState }) => {
               stroke={clr} strokeOpacity="0.25" strokeWidth="1" />
             <text x={bx + 10} y={by + 13} fontSize="8" fill={clr} fillOpacity="0.65"
               fontFamily="inherit" fontWeight="600" letterSpacing="1">
-              {isLeft ? "SYNAPSIO AI" : "PARTNER AI"} · {msg.time}
+              {isLeft ? "SYNAPSIO AI" : "SUPPLIER AI"} · {msg.time}
             </text>
             {msg.thinking ? (
               <motion.text x={bx + 10} y={by + 28} fontSize="11"
