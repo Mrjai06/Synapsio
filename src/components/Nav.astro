@@ -1,0 +1,53 @@
+---
+import { t, localePath, CAL_URL, type Locale } from "../i18n/ui";
+
+interface Props {
+  locale: Locale;
+  /** current path without locale prefix, e.g. "/produkt" */
+  path: string;
+}
+const { locale, path } = Astro.props;
+const other: Locale = locale === "de" ? "en" : "de";
+
+const items = [
+  { href: localePath(locale, "/produkt"), label: t(locale, "nav.product") },
+  { href: localePath(locale, "/sicherheit"), label: t(locale, "nav.security") },
+  { href: localePath(locale, "/blog"), label: t(locale, "nav.blog") },
+  { href: localePath(locale, "/ueber-uns"), label: t(locale, "nav.about") },
+];
+---
+
+<header class="sticky top-0 z-40 hairline-b bg-ground/90 backdrop-blur-sm">
+  <div class="container-site flex items-center justify-between gap-6 py-4">
+    <a href={localePath(locale, "/")} class="flex items-center gap-3">
+      <img src="/synapsio-logo.png" alt="" class="h-7 w-auto" />
+      <span class="text-[0.95rem] font-semibold tracking-[0.18em] uppercase">Synapsio</span>
+    </a>
+
+    <nav class="hidden md:flex items-center gap-7" aria-label="Hauptnavigation">
+      {
+        items.map((item) => (
+          <a
+            href={item.href}
+            class="text-[0.92rem] text-fg-soft hover:text-fg transition-colors duration-150"
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="flex items-center gap-4">
+      <a
+        href={localePath(other, path)}
+        class="label-quiet hover:text-fg transition-colors duration-150"
+        aria-label={other === "en" ? "Switch to English" : "Zur deutschen Version"}
+      >
+        {other.toUpperCase()}
+      </a>
+      <a href={CAL_URL} class="btn-primary !py-2.5 !px-4 text-[0.88rem]">
+        {t(locale, "nav.cta")}
+      </a>
+    </div>
+  </div>
+</header>

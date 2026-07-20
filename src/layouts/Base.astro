@@ -1,0 +1,56 @@
+---
+import "@fontsource-variable/ibm-plex-sans";
+import "../styles/global.css";
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+import { localePath, type Locale } from "../i18n/ui";
+
+interface Props {
+  locale: Locale;
+  title: string;
+  description: string;
+  /** path without locale prefix, e.g. "/" or "/produkt" */
+  path: string;
+  /** set false for pages that exist in only one language */
+  hasAlternate?: boolean;
+}
+const { locale, title, description, path, hasAlternate = true } = Astro.props;
+
+const site = "https://synapsio.solutions";
+const canonical = site + localePath(locale, path);
+const altDe = site + localePath("de", path);
+const altEn = site + localePath("en", path);
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {hasAlternate && <link rel="alternate" hreflang="de" href={altDe} />}
+    {hasAlternate && <link rel="alternate" hreflang="en" href={altEn} />}
+    {hasAlternate && <link rel="alternate" hreflang="x-default" href={altDe} />}
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Synapsio" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={`${site}/og-image.png`} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={`${site}/og-image.png`} />
+  </head>
+  <body class="bg-ground text-fg">
+    <Nav locale={locale} path={path} />
+    <main>
+      <slot />
+    </main>
+    <Footer locale={locale} />
+  </body>
+</html>

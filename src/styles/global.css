@@ -1,0 +1,135 @@
+@import "tailwindcss";
+
+/*
+  Synapsio design tokens: "ruhige Präzision" (engineered calm).
+  Harmonized with the app palette. Hard rules: matte only, no gradients,
+  no glow, no neon. Depth = hairlines, spacing, tonal steps.
+*/
+@theme {
+  --color-ground: #0c1e26;
+  --color-ground-deep: #081720;
+  --color-surface: #142c35;
+  --color-surface-raised: #1a3640;
+  --color-fg: #e8edf0;
+  --color-fg-soft: #b9c9d0;
+  --color-fg-muted: #7a9baa;
+  --color-coral: #e8845a;
+  --color-coral-deep: #c96a45;
+  --color-teal: #3a8080;
+  --color-teal-soft: #5aa3a3;
+  --color-amber: #f0a500;
+  --color-hairline: rgba(255, 255, 255, 0.08);
+  --color-hairline-strong: rgba(255, 255, 255, 0.16);
+
+  --font-sans: "IBM Plex Sans Variable", "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Menlo, monospace;
+
+  --text-display: clamp(2.1rem, 5vw, 3.4rem);
+  --text-h2: clamp(1.4rem, 2.6vw, 1.9rem);
+  --text-h3: 1.12rem;
+
+  --spacing-section: clamp(4.5rem, 10vw, 8rem);
+}
+
+html {
+  background-color: var(--color-ground);
+  color: var(--color-fg);
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 1.03rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-teal);
+  color: var(--color-fg);
+}
+
+/* Reusable primitives */
+.container-site {
+  margin-inline: auto;
+  max-width: 72rem;
+  padding-inline: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+.hairline-t { border-top: 1px solid var(--color-hairline); }
+.hairline-b { border-bottom: 1px solid var(--color-hairline); }
+
+.display {
+  font-size: var(--text-display);
+  font-weight: 550;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+.h2 {
+  font-size: var(--text-h2);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.h3 {
+  font-size: var(--text-h3);
+  font-weight: 600;
+  letter-spacing: -0.005em;
+}
+
+.prose-site {
+  color: var(--color-fg-soft);
+  max-width: 62ch;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--color-coral);
+  color: var(--color-ground);
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.8rem 1.6rem;
+  border-radius: 2px;
+  transition: background-color 160ms ease;
+}
+.btn-primary:hover { background: var(--color-coral-deep); }
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  border: 1px solid var(--color-hairline-strong);
+  color: var(--color-fg-soft);
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 0.8rem 1.6rem;
+  border-radius: 2px;
+  transition: border-color 160ms ease, color 160ms ease;
+}
+.btn-secondary:hover { border-color: var(--color-fg-muted); color: var(--color-fg); }
+
+.label-quiet {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--color-fg-muted);
+}

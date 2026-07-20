@@ -1,0 +1,284 @@
+---
+import { CAL_URL, CONTACT_EMAIL, localePath, type Locale } from "../i18n/ui";
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+
+const content = {
+  de: {
+    heroH1: "Ihr Einkauf arbeitet jetzt auch nachts.",
+    heroSub:
+      "Synapsio ist der KI-Mitarbeiter für den Einkauf im Mittelstand. Er schlägt Bestellungen vor, schreibt mit Ihren Lieferanten, prüft Rechnungen. Und er fragt Sie, bevor er Geld ausgibt.",
+    heroCta: "Pilot-Gespräch buchen",
+    heroCta2: "So arbeitet der Agent",
+    vignette: [
+      "08:12 · Mail vom Lieferanten: Auftragsbestätigung",
+      "Gelesen. Liefertermin übernommen: 12.08.",
+      "Rechnung (PDF) geprüft: Position 3 weicht ab",
+      "Zur Freigabe vorgelegt",
+      "Freigegeben. Erledigt.",
+    ],
+    scenesTitle: "Was heute Morgen passiert ist",
+    scenes: [
+      {
+        h: "Der Lieferant antwortet, der Agent versteht.",
+        p: "Eine Auftragsbestätigung kommt per Mail. Der Agent liest sie, übernimmt den Liefertermin und fragt beim Lieferanten nach, wenn etwas fehlt. Sie sehen nur das Ergebnis.",
+      },
+      {
+        h: "Die Rechnung prüft sich selbst.",
+        p: "Eine Rechnung kommt als PDF. Der Agent gleicht sie mit der Bestellung ab. Stimmt alles, ist sie erledigt. Weicht ein Posten ab, bekommen Sie eine klare Meldung mit Begründung.",
+      },
+      {
+        h: "Der Engpass, der keiner wurde.",
+        p: "Ein Artikel läuft auf einen Engpass zu. Der Agent hat es kommen sehen, Lieferanten nach Preis, Lieferzeit und Zuverlässigkeit verglichen und einen Bestellvorschlag vorbereitet. Sie entscheiden mit einem Klick.",
+      },
+    ],
+    railsTitle: "Und wer kontrolliert das? Sie.",
+    railsIntro:
+      "Ein Agent, der bestellt, braucht Grenzen. Bei Synapsio sind sie eingebaut, nicht angeflanscht.",
+    rails: [
+      {
+        h: "Ihre Geldgrenze",
+        p: "Unter der Schwelle, die Sie setzen, handelt der Agent selbst. Darüber wartet jede Aktion auf Ihre Freigabe.",
+      },
+      {
+        h: "Betrugsschutz",
+        p: "Ändert ein Lieferant plötzlich die Bankverbindung, wird nichts ausgeführt. Der Vorgang wird eingefroren und Ihnen zur Prüfung vorgelegt.",
+      },
+      {
+        h: "Ausgabenlimits",
+        p: "Tageslimits deckeln, was der Agent maximal bewegen kann.",
+      },
+      {
+        h: "Lückenlose Historie",
+        p: "Jede Entscheidung ist protokolliert: was passiert ist, warum, und wer es freigegeben hat.",
+      },
+    ],
+    weekTitle: "Kein ERP-Projekt. Ein erster Arbeitstag.",
+    weekP:
+      "Sie verbinden Ihre Bestände und Lieferanten. Der Agent lernt Ihr Geschäft kennen und stellt Ihnen Fragen, wie ein neuer Mitarbeiter das tun würde. Schon in den ersten Tagen kommen die ersten Bestellvorschläge. Und die Leine bestimmen Sie: Am Anfang geben Sie alles frei. Wie viel der Agent allein erledigen darf, wächst mit Ihrem Vertrauen.",
+    horizonsTitle: "Wohin die Reise geht",
+    horizons: [
+      {
+        label: "Heute, im Einsatz",
+        p: "Ein Agent, der Ihren Einkauf führt: von der Prognose bis zur geprüften Rechnung.",
+      },
+      {
+        label: "In Arbeit",
+        p: "Die Auftrags- und Logistikseite: vom Einkauf zur ganzen Lieferkette.",
+      },
+      {
+        label: "Unsere Vision",
+        p: "Ein Netzwerk, in dem Firmen-Agenten direkt miteinander handeln: Ihr Einkaufsagent spricht mit dem Verkaufsagenten Ihres Lieferanten.",
+      },
+    ],
+    trust: "Daten in der EU (Frankfurt) · Lückenloser Audit-Trail · Entwickelt in Potsdam",
+    pilotTitle: "Wir suchen Pilotkunden.",
+    pilotP:
+      "Synapsio ist jung und das Produkt ist echt: Sie können es heute unter app.synapsio.solutions sehen. Als Pilotkunde bekommen Sie den Agenten zu Pilotkonditionen, einen direkten Draht zu uns Gründern und echten Einfluss darauf, was als Nächstes gebaut wird.",
+    pilotAlt: "Oder schreiben Sie uns:",
+  },
+  en: {
+    heroH1: "Your purchasing now works nights, too.",
+    heroSub:
+      "Synapsio is the AI employee for SMB purchasing. It proposes orders, writes to your suppliers, checks invoices. And it asks you before it spends money.",
+    heroCta: "Book a pilot call",
+    heroCta2: "See how the agent works",
+    vignette: [
+      "08:12 · Supplier email: order confirmation",
+      "Read. Delivery date updated: Aug 12",
+      "Invoice (PDF) checked: line 3 does not match",
+      "Sent for your approval",
+      "Approved. Done.",
+    ],
+    scenesTitle: "What happened this morning",
+    scenes: [
+      {
+        h: "The supplier replies, the agent understands.",
+        p: "An order confirmation arrives by email. The agent reads it, updates the delivery date and follows up with the supplier if something is missing. You only see the result.",
+      },
+      {
+        h: "The invoice checks itself.",
+        p: "An invoice arrives as a PDF. The agent matches it against the order. If everything fits, it is done. If a line is off, you get a clear note explaining why.",
+      },
+      {
+        h: "The stockout that never happened.",
+        p: "An item is heading toward a stockout. The agent saw it coming, compared suppliers on price, lead time and reliability, and prepared an order proposal. You decide with one click.",
+      },
+    ],
+    railsTitle: "And who is in control? You are.",
+    railsIntro:
+      "An agent that places orders needs limits. In Synapsio they are built in, not bolted on.",
+    rails: [
+      {
+        h: "Your money line",
+        p: "Below the threshold you set, the agent acts on its own. Above it, every action waits for your approval.",
+      },
+      {
+        h: "Fraud shield",
+        p: "If a supplier suddenly changes bank details, nothing is executed. The case is frozen and put in front of you.",
+      },
+      {
+        h: "Spend caps",
+        p: "Daily caps limit what the agent can move at most.",
+      },
+      {
+        h: "Complete history",
+        p: "Every decision is on record: what happened, why, and who approved it.",
+      },
+    ],
+    weekTitle: "Not an ERP project. A first day at work.",
+    weekP:
+      "You connect your inventory and suppliers. The agent gets to know your business and asks questions, the way a new employee would. Within the first days, the first order proposals arrive. And you hold the leash: in the beginning you approve everything. What the agent may do on its own grows with your trust.",
+    horizonsTitle: "Where this is going",
+    horizons: [
+      {
+        label: "Today, in operation",
+        p: "An agent that runs your purchasing: from forecast to checked invoice.",
+      },
+      {
+        label: "In progress",
+        p: "The order and logistics side: from purchasing to the whole supply chain.",
+      },
+      {
+        label: "Our vision",
+        p: "A network where company agents trade directly with each other: your purchasing agent talks to your supplier's sales agent.",
+      },
+    ],
+    trust: "Data hosted in the EU (Frankfurt) · Complete audit trail · Built in Potsdam, Germany",
+    pilotTitle: "We are looking for pilot customers.",
+    pilotP:
+      "Synapsio is young and the product is real: you can see it today at app.synapsio.solutions. As a pilot customer you get the agent on pilot terms, a direct line to us founders, and real influence on what gets built next.",
+    pilotAlt: "Or write to us:",
+  },
+}[locale];
+---
+
+<!-- Hero -->
+<section class="container-site pt-20 pb-16 md:pt-28 md:pb-24">
+  <div class="grid gap-14 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+    <div>
+      <h1 class="display">{content.heroH1}</h1>
+      <p class="prose-site mt-6 text-[1.1rem]">{content.heroSub}</p>
+      <div class="mt-9 flex flex-wrap gap-4">
+        <a href={CAL_URL} class="btn-primary">{content.heroCta}</a>
+        <a href={localePath(locale, "/produkt")} class="btn-secondary">{content.heroCta2}</a>
+      </div>
+    </div>
+
+    <!-- Hero vignette: static v1, becomes the animated set piece in the design pass -->
+    <div class="border border-hairline bg-surface p-6 md:p-8">
+      <p class="label-quiet mb-5">Synapsio Agent · Live</p>
+      <ol class="space-y-4">
+        {
+          content.vignette.map((step, i) => (
+            <li class="flex items-start gap-3 text-[0.95rem]">
+              <span
+                class:list={[
+                  "mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full",
+                  i === content.vignette.length - 1 ? "bg-teal-soft" : "bg-fg-muted",
+                ]}
+              />
+              <span class={i === content.vignette.length - 1 ? "text-fg" : "text-fg-soft"}>
+                {step}
+              </span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- Scenes -->
+<section class="hairline-t">
+  <div class="container-site py-16 md:py-24">
+    <h2 class="h2">{content.scenesTitle}</h2>
+    <div class="mt-10 grid gap-10 md:grid-cols-3 md:gap-8">
+      {
+        content.scenes.map((s) => (
+          <div class="hairline-t pt-5">
+            <h3 class="h3">{s.h}</h3>
+            <p class="prose-site mt-3 text-[0.95rem]">{s.p}</p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Rails -->
+<section class="hairline-t bg-ground-deep">
+  <div class="container-site py-16 md:py-24">
+    <h2 class="h2">{content.railsTitle}</h2>
+    <p class="prose-site mt-4">{content.railsIntro}</p>
+    <div class="mt-10 grid gap-x-12 gap-y-8 sm:grid-cols-2">
+      {
+        content.rails.map((r) => (
+          <div class="flex gap-4">
+            <span class="mt-2 h-px w-6 shrink-0 bg-coral" />
+            <div>
+              <h3 class="h3">{r.h}</h3>
+              <p class="prose-site mt-2 text-[0.95rem]">{r.p}</p>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Week 1 -->
+<section class="hairline-t">
+  <div class="container-site py-16 md:py-24">
+    <div class="max-w-2xl">
+      <h2 class="h2">{content.weekTitle}</h2>
+      <p class="prose-site mt-5">{content.weekP}</p>
+    </div>
+  </div>
+</section>
+
+<!-- Horizons -->
+<section class="hairline-t">
+  <div class="container-site py-16 md:py-24">
+    <h2 class="h2">{content.horizonsTitle}</h2>
+    <div class="mt-10 grid gap-8 md:grid-cols-3">
+      {
+        content.horizons.map((h) => (
+          <div class="hairline-t pt-5">
+            <p class="label-quiet">{h.label}</p>
+            <p class="prose-site mt-3 text-[0.95rem]">{h.p}</p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Trust line -->
+<section class="hairline-t bg-ground-deep">
+  <div class="container-site py-8">
+    <p class="text-center text-[0.88rem] text-fg-muted">{content.trust}</p>
+  </div>
+</section>
+
+<!-- Pilot invite -->
+<section class="hairline-t">
+  <div class="container-site py-16 md:py-24">
+    <div class="max-w-2xl">
+      <h2 class="h2">{content.pilotTitle}</h2>
+      <p class="prose-site mt-5">{content.pilotP}</p>
+      <div class="mt-8 flex flex-wrap items-center gap-5">
+        <a href={CAL_URL} class="btn-primary">{content.heroCta}</a>
+        <p class="text-[0.92rem] text-fg-muted">
+          {content.pilotAlt}
+          <a href={`mailto:${CONTACT_EMAIL}`} class="text-fg-soft hover:text-fg underline underline-offset-4 ml-1">
+            {CONTACT_EMAIL}
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://synapsio.solutions/sitemap.xml
+Sitemap: https://synapsio.solutions/sitemap-index.xml
