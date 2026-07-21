@@ -133,3 +133,49 @@ body {
   letter-spacing: 0.02em;
   color: var(--color-fg-muted);
 }
+
+/* Scroll reveal: sections fade up once, calm and short. */
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 650ms ease, transform 650ms ease;
+}
+.reveal.in-view {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Hero vignette: steps appear sequentially, then the loop restarts. */
+[data-vignette] li {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 450ms ease, transform 450ms ease;
+}
+[data-vignette] li.on {
+  opacity: 1;
+  transform: none;
+}
+[data-vignette].static li {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-vignette] li {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-teal-soft);
+  outline-offset: 3px;
+}

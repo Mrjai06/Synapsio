@@ -168,10 +168,10 @@ const content = {
       </div>
     </div>
 
-    <!-- Hero vignette: static v1, becomes the animated set piece in the design pass -->
+    <!-- Hero vignette: the one orchestrated moment of the page -->
     <div class="border border-hairline bg-surface p-6 md:p-8">
       <p class="label-quiet mb-5">Synapsio Agent · Live</p>
-      <ol class="space-y-4">
+      <ol class="min-h-[13.5rem] space-y-4" data-vignette>
         {
           content.vignette.map((step, i) => (
             <li class="flex items-start gap-3 text-[0.95rem]">
@@ -192,9 +192,73 @@ const content = {
   </div>
 </section>
 
+<script>
+  // Hero vignette loop: steps appear one by one, hold, restart.
+  // Pauses off-screen; static when reduced motion is preferred.
+  const vignettes = document.querySelectorAll<HTMLElement>("[data-vignette]");
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  vignettes.forEach((root) => {
+    const steps = Array.from(root.querySelectorAll("li"));
+    if (reduced || steps.length === 0) {
+      root.classList.add("static");
+      return;
+    }
+    let idx = 0;
+    let timer: number | undefined;
+    let running = false;
+
+    const tick = () => {
+      if (!running) return;
+      if (idx < steps.length) {
+        steps[idx]?.classList.add("on");
+        idx += 1;
+        timer = window.setTimeout(tick, idx === steps.length ? 2600 : 1150);
+      } else {
+        steps.forEach((s) => s.classList.remove("on"));
+        idx = 0;
+        timer = window.setTimeout(tick, 700);
+      }
+    };
+
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting && !running) {
+            running = true;
+            tick();
+          } else if (!entry.isIntersecting && running) {
+            running = false;
+            if (timer) window.clearTimeout(timer);
+          }
+        }
+      },
+      { threshold: 0.3 },
+    );
+    io.observe(root);
+  });
+
+  // Scroll reveal: one-time fade-up for marked elements.
+  const revealables = document.querySelectorAll(".reveal");
+  if (revealables.length > 0) {
+    const ro = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("in-view");
+            ro.unobserve(entry.target);
+          }
+        }
+      },
+      { threshold: 0.15 },
+    );
+    revealables.forEach((el) => ro.observe(el));
+  }
+</script>
+
 <!-- Scenes -->
 <section class="hairline-t">
-  <div class="container-site py-16 md:py-24">
+  <div class="container-site py-16 md:py-24 reveal">
     <h2 class="h2">{content.scenesTitle}</h2>
     <div class="mt-10 grid gap-10 md:grid-cols-3 md:gap-8">
       {
@@ -211,7 +275,7 @@ const content = {
 
 <!-- Rails -->
 <section class="hairline-t bg-ground-deep">
-  <div class="container-site py-16 md:py-24">
+  <div class="container-site py-16 md:py-24 reveal">
     <h2 class="h2">{content.railsTitle}</h2>
     <p class="prose-site mt-4">{content.railsIntro}</p>
     <div class="mt-10 grid gap-x-12 gap-y-8 sm:grid-cols-2">
@@ -232,7 +296,7 @@ const content = {
 
 <!-- Week 1 -->
 <section class="hairline-t">
-  <div class="container-site py-16 md:py-24">
+  <div class="container-site py-16 md:py-24 reveal">
     <div class="max-w-2xl">
       <h2 class="h2">{content.weekTitle}</h2>
       <p class="prose-site mt-5">{content.weekP}</p>
@@ -242,7 +306,7 @@ const content = {
 
 <!-- Horizons -->
 <section class="hairline-t">
-  <div class="container-site py-16 md:py-24">
+  <div class="container-site py-16 md:py-24 reveal">
     <h2 class="h2">{content.horizonsTitle}</h2>
     <div class="mt-10 grid gap-8 md:grid-cols-3">
       {
@@ -266,7 +330,7 @@ const content = {
 
 <!-- Pilot invite -->
 <section class="hairline-t">
-  <div class="container-site py-16 md:py-24">
+  <div class="container-site py-16 md:py-24 reveal">
     <div class="max-w-2xl">
       <h2 class="h2">{content.pilotTitle}</h2>
       <p class="prose-site mt-5">{content.pilotP}</p>
