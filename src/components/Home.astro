@@ -8,29 +8,35 @@ const { locale } = Astro.props;
 
 const content = {
   de: {
+    heroKicker: "KI-Agent für den Einkauf im Mittelstand",
     heroH1: "Ihr Einkauf arbeitet jetzt auch nachts.",
     heroSub:
       "Synapsio ist der KI-Mitarbeiter für den Einkauf im Mittelstand. Er schlägt Bestellungen vor, schreibt mit Ihren Lieferanten, prüft Rechnungen. Und er fragt Sie, bevor er Geld ausgibt.",
     heroCta: "Pilot-Gespräch buchen",
     heroCta2: "So arbeitet der Agent",
+    vignetteTitle: "Synapsio Agent",
+    vignetteLive: "Live",
     vignette: [
-      "08:12 · Mail vom Lieferanten: Auftragsbestätigung",
-      "Gelesen. Liefertermin übernommen: 12.08.",
-      "Rechnung (PDF) geprüft: Position 3 weicht ab",
-      "Zur Freigabe vorgelegt",
-      "Freigegeben. Erledigt.",
+      { t: "08:12", s: "Mail vom Lieferanten: Auftragsbestätigung" },
+      { t: "08:12", s: "Gelesen. Liefertermin übernommen: 12.08." },
+      { t: "08:14", s: "Rechnung (PDF) geprüft: Position 3 weicht ab" },
+      { t: "08:14", s: "Zur Freigabe vorgelegt" },
+      { t: "08:31", s: "Freigegeben. Erledigt." },
     ],
     scenesTitle: "Was heute Morgen passiert ist",
     scenes: [
       {
+        t: "08:12",
         h: "Der Lieferant antwortet, der Agent versteht.",
         p: "Eine Auftragsbestätigung kommt per Mail. Der Agent liest sie, übernimmt den Liefertermin und fragt beim Lieferanten nach, wenn etwas fehlt. Sie sehen nur das Ergebnis.",
       },
       {
+        t: "09:04",
         h: "Die Rechnung prüft sich selbst.",
         p: "Eine Rechnung kommt als PDF. Der Agent gleicht sie mit der Bestellung ab. Stimmt alles, ist sie erledigt. Weicht ein Posten ab, bekommen Sie eine klare Meldung mit Begründung.",
       },
       {
+        t: "09:47",
         h: "Der Engpass, der keiner wurde.",
         p: "Ein Artikel läuft auf einen Engpass zu. Der Agent hat es kommen sehen, Lieferanten nach Preis, Lieferzeit und Zuverlässigkeit verglichen und einen Bestellvorschlag vorbereitet. Sie entscheiden mit einem Klick.",
       },
@@ -74,36 +80,42 @@ const content = {
         p: "Ein Marktplatz, auf dem sich die Agenten von Firmen finden, und ein Netzwerk, in dem sie direkt miteinander handeln: Ihr Einkaufsagent spricht mit dem Verkaufsagenten Ihres Lieferanten.",
       },
     ],
-    trust: "Daten in der EU (Frankfurt) · Lückenloser Audit-Trail · Entwickelt bei Berlin",
+    trust: ["Daten in der EU (Frankfurt)", "Lückenloser Audit-Trail", "Entwickelt bei Berlin"],
     pilotTitle: "Wir suchen Pilotkunden.",
     pilotP:
       "Synapsio ist jung und das Produkt ist echt: Sie können es heute unter app.synapsio.solutions sehen. Als Pilotkunde bekommen Sie den Agenten zu Pilotkonditionen, einen direkten Draht zu uns Gründern und echten Einfluss darauf, was als Nächstes gebaut wird.",
     pilotAlt: "Oder schreiben Sie uns:",
   },
   en: {
+    heroKicker: "The AI agent for SMB purchasing",
     heroH1: "Your purchasing now works nights, too.",
     heroSub:
       "Synapsio is the AI employee for SMB purchasing. It proposes orders, writes to your suppliers, checks invoices. And it asks you before it spends money.",
     heroCta: "Book a pilot call",
     heroCta2: "See how the agent works",
+    vignetteTitle: "Synapsio Agent",
+    vignetteLive: "Live",
     vignette: [
-      "08:12 · Supplier email: order confirmation",
-      "Read. Delivery date updated: Aug 12",
-      "Invoice (PDF) checked: line 3 does not match",
-      "Sent for your approval",
-      "Approved. Done.",
+      { t: "08:12", s: "Supplier email: order confirmation" },
+      { t: "08:12", s: "Read. Delivery date updated: Aug 12" },
+      { t: "08:14", s: "Invoice (PDF) checked: line 3 does not match" },
+      { t: "08:14", s: "Sent for your approval" },
+      { t: "08:31", s: "Approved. Done." },
     ],
     scenesTitle: "What happened this morning",
     scenes: [
       {
+        t: "08:12",
         h: "The supplier replies, the agent understands.",
         p: "An order confirmation arrives by email. The agent reads it, updates the delivery date and follows up with the supplier if something is missing. You only see the result.",
       },
       {
+        t: "09:04",
         h: "The invoice checks itself.",
         p: "An invoice arrives as a PDF. The agent matches it against the order. If everything fits, it is done. If a line is off, you get a clear note explaining why.",
       },
       {
+        t: "09:47",
         h: "The stockout that never happened.",
         p: "An item is heading toward a stockout. The agent saw it coming, compared suppliers on price, lead time and reliability, and prepared an order proposal. You decide with one click.",
       },
@@ -147,7 +159,7 @@ const content = {
         p: "A marketplace where companies' agents find each other, and a network where they trade directly: your purchasing agent talks to your supplier's sales agent.",
       },
     ],
-    trust: "Data hosted in the EU (Frankfurt) · Complete audit trail · Built near Berlin, Germany",
+    trust: ["Data hosted in the EU (Frankfurt)", "Complete audit trail", "Built near Berlin, Germany"],
     pilotTitle: "We are looking for pilot customers.",
     pilotP:
       "Synapsio is young and the product is real: you can see it today at app.synapsio.solutions. As a pilot customer you get the agent on pilot terms, a direct line to us founders, and real influence on what gets built next.",
@@ -157,68 +169,205 @@ const content = {
 ---
 
 <!-- Hero -->
-<section class="container-site pt-20 pb-16 md:pt-28 md:pb-24">
-  <div class="grid gap-14 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-    <div>
-      <h1 class="display">{content.heroH1}</h1>
-      <p class="prose-site mt-6 text-[1.1rem]">{content.heroSub}</p>
-      <div class="mt-9 flex flex-wrap gap-4">
-        <a href={CAL_URL} class="btn-primary">{content.heroCta}</a>
-        <a href={localePath(locale, "/produkt")} class="btn-secondary">{content.heroCta2}</a>
+<section class="hairline-b bg-ground-deep">
+  <div class="container-site pt-16 pb-16 md:pt-24 md:pb-20">
+    <div class="grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+      <div>
+        <p class="mono-label">{content.heroKicker}</p>
+        <h1 class="display mt-5">{content.heroH1}</h1>
+        <p class="prose-site mt-6 text-[1.12rem] leading-[1.6]">{content.heroSub}</p>
+        <div class="mt-9 flex flex-wrap gap-4">
+          <a href={CAL_URL} class="btn-primary">{content.heroCta}</a>
+          <a href={localePath(locale, "/produkt")} class="btn-secondary">{content.heroCta2}</a>
+        </div>
+      </div>
+
+      <!-- Living console: the one orchestrated moment of the page -->
+      <div class="panel" data-vignette>
+        <div class="flex items-center justify-between border-b border-hairline px-5 py-3.5">
+          <div class="flex items-center gap-2.5">
+            <span class="h-2 w-2 rounded-full bg-teal-soft"></span>
+            <span class="text-[0.9rem] font-semibold">{content.vignetteTitle}</span>
+          </div>
+          <span class="mono-label">{content.vignetteLive}</span>
+        </div>
+        <ol class="px-2 py-2">
+          {
+            content.vignette.map((step) => (
+              <li class="step flex items-center gap-3.5 px-3 py-3">
+                <span class="dot h-2.5 w-2.5 shrink-0 rounded-full" />
+                <span class="mono-label !text-[0.68rem] !tracking-normal w-11 shrink-0">
+                  {step.t}
+                </span>
+                <span class="text-[0.94rem] leading-snug">{step.s}</span>
+              </li>
+            ))
+          }
+        </ol>
+        <div class="mx-5 mb-4 mt-1 h-px bg-hairline">
+          <div class="progress-fill h-px w-0 bg-teal-soft"></div>
+        </div>
       </div>
     </div>
+  </div>
+</section>
 
-    <!-- Hero vignette: the one orchestrated moment of the page -->
-    <div class="border border-hairline bg-surface p-6 md:p-8">
-      <p class="label-quiet mb-5">Synapsio Agent · Live</p>
-      <ol class="min-h-[13.5rem] space-y-4" data-vignette>
+<!-- Scenes -->
+<section>
+  <div class="container-site py-16 md:py-24 reveal">
+    <h2 class="h2 max-w-xl">{content.scenesTitle}</h2>
+    <div class="mt-12 grid gap-10 md:grid-cols-3 md:gap-0 md:divide-x md:divide-[rgba(255,255,255,0.08)]">
+      {
+        content.scenes.map((s) => (
+          <div class="md:px-8 first:md:pl-0 last:md:pr-0">
+            <p class="mono-label">{s.t}</p>
+            <h3 class="h3 mt-3">{s.h}</h3>
+            <p class="prose-site mt-3 text-[0.96rem]">{s.p}</p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Rails -->
+<section class="hairline-t bg-ground-deep">
+  <div class="container-site py-16 md:py-24 reveal">
+    <div class="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+      <div>
+        <h2 class="h2">{content.railsTitle}</h2>
+        <p class="prose-site mt-5">{content.railsIntro}</p>
+      </div>
+      <div class="panel grid sm:grid-cols-2">
         {
-          content.vignette.map((step, i) => (
-            <li class="flex items-start gap-3 text-[0.95rem]">
-              <span
-                class:list={[
-                  "mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full",
-                  i === content.vignette.length - 1 ? "bg-teal-soft" : "bg-fg-muted",
-                ]}
-              />
-              <span class={i === content.vignette.length - 1 ? "text-fg" : "text-fg-soft"}>
-                {step}
-              </span>
-            </li>
+          content.rails.map((r, i) => (
+            <div
+              class:list={[
+                "p-6",
+                i % 2 === 0 ? "sm:border-r sm:border-hairline" : "",
+                i < 2 ? "border-b border-hairline" : "",
+              ]}
+            >
+              <span class="block h-[3px] w-7 bg-coral" />
+              <h3 class="h3 mt-4">{r.h}</h3>
+              <p class="prose-site mt-2 text-[0.94rem]">{r.p}</p>
+            </div>
           ))
         }
-      </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Week 1 -->
+<section class="hairline-t">
+  <div class="container-site py-16 md:py-24 reveal">
+    <div class="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+      <h2 class="h2">{content.weekTitle}</h2>
+      <p class="prose-site text-[1.05rem]">{content.weekP}</p>
+    </div>
+  </div>
+</section>
+
+<!-- Horizons -->
+<section class="hairline-t bg-ground-deep">
+  <div class="container-site py-16 md:py-24 reveal">
+    <h2 class="h2">{content.horizonsTitle}</h2>
+    <div class="mt-12 grid gap-10 md:grid-cols-3 md:gap-8">
+      {
+        content.horizons.map((h, i) => (
+          <div class="relative border-t-2 border-hairline-strong pt-6">
+            <span
+              class:list={[
+                "absolute -top-[5px] left-0 h-2 w-2 rounded-full",
+                i === 0 ? "bg-teal-soft" : "bg-fg-muted",
+              ]}
+            />
+            <p class="mono-label">{h.label}</p>
+            <p class="prose-site mt-3 text-[0.96rem]">{h.p}</p>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Trust strip -->
+<section class="hairline-t">
+  <div class="container-site py-7">
+    <div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-2">
+      {
+        content.trust.map((item) => (
+          <span class="flex items-center gap-2.5 text-[0.88rem] text-fg-muted">
+            <span class="h-1 w-1 rounded-full bg-teal-soft" />
+            {item}
+          </span>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Pilot invite -->
+<section class="hairline-t bg-ground-deep">
+  <div class="container-site py-16 md:py-24 reveal">
+    <div class="max-w-2xl">
+      <h2 class="h2">{content.pilotTitle}</h2>
+      <p class="prose-site mt-5 text-[1.05rem]">{content.pilotP}</p>
+      <div class="mt-9 flex flex-wrap items-center gap-6">
+        <a href={CAL_URL} class="btn-primary">{content.heroCta}</a>
+        <p class="text-[0.92rem] text-fg-muted">
+          {content.pilotAlt}
+          <a
+            href={`mailto:${CONTACT_EMAIL}`}
+            class="ml-1 text-fg-soft underline underline-offset-4 hover:text-fg"
+          >
+            {CONTACT_EMAIL}
+          </a>
+        </p>
+      </div>
     </div>
   </div>
 </section>
 
 <script>
-  // Hero vignette loop: steps appear one by one, hold, restart.
-  // Pauses off-screen; static when reduced motion is preferred.
+  // Living console: highlight walks the always-visible rows, then restarts.
+  // Pauses off-screen; fully static under reduced motion.
   const vignettes = document.querySelectorAll<HTMLElement>("[data-vignette]");
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   vignettes.forEach((root) => {
-    const steps = Array.from(root.querySelectorAll("li"));
+    const steps = Array.from(root.querySelectorAll<HTMLElement>(".step"));
+    const bar = root.querySelector<HTMLElement>(".progress-fill");
     if (reduced || steps.length === 0) {
       root.classList.add("static");
+      if (bar) bar.style.width = "100%";
       return;
     }
-    let idx = 0;
+
+    let idx = -1;
     let timer: number | undefined;
     let running = false;
 
+    const paint = () => {
+      steps.forEach((s, i) => {
+        s.classList.toggle("done", idx >= 0 && i < idx);
+        s.classList.toggle("active", i === idx);
+      });
+      if (bar) bar.style.width = idx < 0 ? "0" : `${((idx + 1) / steps.length) * 100}%`;
+    };
+
     const tick = () => {
       if (!running) return;
-      if (idx < steps.length) {
-        steps[idx]?.classList.add("on");
-        idx += 1;
-        timer = window.setTimeout(tick, idx === steps.length ? 2600 : 1150);
-      } else {
-        steps.forEach((s) => s.classList.remove("on"));
-        idx = 0;
-        timer = window.setTimeout(tick, 700);
+      idx += 1;
+      if (idx >= steps.length) {
+        idx = -1;
+        paint();
+        timer = window.setTimeout(tick, 900);
+        return;
       }
+      paint();
+      timer = window.setTimeout(tick, idx === steps.length - 1 ? 3000 : 1500);
     };
 
     const io = new IntersectionObserver(
@@ -255,94 +404,3 @@ const content = {
     revealables.forEach((el) => ro.observe(el));
   }
 </script>
-
-<!-- Scenes -->
-<section class="hairline-t">
-  <div class="container-site py-16 md:py-24 reveal">
-    <h2 class="h2">{content.scenesTitle}</h2>
-    <div class="mt-10 grid gap-10 md:grid-cols-3 md:gap-8">
-      {
-        content.scenes.map((s) => (
-          <div class="hairline-t pt-5">
-            <h3 class="h3">{s.h}</h3>
-            <p class="prose-site mt-3 text-[0.95rem]">{s.p}</p>
-          </div>
-        ))
-      }
-    </div>
-  </div>
-</section>
-
-<!-- Rails -->
-<section class="hairline-t bg-ground-deep">
-  <div class="container-site py-16 md:py-24 reveal">
-    <h2 class="h2">{content.railsTitle}</h2>
-    <p class="prose-site mt-4">{content.railsIntro}</p>
-    <div class="mt-10 grid gap-x-12 gap-y-8 sm:grid-cols-2">
-      {
-        content.rails.map((r) => (
-          <div class="flex gap-4">
-            <span class="mt-2 h-px w-6 shrink-0 bg-coral" />
-            <div>
-              <h3 class="h3">{r.h}</h3>
-              <p class="prose-site mt-2 text-[0.95rem]">{r.p}</p>
-            </div>
-          </div>
-        ))
-      }
-    </div>
-  </div>
-</section>
-
-<!-- Week 1 -->
-<section class="hairline-t">
-  <div class="container-site py-16 md:py-24 reveal">
-    <div class="max-w-2xl">
-      <h2 class="h2">{content.weekTitle}</h2>
-      <p class="prose-site mt-5">{content.weekP}</p>
-    </div>
-  </div>
-</section>
-
-<!-- Horizons -->
-<section class="hairline-t">
-  <div class="container-site py-16 md:py-24 reveal">
-    <h2 class="h2">{content.horizonsTitle}</h2>
-    <div class="mt-10 grid gap-8 md:grid-cols-3">
-      {
-        content.horizons.map((h) => (
-          <div class="hairline-t pt-5">
-            <p class="label-quiet">{h.label}</p>
-            <p class="prose-site mt-3 text-[0.95rem]">{h.p}</p>
-          </div>
-        ))
-      }
-    </div>
-  </div>
-</section>
-
-<!-- Trust line -->
-<section class="hairline-t bg-ground-deep">
-  <div class="container-site py-8">
-    <p class="text-center text-[0.88rem] text-fg-muted">{content.trust}</p>
-  </div>
-</section>
-
-<!-- Pilot invite -->
-<section class="hairline-t">
-  <div class="container-site py-16 md:py-24 reveal">
-    <div class="max-w-2xl">
-      <h2 class="h2">{content.pilotTitle}</h2>
-      <p class="prose-site mt-5">{content.pilotP}</p>
-      <div class="mt-8 flex flex-wrap items-center gap-5">
-        <a href={CAL_URL} class="btn-primary">{content.heroCta}</a>
-        <p class="text-[0.92rem] text-fg-muted">
-          {content.pilotAlt}
-          <a href={`mailto:${CONTACT_EMAIL}`} class="text-fg-soft hover:text-fg underline underline-offset-4 ml-1">
-            {CONTACT_EMAIL}
-          </a>
-        </p>
-      </div>
-    </div>
-  </div>
-</section>

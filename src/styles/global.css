@@ -3,7 +3,8 @@
 /*
   Synapsio design tokens: "ruhige Präzision" (engineered calm).
   Harmonized with the app palette. Hard rules: matte only, no gradients,
-  no glow, no neon. Depth = hairlines, spacing, tonal steps.
+  no glow, no neon. Depth = hairlines, spacing, tonal steps, panels.
+  Typeface: Schibsted Grotesk (Jakob's pick, design gate 21.07.2026).
 */
 @theme {
   --color-ground: #0c1e26;
@@ -21,14 +22,12 @@
   --color-hairline: rgba(255, 255, 255, 0.08);
   --color-hairline-strong: rgba(255, 255, 255, 0.16);
 
-  --font-sans: "IBM Plex Sans Variable", "IBM Plex Sans", system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Menlo, monospace;
+  --font-sans: "Schibsted Grotesk Variable", "Schibsted Grotesk", system-ui, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Mono", "Segoe UI Mono", Menlo, monospace;
 
-  --text-display: clamp(2.1rem, 5vw, 3.4rem);
-  --text-h2: clamp(1.4rem, 2.6vw, 1.9rem);
-  --text-h3: 1.12rem;
-
-  --spacing-section: clamp(4.5rem, 10vw, 8rem);
+  --text-display: clamp(2.3rem, 5.5vw, 3.9rem);
+  --text-h2: clamp(1.55rem, 2.8vw, 2.1rem);
+  --text-h3: 1.14rem;
 }
 
 html {
@@ -52,7 +51,7 @@ html {
 
 body {
   font-family: var(--font-sans);
-  font-size: 1.03rem;
+  font-size: 1.04rem;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
 }
@@ -62,36 +61,46 @@ body {
   color: var(--color-fg);
 }
 
-/* Reusable primitives */
+/* Layout primitives */
 .container-site {
   margin-inline: auto;
-  max-width: 72rem;
+  max-width: 74rem;
   padding-inline: clamp(1.25rem, 4vw, 2.5rem);
 }
 
 .hairline-t { border-top: 1px solid var(--color-hairline); }
 .hairline-b { border-bottom: 1px solid var(--color-hairline); }
 
+.panel {
+  border: 1px solid var(--color-hairline-strong);
+  background: var(--color-surface);
+}
+.panel-deep {
+  border: 1px solid var(--color-hairline);
+  background: var(--color-ground-deep);
+}
+
+/* Type roles */
 .display {
   font-size: var(--text-display);
-  font-weight: 550;
-  letter-spacing: -0.025em;
-  line-height: 1.08;
+  font-weight: 700;
+  letter-spacing: -0.028em;
+  line-height: 1.04;
   text-wrap: balance;
 }
 
 .h2 {
   font-size: var(--text-h2);
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  line-height: 1.2;
+  font-weight: 650;
+  letter-spacing: -0.018em;
+  line-height: 1.15;
   text-wrap: balance;
 }
 
 .h3 {
   font-size: var(--text-h3);
-  font-weight: 600;
-  letter-spacing: -0.005em;
+  font-weight: 650;
+  letter-spacing: -0.006em;
 }
 
 .prose-site {
@@ -99,15 +108,31 @@ body {
   max-width: 62ch;
 }
 
+.mono-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--color-fg-muted);
+}
+
+.label-quiet {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--color-fg-muted);
+}
+
+/* Buttons */
 .btn-primary {
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
   background: var(--color-coral);
   color: var(--color-ground);
-  font-weight: 600;
+  font-weight: 650;
   font-size: 0.95rem;
-  padding: 0.8rem 1.6rem;
+  padding: 0.85rem 1.7rem;
   border-radius: 2px;
   transition: background-color 160ms ease;
 }
@@ -119,22 +144,19 @@ body {
   gap: 0.6rem;
   border: 1px solid var(--color-hairline-strong);
   color: var(--color-fg-soft);
-  font-weight: 500;
+  font-weight: 550;
   font-size: 0.95rem;
-  padding: 0.8rem 1.6rem;
+  padding: 0.85rem 1.7rem;
   border-radius: 2px;
-  transition: border-color 160ms ease, color 160ms ease;
+  transition: border-color 160ms ease, color 160ms ease, background-color 160ms ease;
 }
-.btn-secondary:hover { border-color: var(--color-fg-muted); color: var(--color-fg); }
-
-.label-quiet {
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: var(--color-fg-muted);
+.btn-secondary:hover {
+  border-color: var(--color-fg-muted);
+  color: var(--color-fg);
+  background: var(--color-surface);
 }
 
-/* Scroll reveal: sections fade up once, calm and short. */
+/* Scroll reveal: one calm fade-up per section */
 .reveal {
   opacity: 0;
   transform: translateY(14px);
@@ -152,26 +174,51 @@ body {
   }
 }
 
-/* Hero vignette: steps appear sequentially, then the loop restarts. */
-[data-vignette] li {
-  opacity: 0;
-  transform: translateY(6px);
-  transition: opacity 450ms ease, transform 450ms ease;
+/*
+  Hero vignette, "living console" model:
+  every row is always laid out (the card is never empty); the loop moves
+  a highlight through the rows. done = quiet teal, active = bright,
+  upcoming = dimmed. A thin matte progress line runs at the card bottom.
+*/
+[data-vignette] .step {
+  opacity: 0.34;
+  transition: opacity 420ms ease, background-color 420ms ease;
 }
-[data-vignette] li.on {
+[data-vignette] .step.active {
   opacity: 1;
-  transform: none;
+  background: var(--color-surface-raised);
 }
-[data-vignette].static li {
+[data-vignette] .step.done {
+  opacity: 0.62;
+}
+[data-vignette] .step .dot {
+  background: transparent;
+  border: 1.5px solid var(--color-fg-muted);
+  transition: background-color 420ms ease, border-color 420ms ease;
+}
+[data-vignette] .step.active .dot {
+  background: var(--color-coral);
+  border-color: var(--color-coral);
+}
+[data-vignette] .step.done .dot {
+  background: var(--color-teal-soft);
+  border-color: var(--color-teal-soft);
+}
+[data-vignette] .progress-fill {
+  transition: width 500ms ease;
+}
+[data-vignette].static .step {
   opacity: 1;
-  transform: none;
-  transition: none;
+  background: transparent;
+}
+[data-vignette].static .step .dot {
+  background: var(--color-teal-soft);
+  border-color: var(--color-teal-soft);
 }
 @media (prefers-reduced-motion: reduce) {
-  [data-vignette] li {
-    opacity: 1;
-    transform: none;
-    transition: none;
+  [data-vignette] .step {
+    opacity: 1 !important;
+    background: transparent !important;
   }
 }
 

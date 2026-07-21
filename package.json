@@ -10,8 +10,6 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.4.1",
-    "@fontsource-variable/familjen-grotesk": "^5.2.5",
-    "@fontsource-variable/ibm-plex-sans": "^5.2.5",
     "@fontsource-variable/schibsted-grotesk": "^5.2.5",
     "@tailwindcss/vite": "^4.1.11",
     "astro": "^5.12.3",
