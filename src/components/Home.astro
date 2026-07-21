@@ -9,13 +9,20 @@ const { locale } = Astro.props;
 const content = {
   de: {
     heroKicker: "KI-Agent für den Einkauf im Mittelstand",
-    heroH1: "Ihr Einkauf arbeitet jetzt auch nachts.",
+    heroH1a: "Ihr Einkauf arbeitet",
+    heroH1b: "jetzt auch nachts.",
     heroSub:
       "Synapsio ist der KI-Mitarbeiter für den Einkauf im Mittelstand. Er schlägt Bestellungen vor, schreibt mit Ihren Lieferanten, prüft Rechnungen. Und er fragt Sie, bevor er Geld ausgibt.",
     heroCta: "Pilot-Gespräch buchen",
     heroCta2: "So arbeitet der Agent",
     vignetteTitle: "Synapsio Agent",
     vignetteLive: "Live",
+    vignetteSideLabel: "Heute",
+    vignetteSide: [
+      { n: "12", s: "Vorgänge bearbeitet" },
+      { n: "1", s: "Freigabe offen" },
+      { n: "3", s: "Lieferantenmails beantwortet" },
+    ],
     vignette: [
       { t: "08:12", s: "Mail vom Lieferanten: Auftragsbestätigung" },
       { t: "08:12", s: "Gelesen. Liefertermin übernommen: 12.08." },
@@ -85,16 +92,24 @@ const content = {
     pilotP:
       "Synapsio ist jung und das Produkt ist echt: Sie können es heute unter app.synapsio.solutions sehen. Als Pilotkunde bekommen Sie den Agenten zu Pilotkonditionen, einen direkten Draht zu uns Gründern und echten Einfluss darauf, was als Nächstes gebaut wird.",
     pilotAlt: "Oder schreiben Sie uns:",
+    sections: { scenes: "01", rails: "02", week: "03", horizons: "04", pilot: "05" },
   },
   en: {
     heroKicker: "The AI agent for SMB purchasing",
-    heroH1: "Your purchasing now works nights, too.",
+    heroH1a: "Your purchasing now",
+    heroH1b: "works nights, too.",
     heroSub:
       "Synapsio is the AI employee for SMB purchasing. It proposes orders, writes to your suppliers, checks invoices. And it asks you before it spends money.",
     heroCta: "Book a pilot call",
     heroCta2: "See how the agent works",
     vignetteTitle: "Synapsio Agent",
     vignetteLive: "Live",
+    vignetteSideLabel: "Today",
+    vignetteSide: [
+      { n: "12", s: "cases handled" },
+      { n: "1", s: "approval waiting" },
+      { n: "3", s: "supplier emails answered" },
+    ],
     vignette: [
       { t: "08:12", s: "Supplier email: order confirmation" },
       { t: "08:12", s: "Read. Delivery date updated: Aug 12" },
@@ -164,64 +179,85 @@ const content = {
     pilotP:
       "Synapsio is young and the product is real: you can see it today at app.synapsio.solutions. As a pilot customer you get the agent on pilot terms, a direct line to us founders, and real influence on what gets built next.",
     pilotAlt: "Or write to us:",
+    sections: { scenes: "01", rails: "02", week: "03", horizons: "04", pilot: "05" },
   },
 }[locale];
 ---
 
-<!-- Hero -->
+<!-- Hero: centered, huge, composio-scale -->
 <section class="hairline-b bg-ground-deep">
-  <div class="container-site pt-16 pb-16 md:pt-24 md:pb-20">
-    <div class="grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-      <div>
-        <p class="mono-label">{content.heroKicker}</p>
-        <h1 class="display mt-5">{content.heroH1}</h1>
-        <p class="prose-site mt-6 text-[1.12rem] leading-[1.6]">{content.heroSub}</p>
-        <div class="mt-9 flex flex-wrap gap-4">
-          <a href={CAL_URL} class="btn-primary">{content.heroCta}</a>
-          <a href={localePath(locale, "/produkt")} class="btn-secondary">{content.heroCta2}</a>
-        </div>
-      </div>
+  <div class="container-site pt-20 pb-14 md:pt-28 md:pb-16 text-center">
+    <p class="mono-label">
+      <span class="hatch mr-3 align-middle"></span>{content.heroKicker}
+    </p>
+    <h1 class="display mx-auto mt-7 max-w-4xl">
+      {content.heroH1a}<br />{content.heroH1b}
+    </h1>
+    <p class="prose-site mx-auto mt-7 text-[1.14rem] leading-[1.6]">{content.heroSub}</p>
+    <div class="mt-10 flex flex-wrap justify-center gap-4">
+      <a href={CAL_URL} class="btn-primary">{content.heroCta}</a>
+      <a href={localePath(locale, "/produkt")} class="btn-secondary">{content.heroCta2}</a>
+    </div>
+  </div>
 
-      <!-- Living console: the one orchestrated moment of the page -->
-      <div class="panel" data-vignette>
-        <div class="flex items-center justify-between border-b border-hairline px-5 py-3.5">
-          <div class="flex items-center gap-2.5">
-            <span class="h-2 w-2 rounded-full bg-teal-soft"></span>
-            <span class="text-[0.9rem] font-semibold">{content.vignetteTitle}</span>
-          </div>
-          <span class="mono-label">{content.vignetteLive}</span>
+  <!-- Living console: full-width product object -->
+  <div class="container-site pb-20 md:pb-24">
+    <div class="panel ticks mx-auto max-w-4xl" data-vignette>
+      <div class="flex items-center justify-between border-b border-hairline-strong px-5 py-3.5">
+        <div class="flex items-center gap-2.5">
+          <span class="h-2 w-2 rounded-full bg-teal-soft"></span>
+          <span class="text-[0.92rem] font-semibold tracking-tight">{content.vignetteTitle}</span>
         </div>
-        <ol class="px-2 py-2">
-          {
-            content.vignette.map((step) => (
-              <li class="step flex items-center gap-3.5 px-3 py-3">
-                <span class="dot h-2.5 w-2.5 shrink-0 rounded-full" />
-                <span class="mono-label !text-[0.68rem] !tracking-normal w-11 shrink-0">
-                  {step.t}
-                </span>
-                <span class="text-[0.94rem] leading-snug">{step.s}</span>
-              </li>
-            ))
-          }
-        </ol>
-        <div class="mx-5 mb-4 mt-1 h-px bg-hairline">
-          <div class="progress-fill h-px w-0 bg-teal-soft"></div>
+        <span class="mono-label">{content.vignetteLive}</span>
+      </div>
+      <div class="grid md:grid-cols-[220px_1fr]">
+        <div class="hidden border-r border-hairline px-5 py-5 md:block">
+          <p class="mono-label mb-4">{content.vignetteSideLabel}</p>
+          <ul class="space-y-4">
+            {
+              content.vignetteSide.map((item) => (
+                <li>
+                  <span class="block font-mono text-[1.6rem] leading-none text-fg">{item.n}</span>
+                  <span class="mt-1 block text-[0.8rem] text-fg-muted">{item.s}</span>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+        <div>
+          <ol class="px-2 py-2">
+            {
+              content.vignette.map((step) => (
+                <li class="step flex items-center gap-3.5 px-3 py-3">
+                  <span class="dot h-2.5 w-2.5 shrink-0 rounded-full" />
+                  <span class="mono-num w-11 shrink-0 !text-[0.7rem]">{step.t}</span>
+                  <span class="text-[0.95rem] leading-snug">{step.s}</span>
+                </li>
+              ))
+            }
+          </ol>
+          <div class="mx-5 mb-4 mt-1 h-px bg-hairline">
+            <div class="progress-fill h-px w-0 bg-teal-soft"></div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Scenes -->
+<!-- 01 · Scenes -->
 <section>
   <div class="container-site py-16 md:py-24 reveal">
-    <h2 class="h2 max-w-xl">{content.scenesTitle}</h2>
-    <div class="mt-12 grid gap-10 md:grid-cols-3 md:gap-0 md:divide-x md:divide-[rgba(255,255,255,0.08)]">
+    <div class="section-head">
+      <p class="mono-label"><span class="hatch mr-3 align-middle"></span>{content.scenesTitle}</p>
+      <span class="mono-num">{content.sections.scenes}</span>
+    </div>
+    <div class="mt-2 grid md:grid-cols-3 rule-grid">
       {
         content.scenes.map((s) => (
-          <div class="md:px-8 first:md:pl-0 last:md:pr-0">
-            <p class="mono-label">{s.t}</p>
-            <h3 class="h3 mt-3">{s.h}</h3>
+          <div class="pt-8 md:pt-10 pb-4">
+            <p class="font-mono text-[1.9rem] leading-none text-fg-muted">{s.t}</p>
+            <h3 class="h3 mt-5">{s.h}</h3>
             <p class="prose-site mt-3 text-[0.96rem]">{s.p}</p>
           </div>
         ))
@@ -230,26 +266,30 @@ const content = {
   </div>
 </section>
 
-<!-- Rails -->
+<!-- 02 · Rails -->
 <section class="hairline-t bg-ground-deep">
   <div class="container-site py-16 md:py-24 reveal">
-    <div class="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+    <div class="section-head">
+      <p class="mono-label"><span class="hatch mr-3 align-middle"></span>{locale === "de" ? "Kontrolle" : "Control"}</p>
+      <span class="mono-num">{content.sections.rails}</span>
+    </div>
+    <div class="mt-12 grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
       <div>
         <h2 class="h2">{content.railsTitle}</h2>
-        <p class="prose-site mt-5">{content.railsIntro}</p>
+        <p class="prose-site mt-6 text-[1.05rem]">{content.railsIntro}</p>
       </div>
-      <div class="panel grid sm:grid-cols-2">
+      <div class="panel ticks grid sm:grid-cols-2">
         {
           content.rails.map((r, i) => (
             <div
               class:list={[
-                "p-6",
+                "p-7",
                 i % 2 === 0 ? "sm:border-r sm:border-hairline" : "",
                 i < 2 ? "border-b border-hairline" : "",
               ]}
             >
-              <span class="block h-[3px] w-7 bg-coral" />
-              <h3 class="h3 mt-4">{r.h}</h3>
+              <span class="mono-num">0{i + 1}</span>
+              <h3 class="h3 mt-3">{r.h}</h3>
               <p class="prose-site mt-2 text-[0.94rem]">{r.p}</p>
             </div>
           ))
@@ -259,32 +299,35 @@ const content = {
   </div>
 </section>
 
-<!-- Week 1 -->
+<!-- 03 · Week 1 -->
 <section class="hairline-t">
   <div class="container-site py-16 md:py-24 reveal">
-    <div class="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
-      <h2 class="h2">{content.weekTitle}</h2>
-      <p class="prose-site text-[1.05rem]">{content.weekP}</p>
+    <div class="section-head">
+      <p class="mono-label"><span class="hatch mr-3 align-middle"></span>{locale === "de" ? "Der Einstieg" : "Getting started"}</p>
+      <span class="mono-num">{content.sections.week}</span>
+    </div>
+    <div class="mt-12 grid gap-8 lg:grid-cols-[1fr_1fr] lg:gap-16">
+      <h2 class="h2 max-w-md">{content.weekTitle}</h2>
+      <p class="prose-site text-[1.08rem]">{content.weekP}</p>
     </div>
   </div>
 </section>
 
-<!-- Horizons -->
+<!-- 04 · Horizons -->
 <section class="hairline-t bg-ground-deep">
   <div class="container-site py-16 md:py-24 reveal">
-    <h2 class="h2">{content.horizonsTitle}</h2>
-    <div class="mt-12 grid gap-10 md:grid-cols-3 md:gap-8">
+    <div class="section-head">
+      <p class="mono-label"><span class="hatch mr-3 align-middle"></span>{content.horizonsTitle}</p>
+      <span class="mono-num">{content.sections.horizons}</span>
+    </div>
+    <div class="mt-2 grid md:grid-cols-3 rule-grid">
       {
         content.horizons.map((h, i) => (
-          <div class="relative border-t-2 border-hairline-strong pt-6">
-            <span
-              class:list={[
-                "absolute -top-[5px] left-0 h-2 w-2 rounded-full",
-                i === 0 ? "bg-teal-soft" : "bg-fg-muted",
-              ]}
-            />
-            <p class="mono-label">{h.label}</p>
-            <p class="prose-site mt-3 text-[0.96rem]">{h.p}</p>
+          <div class="pt-8 md:pt-10 pb-4">
+            <p class="mono-label" style={i === 0 ? "color: var(--color-teal-soft)" : ""}>
+              {h.label}
+            </p>
+            <p class="prose-site mt-4 text-[0.98rem]">{h.p}</p>
           </div>
         ))
       }
@@ -292,13 +335,13 @@ const content = {
   </div>
 </section>
 
-<!-- Trust strip -->
+<!-- Trust band -->
 <section class="hairline-t">
-  <div class="container-site py-7">
-    <div class="flex flex-wrap items-center justify-center gap-x-10 gap-y-2">
+  <div class="container-site py-6">
+    <div class="flex flex-wrap items-center justify-center gap-x-12 gap-y-2">
       {
         content.trust.map((item) => (
-          <span class="flex items-center gap-2.5 text-[0.88rem] text-fg-muted">
+          <span class="mono-label !normal-case !tracking-normal flex items-center gap-2.5 !text-[0.8rem]">
             <span class="h-1 w-1 rounded-full bg-teal-soft" />
             {item}
           </span>
@@ -308,31 +351,34 @@ const content = {
   </div>
 </section>
 
-<!-- Pilot invite -->
+<!-- 05 · Pilot invite -->
 <section class="hairline-t bg-ground-deep">
-  <div class="container-site py-16 md:py-24 reveal">
-    <div class="max-w-2xl">
-      <h2 class="h2">{content.pilotTitle}</h2>
-      <p class="prose-site mt-5 text-[1.05rem]">{content.pilotP}</p>
-      <div class="mt-9 flex flex-wrap items-center gap-6">
-        <a href={CAL_URL} class="btn-primary">{content.heroCta}</a>
-        <p class="text-[0.92rem] text-fg-muted">
-          {content.pilotAlt}
-          <a
-            href={`mailto:${CONTACT_EMAIL}`}
-            class="ml-1 text-fg-soft underline underline-offset-4 hover:text-fg"
-          >
-            {CONTACT_EMAIL}
-          </a>
-        </p>
-      </div>
+  <div class="container-site py-20 md:py-28 reveal text-center">
+    <p class="mono-label">
+      <span class="hatch mr-3 align-middle"></span>{locale === "de" ? "Pilotprogramm" : "Pilot program"}
+      <span class="ml-3 mono-num">{content.sections.pilot}</span>
+    </p>
+    <h2 class="h2 mx-auto mt-6 max-w-2xl" style="font-size: clamp(2.1rem, 4.5vw, 3.2rem)">
+      {content.pilotTitle}
+    </h2>
+    <p class="prose-site mx-auto mt-6 text-[1.07rem]">{content.pilotP}</p>
+    <div class="mt-10 flex flex-wrap items-center justify-center gap-6">
+      <a href={CAL_URL} class="btn-primary">{content.heroCta}</a>
+      <p class="text-[0.92rem] text-fg-muted">
+        {content.pilotAlt}
+        <a
+          href={`mailto:${CONTACT_EMAIL}`}
+          class="ml-1 text-fg-soft underline underline-offset-4 hover:text-fg"
+        >
+          {CONTACT_EMAIL}
+        </a>
+      </p>
     </div>
   </div>
 </section>
 
 <script>
   // Living console: highlight walks the always-visible rows, then restarts.
-  // Pauses off-screen; fully static under reduced motion.
   const vignettes = document.querySelectorAll<HTMLElement>("[data-vignette]");
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -387,7 +433,7 @@ const content = {
     io.observe(root);
   });
 
-  // Scroll reveal: one-time fade-up for marked elements.
+  // Scroll reveal
   const revealables = document.querySelectorAll(".reveal");
   if (revealables.length > 0) {
     const ro = new IntersectionObserver(
