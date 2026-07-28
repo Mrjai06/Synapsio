@@ -67,11 +67,26 @@
   .btn.primary { background:var(--coral); border-color:var(--coral); color:#1a0d07; font-weight:600; }
   .btn.primary:hover { background:#ef9068; border-color:#ef9068; transform:translateY(-1px); }
   .btn.lg { padding:12px 22px; font-size:15px; }
+  /* At 320px (the narrowest phone still in use) brand + language switch + CTA are 5px too wide
+     for the bar and the CTA pushed the document sideways. Only the button gives. */
+  @media (max-width:380px){
+    .nav-in { gap:10px; }
+    nav .btn.primary { padding:8px 12px; font-size:13.5px; }
+    .wordmark { font-size:12.5px; letter-spacing:0.16em; }
+  }
 
   /* A zero-size anchor at the document's top-right corner. The sphere offsets itself by half
      its own width and height from here, so its centre lands exactly on the corner and only the
-     lower-left quarter is on screen. body{overflow-x:hidden} does the clipping. */
-  .hero-sphere { position:absolute; top:0; right:0; width:0; height:0; z-index:0; pointer-events:none; }
+     lower-left quarter is on screen. main{overflow-x:clip} below does the clipping. */
+  /* top:-62px cancels the nav's height: main is now the containing block (see below), so a plain
+     top:0 would drop the sphere by exactly the nav bar and move a design Jakob has signed off. */
+  .hero-sphere { position:absolute; top:-62px; right:0; width:0; height:0; z-index:0; pointer-events:none; }
+  /* The sphere and the full-bleed stage deliberately reach past the page edge. Clip them here
+     rather than leaning on body{overflow-x:hidden}: `clip` (not `hidden`) keeps the viewport as
+     the scrollport, so the sticky .ctrl-nav inside still sticks. position:relative is required —
+     an unpositioned ancestor is not in .hero-sphere's containing-block chain and so never
+     clips it. It also re-anchors the sphere to main's top edge, i.e. under the nav bar. */
+  main { position:relative; overflow-x:clip; }
   .hero { padding-top:clamp(46px,9vh,100px); position:relative; z-index:1; }
   .hero .chip { opacity:0; transition:opacity 500ms ease 120ms; }
   .go .hero .chip { opacity:1; }
@@ -89,7 +104,11 @@
 
   /* ===== product window ===== */
   .stage-wrap { position:relative; margin-top:clamp(38px,6vh,64px); width:100vw; margin-left:calc(50% - 50vw); }
-  .surface { position:relative; max-width:1080px; height:588px; margin-inline:auto; border:1px solid var(--hairline-strong); border-radius:13px; background:var(--app-bg); overflow:hidden; box-shadow:0 40px 90px -50px rgba(0,0,0,0.85); opacity:0; transform-origin:top center; transition:opacity 800ms ease 440ms; will-change:transform; }
+  /* Below 1080px the window used to fill the viewport edge to edge, so its own border sat exactly
+     on the page edge and the mock read as content bleeding off-screen rather than as a window
+     with a cropped view inside it. A small gutter keeps the frame visible at every width.
+     (No global box-sizing reset on this site: .surface has no padding, so width is safe here.) */
+  .surface { position:relative; width:min(1080px, calc(100% - clamp(20px,4vw,48px))); height:588px; margin-inline:auto; border:1px solid var(--hairline-strong); border-radius:13px; background:var(--app-bg); overflow:hidden; box-shadow:0 40px 90px -50px rgba(0,0,0,0.85); opacity:0; transform-origin:top center; transition:opacity 800ms ease 440ms; will-change:transform; }
   /* shrink the whole app so a full tab fits inside the fixed landscape window */
   .surface .app { zoom:0.88; }
   .go .surface { opacity:1; }
@@ -99,7 +118,10 @@
   .gwin.a { right:calc(50% + 552px); top:34px; }
   .gwin.b { left:calc(50% + 552px); top:150px; }
   .gwin.c { right:calc(50% + 552px); top:330px; }
-  @media (max-width:1480px){ .gwin{ display:none; } }
+  /* A gutter window needs 552 + 238 = 790px of clearance from the centre line, so it only fits
+     from ~1580px up, and measurement puts the true cut-off a few px above that. The old 1480px
+     rule left a 140px band where the windows were shown with 40px sliced off by the page edge. */
+  @media (max-width:1620px){ .gwin{ display:none; } }
   /* speech tail only on the Ava chat window */
   .gwin.a::after { content:""; position:absolute; top:26px; right:-6px; width:11px; height:11px; background:rgba(13,30,37,0.97); transform:rotate(45deg); border-top:1px solid rgba(255,255,255,0.12); border-right:1px solid rgba(255,255,255,0.12); }
   .gwin .gh { display:flex; align-items:center; gap:8px; margin-bottom:9px; padding-bottom:9px; border-bottom:1px solid var(--app-line); }
@@ -131,7 +153,7 @@
   .gwin.term .cur { color:var(--teal-soft); }
 
   .app { display:grid; grid-template-columns:210px 1fr; min-height:668px; }
-  @media (max-width:760px){ .app{ grid-template-columns:1fr; } .side{ display:none; } }
+  @media (max-width:760px){ .app{ grid-template-columns:1fr; } }
 
   /* sidebar (faithful) */
   .side { background:var(--app-side); border-right:1px solid var(--app-line); display:flex; flex-direction:column; }
@@ -150,9 +172,16 @@
   .side .badge { margin-left:auto; min-width:18px; height:18px; display:inline-flex; align-items:center; justify-content:center; border-radius:999px; background:var(--coral); color:#fff; font-size:10px; font-weight:700; padding:0 5px; }
   .side .sfoot { border-top:1px solid var(--app-line); padding:12px; }
   .side .sfoot .acct { padding:2px 12px; font-size:10.5px; color:#4a7080; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  /* Below the sidebar breakpoint the mock is just the main panel. This override has to sit AFTER
+     the .side block: it is the same specificity as .side{display:flex}, so declared earlier it
+     lost the cascade and the phone layout showed the sidebar and nothing else. */
+  @media (max-width:760px){ .side{ display:none; } }
 
   /* main */
-  .main { position:relative; display:flex; flex-direction:column; }
+  /* min-width:0 stops the dense tables inside from widening the grid column past the window;
+     overflow-x:clip then crops them at the window's inner edge instead of letting them run under
+     its border. clip, not hidden, so the Ava nudge can still hang below the top bar. */
+  .main { position:relative; display:flex; flex-direction:column; min-width:0; overflow-x:clip; }
   .apptop { position:relative; height:52px; display:flex; align-items:center; gap:10px; padding:0 18px; background:linear-gradient(90deg,var(--app-top1),var(--app-top2)); border-bottom:1px solid rgba(255,255,255,0.09); box-shadow:0 2px 12px rgba(0,0,0,0.28); z-index:8; }
   .orb-slot { position:relative; width:52px; height:52px; transform:translateY(13px); z-index:9; }
   .orb-halo { position:absolute; inset:-9px; border-radius:50%; pointer-events:none; background:radial-gradient(circle at 50% 45%,rgba(95,212,200,0.40),rgba(58,128,128,0.16) 46%,transparent 70%); filter:blur(9px); }
@@ -436,6 +465,26 @@
   .clabel { position:absolute; font-family:var(--mono); font-size:9px; letter-spacing:0.06em; text-transform:uppercase; padding:1px 8px; border-radius:4px; border:1px solid; background:var(--app-card-2); }
   .clabel.teal { color:var(--teal-soft); border-color:rgba(90,163,163,0.5); }
   .clabel.coral { color:var(--coral); border-color:rgba(232,132,90,0.5); }
+  /* Under ~800px the 660px canvas no longer fits its column, and scrolling it sideways hides
+     exactly the branch the diagram exists to show. So it stops being a canvas and becomes a
+     stack: connectors off, nodes in flow, and the JA/NEIN chips re-ordered to sit directly above
+     the outcome they lead to. The nth-child indices track the markup order in Home.astro
+     (1 svg, 2-4 nodes, 5 JA, 6 NEIN, 7 Bestellt, 8 Freigabe) — keep them in step if it changes. */
+  @media (max-width:800px){
+    .canvas { padding:15px; overflow-x:visible; }
+    .cv-in { width:auto; height:auto; margin:0; display:flex; flex-direction:column; gap:19px; }
+    .cv-svg { display:none; }
+    /* left/top/width are INLINE on every node (they are diagram coordinates), so unwinding them
+       needs !important. position stays relative, not static: .cbadge hangs off each node and
+       would otherwise resolve against .cv-in. */
+    .cv-in > .cnode { position:relative; left:auto !important; top:auto !important; width:auto !important; }
+    .cv-in > .clabel { position:relative; left:auto !important; top:auto !important; align-self:flex-start; margin-bottom:-11px; }
+    .cv-in > :nth-child(5){ order:1; }
+    .cv-in > :nth-child(7){ order:2; }
+    .cv-in > :nth-child(6){ order:3; }
+    .cv-in > :nth-child(8){ order:4; }
+    .cv-in > :nth-child(7), .cv-in > :nth-child(8) { margin-left:15px; }
+  }
   /* Ausgabenlimits — dashboard (bar chart + stat tiles) */
   .dash { padding:18px; }
   .chartwrap { position:relative; height:150px; padding-top:20px; }
@@ -496,11 +545,17 @@
   /* control rails — one connected grid: sticky nav + hairline-divided blocks + detail sub-rows (Attio) */
   .ctrl { padding:clamp(54px,8vh,100px) 0 clamp(66px,10vh,130px); }
   .ctrl-grid { display:grid; grid-template-columns:284px 1fr; align-items:start; border-top:1px solid var(--hairline-strong); border-bottom:1px solid var(--hairline-strong); }
-  @media (max-width:960px){ .ctrl-grid{ grid-template-columns:1fr; } }
-  .ctrl-nav { position:sticky; top:96px; align-self:start; padding:clamp(30px,4vh,48px) clamp(24px,3vw,44px) 40px 0; }
-  @media (max-width:960px){ .ctrl-nav{ position:static; padding:32px 0; border-bottom:1px solid var(--hairline); } }
-  .ctrl-track { border-left:1px solid var(--hairline-strong); }
-  @media (max-width:960px){ .ctrl-track{ border-left:none; } }
+  /* Collapses at 1080, not 960: the sticky column costs 284px, and between those two widths what
+     is left is too narrow for the 660px flow diagram, which then sat in a sideways scroll box.
+     Giving the track the full width there is worth more than keeping the sidebar. */
+  @media (max-width:1080px){ .ctrl-grid{ grid-template-columns:1fr; } }
+  /* min-width:0 on both columns is load-bearing. Grid items default to min-width:auto, so the
+     widest thing inside the track (the 660px flow diagram) set the MIN-CONTENT width of the whole
+     grid — both columns then grew past the viewport at every width under ~1100px. */
+  .ctrl-nav { position:sticky; top:96px; align-self:start; min-width:0; padding:clamp(30px,4vh,48px) clamp(24px,3vw,44px) 40px 0; }
+  @media (max-width:1080px){ .ctrl-nav{ position:static; padding:32px 0; border-bottom:1px solid var(--hairline); } }
+  .ctrl-track { border-left:1px solid var(--hairline-strong); min-width:0; }
+  @media (max-width:1080px){ .ctrl-track{ border-left:none; } }
   .ctrl-block { scroll-margin-top:96px; padding:clamp(38px,5.5vh,60px) clamp(22px,3.2vw,52px); border-top:1px solid var(--hairline); opacity:0; transform:translateY(20px); transition:opacity 680ms ease, transform 680ms cubic-bezier(0.2,0.7,0.3,1); }
   .ctrl-block:first-child { border-top:none; }
   .ctrl-block.seen { opacity:1; transform:none; }

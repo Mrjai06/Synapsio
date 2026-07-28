@@ -507,8 +507,12 @@ const p = (path: string) => localePath(locale, path);
     var r=surfaceEl.getBoundingClientRect(), vh=window.innerHeight;
     // p: 0 when the window first enters from the bottom, 1 once scrolled up into view
     var p=clamp((vh - r.top)/(vh*0.92));
-    // pronounced Attio-style shrink: big on entry, settles smaller as side windows appear
-    surfaceEl.style.transform="scale("+(1.16-p*0.20).toFixed(3)+")";
+    // pronounced Attio-style shrink: big on entry, settles smaller as side windows appear.
+    // The 1.16 entry scale assumes gutter. Once the window is as wide as the viewport there is
+    // none, and scaling up pushed it off the page edge, so cap the entry scale at what fits.
+    var up=Math.min(1.16,(window.innerWidth-20)/surfaceEl.offsetWidth);
+    if(up<0.96) up=0.96;
+    surfaceEl.style.transform="scale("+(up-p*(up-0.96)).toFixed(3)+")";
     var g=clamp((p-0.34)/0.34);
     [gwinA,gwinB,gwinC].forEach(function(w,i){ w.style.opacity=g;
       var dir = (i===1)? -1 : 1;   // B on the right slides in from the right
