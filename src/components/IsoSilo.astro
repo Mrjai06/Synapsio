@@ -1,0 +1,220 @@
+---
+// Reichweite as a physical object: a silo that drains at the consumption rate, a marked reorder
+// line on its body, and a refill that arrives one lead time after the level crosses that line.
+// The whole reorder cycle, running by itself. No clicks.
+//
+// Same hairline-iso engine as HorizonteIso: z-up projection, painter sort, backface cull.
+// Objects here are deliberately NOT the startpage's (papers, rack, conveyor, target) or
+// Horizonte's (warehouses, trucks, roads) — a device may only appear once on the site.
+import type { Locale } from "../i18n/ui";
+interface Props { locale?: Locale }
+const { locale = "de" } = Astro.props;
+const T = locale === "de"
+  ? { stock: "Bestand", rop: "Nachbestellpunkt", lead: "Lieferzeit läuft", refill: "Lieferung", use: "Verbrauch" }
+  : { stock: "Stock", rop: "Reorder point", lead: "Lead time running", refill: "Delivery", use: "Consumption" };
+---
+
+<div class="silo" id="silo">
+  <svg id="siloSvg" aria-hidden="true"></svg>
+  <span class="silo-lbl" id="lRop">{T.rop}</span>
+  <span class="silo-lbl" id="lStock">{T.stock}</span>
+  <span class="silo-lbl" id="lUse">{T.use}</span>
+  <span class="silo-tag" id="siloTag">{T.lead}</span>
+  <span class="silo-tag drop" id="siloDrop">{T.refill}</span>
+</div>
+
+<script is:inline>
+(function(){
+  var root=document.getElementById("silo"), svg=document.getElementById("siloSvg");
+  if(!root||!svg) return;
+  var SVGNS="http://www.w3.org/2000/svg", COS30=Math.cos(Math.PI/6);
+  var reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function project(p){ return [(p[0]-p[1])*COS30,(p[0]+p[1])*0.5-p[2],p[0]+p[1]+p[2]]; }
+  function neg(a){ return [-a[0],-a[1],-a[2]]; }
+  function box(o,u,v,w,cls){
+    function k(a,b,c){ return [o[0]+a*u[0]+b*v[0]+c*w[0], o[1]+a*u[1]+b*v[1]+c*w[1], o[2]+a*u[2]+b*v[2]+c*w[2]]; }
+    var A=k(0,0,0),B=k(1,0,0),C=k(1,1,0),D=k(0,1,0),E=k(0,0,1),F=k(1,0,1),G=k(1,1,1),H=k(0,1,1);
+    return [{pts:[A,B,C,D],nrm:neg(w),cls:cls},{pts:[E,F,G,H],nrm:w,lit:true,cls:cls},
+            {pts:[A,B,F,E],nrm:neg(v),cls:cls},{pts:[D,C,G,H],nrm:v,cls:cls},
+            {pts:[A,D,H,E],nrm:neg(u),cls:cls},{pts:[B,C,G,F],nrm:u,cls:cls}];
+  }
+  // an N-sided prism reads as a cylinder in isometric and keeps the flat-shaded hairline look
+  function prism(cx,cy,r,z0,z1,n,cls,lit){
+    var f=[],i,a0,a1,top=[];
+    for(i=0;i<n;i++){
+      a0=i/n*Math.PI*2, a1=(i+1)/n*Math.PI*2;
+      var p0=[cx+Math.cos(a0)*r,cy+Math.sin(a0)*r], p1=[cx+Math.cos(a1)*r,cy+Math.sin(a1)*r];
+      f.push({pts:[[p0[0],p0[1],z0],[p1[0],p1[1],z0],[p1[0],p1[1],z1],[p0[0],p0[1],z1]],
+              nrm:[(Math.cos(a0)+Math.cos(a1))/2,(Math.sin(a0)+Math.sin(a1))/2,0],cls:cls});
+      top.push([p0[0],p0[1],z1]);
+    }
+    if(lit) f.push({pts:top,nrm:[0,0,1],lit:true,cls:cls});
+    return f;
+  }
+  function ring(cx,cy,r,z,n,cls){
+    var pts=[],i;
+    for(i=0;i<=n;i++){ var a=i/n*Math.PI*2; pts.push([cx+Math.cos(a)*r,cy+Math.sin(a)*r,z]); }
+    return [{pts:pts,nrm:null,open:true,cls:cls}];
+  }
+
+  var R=13, Z0=3.4, Z1=40, ROP=15.5;      // silo radius, body bottom/top, reorder line height
+  var CX=0, CY=0;
+
+  function scene(T){
+    var f=[], i;
+    // ---- ground pad + legs ----
+    f=f.concat(prism(CX,CY,R+3.4,0,1.1,10,"pad",true));
+    for(i=0;i<4;i++){
+      var a=(i/4)*Math.PI*2+Math.PI/4, lx=CX+Math.cos(a)*(R-1.6), ly=CY+Math.sin(a)*(R-1.6);
+      f=f.concat(box([lx-0.9,ly-0.9,1.1],[1.8,0,0],[0,1.8,0],[0,0,Z0-1.1],"leg"));
+    }
+    // ---- the level: a solid that drops as the material is consumed ----
+    var lvl=Z0+(Z1-Z0)*T.fill;
+    if(lvl>Z0+0.4){
+      f=f.concat(prism(CX,CY,R-1.5,Z0+0.4,lvl,10,T.low?"fill-low":"fill",true));
+    }
+    // ---- silo body: drawn AFTER the level so its front faces sit in front of it ----
+    // CUTAWAY: drop the near wall and keep the far one, with its normal FLIPPED. Without the
+    // flip the renderer's backface cull deletes exactly the faces the cutaway is meant to show,
+    // and the silo renders as a lid floating over its contents.
+    prism(CX,CY,R,Z0,Z1,10,"body",false).forEach(function(fc){
+      if((fc.nrm[0]+fc.nrm[1]+fc.nrm[2])>-0.15) return;
+      f.push({pts:fc.pts,nrm:neg(fc.nrm),cls:"body-in",back:true});
+    });
+    f=f.concat(ring(CX,CY,R,Z1,40,"edge"));
+    f=f.concat(ring(CX,CY,R,Z0,40,"edge"));
+    f=f.concat(prism(CX,CY,R+0.9,Z1,Z1+1.6,10,"rim",true));
+    // ---- the reorder line, marked on the body ----
+    f=f.concat(ring(CX,CY,R+0.12,ROP,40,T.low?"rop-hit":"rop"));
+    f=f.concat(ring(CX,CY,R+0.12,ROP-0.55,40,T.low?"rop-hit":"rop"));
+    // ---- outlet cone + chute, where consumption leaves ----
+    for(i=0;i<10;i++){
+      var b0=i/10*Math.PI*2, b1=(i+1)/10*Math.PI*2;
+      f.push({pts:[[CX+Math.cos(b0)*R,CY+Math.sin(b0)*R,Z0],[CX+Math.cos(b1)*R,CY+Math.sin(b1)*R,Z0],
+                   [CX+Math.cos(b1)*2.2,CY+Math.sin(b1)*2.2,Z0-4.2],[CX+Math.cos(b0)*2.2,CY+Math.sin(b0)*2.2,Z0-4.2]],
+              nrm:[(Math.cos(b0)+Math.cos(b1))/2,(Math.sin(b0)+Math.sin(b1))/2,0.35],cls:"cone"});
+    }
+    // ---- material falling out of the chute ----
+    for(i=0;i<4;i++){
+      var d=(T.t*7+i*1.9)%7.6, dz=Z0-4.6-d;
+      if(dz>-7.4) f=f.concat(box([CX-0.55,CY-0.55,dz],[1.1,0,0],[0,1.1,0],[0,0,1.1],"grain"));
+    }
+    // ---- the delivery: a drop that only appears once the lead time has run out ----
+    if(T.drop>0){
+      var dz2=Z1+26-T.drop*26;
+      f=f.concat(box([CX-3.2,CY-3.2,dz2],[6.4,0,0],[0,6.4,0],[0,0,4.6],"crate"));
+      f=f.concat(ring(CX,CY,R+0.12,Z1+2.4,40,"rop-hit"));
+    }
+    return f;
+  }
+
+  var pool=[], VB=null;
+  function frame(){
+    var mnX=1e9,mnY=1e9,mxX=-1e9,mxY=-1e9;
+    [{fill:1,t:0,low:false,drop:0},{fill:0.08,t:0,low:true,drop:0.999}].forEach(function(st){
+      scene(st).forEach(function(fc){ fc.pts.forEach(function(p){ var s=project(p);
+        if(s[0]<mnX)mnX=s[0]; if(s[0]>mxX)mxX=s[0]; if(s[1]<mnY)mnY=s[1]; if(s[1]>mxY)mxY=s[1]; }); });
+    });
+    var pad=Math.max(mxX-mnX,mxY-mnY)*0.045;
+    VB=[mnX-pad,mnY-pad,(mxX-mnX)+pad*2,(mxY-mnY)+pad*2];
+    svg.setAttribute("viewBox",VB.map(function(v){return v.toFixed(2);}).join(" "));
+  }
+
+  var tagEl=document.getElementById("siloTag"), dropEl=document.getElementById("siloDrop");
+  var lRop=document.getElementById("lRop"), lStock=document.getElementById("lStock"), lUse=document.getElementById("lUse");
+  function place(el,p){ var s=project(p);
+    el.style.left=((s[0]-VB[0])/VB[2]*100).toFixed(2)+"%";
+    el.style.top=((s[1]-VB[1])/VB[3]*100).toFixed(2)+"%"; }
+
+  function render(st){
+    var recs=[];
+    scene(st).forEach(function(fc){
+      if(fc.nrm && (fc.nrm[0]+fc.nrm[1]+fc.nrm[2])<=0) return;
+      var d="",depth=0,pts=fc.pts,q;
+      for(q=0;q<pts.length;q++){ var s=project(pts[q]); d+=(q?"L":"M")+s[0].toFixed(2)+" "+s[1].toFixed(2); depth+=s[2]; }
+      var dep=depth/pts.length; if(fc.back) dep-=500;
+      recs.push({d:d+(fc.open?"":"Z"),depth:dep,lit:fc.lit,cls:fc.cls});
+    });
+    recs.sort(function(a,b){ return a.depth-b.depth; });
+    var i=0;
+    for(;i<recs.length;i++){
+      var r=recs[i], el=pool[i];
+      if(!el){ el=document.createElementNS(SVGNS,"path"); svg.appendChild(el); pool[i]=el; }
+      var cls="face"+(r.lit?" lit":"")+" "+r.cls;
+      if(el._c!==cls){ el.setAttribute("class",cls); el._c=cls; }
+      el.setAttribute("d",r.d); el.style.display="";
+    }
+    for(;i<pool.length;i++) pool[i].style.display="none";
+  }
+
+  // one full cycle: drain to the reorder line, hold for the lead time, refill.
+  var CYCLE=17, DRAIN=0.62, HOLD=0.86;
+  function stateAt(tt){
+    var u=(tt%CYCLE)/CYCLE, fill, drop=0, low=false;
+    var lowFill=(ROP-Z0)/(Z1-Z0);
+    if(u<DRAIN){ fill=1-(1-lowFill)*(u/DRAIN); }
+    else if(u<HOLD){ low=true; fill=lowFill-0.05*((u-DRAIN)/(HOLD-DRAIN)); }
+    else { low=true; drop=(u-HOLD)/(1-HOLD); fill=lowFill-0.05+ (1-(lowFill-0.05))*Math.max(0,(drop-0.55)/0.45); if(drop>0.99) drop=0; }
+    return {fill:fill,t:tt,low:low,drop:drop};
+  }
+
+  function placeAll(){
+    place(tagEl,[CX-R-9,CY+R+7,ROP+2]);
+    place(dropEl,[CX,CY-R-2,Z1+12]);
+    place(lRop,[CX+R+2,CY-R*0.1,ROP-1]);
+    place(lStock,[CX-R-3,CY+R*0.6,Z1-7]);
+    place(lUse,[CX+2,CY+R*0.6,Z0-8.5]);
+  }
+  frame(); placeAll();
+  var t0=performance.now(), raf=0, running=false;
+  function tick(now){
+    var st=stateAt((now-t0)/1000);
+    render(st);
+    tagEl.classList.toggle("on",st.low&&st.drop===0);
+    dropEl.classList.toggle("on",st.drop>0.05&&st.drop<0.98);
+    raf=requestAnimationFrame(tick);
+  }
+  function inView(){ var r=svg.getBoundingClientRect(); return r.bottom>-60&&r.top<(window.innerHeight||0)+60; }
+  function poll(){
+    if(inView()&&!running&&!reduced){ running=true; raf=requestAnimationFrame(tick); }
+    else if(!inView()&&running){ running=false; cancelAnimationFrame(raf); }
+  }
+  // always paint a first frame: the rAF loop only starts once the block is in view, so without
+  // this the card sits empty until someone scrolls to it (and stays empty in a screenshot)
+  render(stateAt(2.2));
+  if(!reduced){ poll(); window.addEventListener("scroll",poll,{passive:true}); }
+  window.addEventListener("resize",function(){
+    frame(); placeAll();
+    if(!reduced) poll(); else render(stateAt(2.2));
+  });
+})();
+</script>
+
+<style is:global>
+  .silo { position:relative; width:100%; }
+  .silo svg { width:100%; height:auto; display:block; overflow:visible; max-height:390px; }
+  .silo .face { vector-effect:non-scaling-stroke; }
+  .silo .face.pad { fill:#0e2029; stroke:var(--edge-soft); }
+  .silo .face.pad.lit { fill:#14303c; }
+  .silo .face.leg { fill:#122a34; stroke:var(--edge-soft); }
+  .silo .face.body-in { fill:#0e242e; stroke:var(--edge-soft); }
+  .silo .face.edge { fill:none; stroke:var(--edge); }
+  .silo .face.rim { fill:#16323e; stroke:var(--edge); }
+  .silo .face.rim.lit { fill:#1e4453; }
+  .silo .face.cone { fill:#102630; stroke:var(--edge-soft); }
+  .silo .face.fill { fill:#2c6a68; stroke:rgba(90,163,163,0.5); }
+  .silo .face.fill.lit { fill:#3d8a86; }
+  .silo .face.fill-low { fill:#7a4a34; stroke:rgba(232,132,90,0.45); }
+  .silo .face.fill-low.lit { fill:#9a5c40; }
+  .silo .face.grain { fill:#2c6a68; stroke:none; }
+  .silo .face.crate { fill:#5e4030; stroke:rgba(232,132,90,0.4); }
+  .silo .face.crate.lit { fill:#7a5440; }
+  .silo .face.rop { fill:none; stroke:rgba(232,237,240,0.34); stroke-dasharray:4 4; }
+  .silo .face.rop-hit { fill:none; stroke:var(--coral); }
+  .silo-lbl, .silo-tag { position:absolute; transform:translate(-50%,-50%); font-family:var(--mono); font-size:9.5px;
+    letter-spacing:0.12em; text-transform:uppercase; color:var(--fg-muted); white-space:nowrap; pointer-events:none; }
+  .silo-tag { padding:3px 8px; border-radius:5px; border:1px solid rgba(232,132,90,0.45); color:var(--coral);
+    background:var(--app-card); opacity:0; transition:opacity 380ms ease; }
+  .silo-tag.on { opacity:1; }
+</style>

@@ -1,0 +1,187 @@
+---
+// The neural sphere from the MVP's login page, ported from React to a plain inline script.
+//
+// Placed so only ONE QUARTER is visible: the canvas is square and its centre sits exactly on
+// the hero's top-right corner, so the lower-left quadrant is all that shows. That is why the
+// element is offset by half its own size in both axes rather than being cropped by a parent.
+//
+// Non-interactive on purpose. On the login page it follows the pointer, but here it sits
+// behind the headline and the nav, and a background that reacts to the mouse pulls attention
+// off the copy. It keeps the slow auto-rotation and the firing cascades, nothing else.
+interface Props {
+  size?: number;      // canvas edge in px; the sphere is drawn centred in it
+  nodes?: number;
+  opacity?: number;
+}
+const { size = 940, nodes = 320, opacity = 0.8 } = Astro.props;
+---
+
+<div class="nsphere" aria-hidden="true" style={`--ns-size:${size}px; --ns-op:${opacity}`}>
+  <canvas data-nsphere data-nodes={nodes}></canvas>
+</div>
+
+<style is:global>
+  .nsphere {
+    position: absolute;
+    /* Offsetting by exactly half would put the centre on the corner and show a clean quarter.
+       Pulled in to 0.4 so a bit more than a quarter reads, without the sphere's centre coming
+       far enough on screen to sit behind the nav. */
+    top: calc(var(--ns-size) * -0.4);
+    right: calc(var(--ns-size) * -0.4);
+    width: var(--ns-size);
+    height: var(--ns-size);
+    pointer-events: none;
+    z-index: 0;
+    opacity: var(--ns-op);
+    /* The page corner sits at the canvas CENTRE (the element is offset by half its own size),
+       so the mask is anchored at 50%/50%, not at a canvas edge. It clears the very corner so the
+       nav links stay clean, holds a dense band, then dissolves before reaching the headline. */
+    -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 3%, black 16%, black 50%, transparent 72%);
+    mask-image: radial-gradient(circle at 50% 50%, transparent 3%, black 16%, black 50%, transparent 72%);
+  }
+  .nsphere canvas { display: block; width: 100%; height: 100%; }
+  @media (max-width: 900px) { .nsphere { --ns-size: 560px; opacity: calc(var(--ns-op) * 0.7); } }
+  @media (prefers-reduced-motion: reduce) { .nsphere { opacity: calc(var(--ns-op) * 0.8); } }
+</style>
+
+<script is:inline>
+  (function () {
+    var cvs = document.querySelector("[data-nsphere]");
+    if (!cvs) return;
+    var ctx = cvs.getContext("2d");
+    if (!ctx) return;
+    var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    var NODE_BASE = "rgba(180, 215, 225,";
+    var NODE_ACCENT = "rgba(218, 138, 103,";
+    var N = +(cvs.getAttribute("data-nodes") || 320);
+    var R = 372, PERSP = 760;
+    var CONNECT = R * 0.16 * Math.sqrt(600 / N);
+    var DOT = Math.max(0.5, Math.min(1, R / 260));
+    var FIRE = reduced ? 0 : 0.02;
+    var W = 0, H = 0, raf = 0, autoY = 0, autoX = 0;
+
+    var nodes = [];
+    for (var i = 0; i < N; i++) {
+      var phi = Math.acos(-1 + (2 * i) / N);
+      var th = Math.sqrt(N * Math.PI) * phi;
+      var x = R * Math.sin(phi) * Math.cos(th);
+      var y = R * Math.sin(phi) * Math.sin(th);
+      var z = R * Math.cos(phi);
+      var big = Math.random() < 0.15;
+      nodes.push({ bx: x, by: y, bz: z, x: x, y: y, z: z,
+        r: (big ? 1.8 + Math.random() * 1.4 : 0.8 + Math.random() * 1.0) * DOT,
+        act: 0, nb: [] });
+    }
+    for (var a = 0; a < N; a++) for (var b = a + 1; b < N; b++) {
+      var dx = nodes[a].bx - nodes[b].bx, dy = nodes[a].by - nodes[b].by, dz = nodes[a].bz - nodes[b].bz;
+      if (Math.sqrt(dx * dx + dy * dy + dz * dz) < CONNECT) { nodes[a].nb.push(b); nodes[b].nb.push(a); }
+    }
+
+    var pulses = [];
+    function fire(start) {
+      nodes[start].act = 1;
+      var maxDepth = 2 + Math.floor(Math.random() * 7);
+      (function prop(idx, depth, seen) {
+        if (depth > maxDepth) return;
+        var maxN = Math.max(1, 5 - depth);
+        var t = nodes[idx].nb.filter(function (n) { return seen.indexOf(n) < 0; })
+          .sort(function () { return Math.random() - 0.5; }).slice(0, maxN);
+        t.forEach(function (nIdx, k) {
+          seen.push(nIdx);
+          setTimeout(function () {
+            pulses.push({ from: idx, to: nIdx, t: 0, alpha: 0.9 - depth * 0.07 });
+            nodes[nIdx].act = Math.max(nodes[nIdx].act, 1 - depth * 0.08);
+            prop(nIdx, depth + 1, seen);
+          }, 90 + Math.random() * 160 + depth * 55 + k * 30);
+        });
+      })(start, 1, [start]);
+    }
+
+    function resize() {
+      W = cvs.offsetWidth; H = cvs.offsetHeight;
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      cvs.width = W * dpr; cvs.height = H * dpr;
+      ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.scale(dpr, dpr);
+    }
+    resize();
+    if (window.ResizeObserver) new ResizeObserver(resize).observe(cvs);
+
+    function frame() {
+      raf = requestAnimationFrame(frame);
+      if (!W || !H) return;
+      ctx.clearRect(0, 0, W, H);
+      var cx = W / 2, cy = H / 2;
+      if (!reduced) { autoY += 0.0004; autoX = Math.sin(autoY * 0.3) * 0.08; }
+      if (Math.random() < FIRE) fire(Math.floor(Math.random() * N));
+
+      var proj = nodes.map(function (n) {
+        var c = Math.cos(autoY), s = Math.sin(autoY);
+        var px = n.x * c + n.z * s, pz = -n.x * s + n.z * c;
+        var c2 = Math.cos(autoX), s2 = Math.sin(autoX);
+        var py = n.y * c2 - pz * s2; pz = n.y * s2 + pz * c2;
+        var sc = PERSP / (PERSP + pz);
+        return { sx: cx + px * sc, sy: cy + py * sc, scale: sc };
+      });
+
+      for (var i2 = 0; i2 < N; i2++) {
+        var pi = proj[i2];
+        if (pi.scale < 0.68) continue;
+        for (var q = 0; q < nodes[i2].nb.length; q++) {
+          var j = nodes[i2].nb[q];
+          if (j <= i2) continue;
+          var pj = proj[j];
+          if (pj.scale < 0.68) continue;
+          var depth = (Math.min(pi.scale, pj.scale) - 0.68) / 0.32;
+          var boost = Math.max(nodes[i2].act, nodes[j].act);
+          ctx.beginPath(); ctx.moveTo(pi.sx, pi.sy); ctx.lineTo(pj.sx, pj.sy);
+          ctx.strokeStyle = NODE_BASE + (depth * 0.055 + boost * 0.22) + ")";
+          ctx.lineWidth = 0.35; ctx.stroke();
+        }
+      }
+
+      for (var k2 = 0; k2 < N; k2++) {
+        var n2 = nodes[k2]; n2.act = Math.max(0, n2.act - 0.007);
+        var p2 = proj[k2];
+        var alpha = Math.min(0.9, 0.12 + (p2.scale - 0.5) * 0.55 + n2.act * 0.85);
+        var rad = n2.r * p2.scale * (1 + n2.act * 1.8);
+        if (n2.act > 0.08) {
+          var g = ctx.createRadialGradient(p2.sx, p2.sy, 0, p2.sx, p2.sy, rad * 4);
+          g.addColorStop(0, "rgba(218,138,103," + n2.act * 0.28 + ")");
+          g.addColorStop(1, "rgba(218,138,103,0)");
+          ctx.beginPath(); ctx.arc(p2.sx, p2.sy, rad * 4, 0, 6.2832); ctx.fillStyle = g; ctx.fill();
+          ctx.beginPath(); ctx.arc(p2.sx, p2.sy, rad, 0, 6.2832); ctx.fillStyle = NODE_ACCENT + alpha + ")"; ctx.fill();
+        } else {
+          ctx.beginPath(); ctx.arc(p2.sx, p2.sy, rad, 0, 6.2832);
+          ctx.fillStyle = NODE_BASE + Math.min(alpha, 0.75) + ")"; ctx.fill();
+        }
+      }
+
+      for (var m = pulses.length - 1; m >= 0; m--) {
+        var pu = pulses[m]; pu.t += 0.032;
+        if (pu.t >= 1) { pulses.splice(m, 1); continue; }
+        var pf = proj[pu.from], pt = proj[pu.to];
+        if (pf.scale < 0.68 || pt.scale < 0.68) { pulses.splice(m, 1); continue; }
+        var e = pu.t < 0.5 ? 2 * pu.t * pu.t : 1 - Math.pow(-2 * pu.t + 2, 2) / 2;
+        var ux = pf.sx + (pt.sx - pf.sx) * e, uy = pf.sy + (pt.sy - pf.sy) * e;
+        var ua = pu.alpha * (1 - pu.t * 0.6), ur = 2.8 * pf.scale * DOT;
+        var g2 = ctx.createRadialGradient(ux, uy, 0, ux, uy, ur * 5);
+        g2.addColorStop(0, "rgba(218,138,103," + ua * 0.55 + ")");
+        g2.addColorStop(1, "rgba(218,138,103,0)");
+        ctx.beginPath(); ctx.arc(ux, uy, ur * 5, 0, 6.2832); ctx.fillStyle = g2; ctx.fill();
+        ctx.beginPath(); ctx.arc(ux, uy, ur, 0, 6.2832); ctx.fillStyle = "rgba(255,210,170," + ua + ")"; ctx.fill();
+      }
+    }
+    frame();
+
+    // stop burning frames when it is scrolled away
+    if (window.IntersectionObserver) {
+      new IntersectionObserver(function (es) {
+        es.forEach(function (e) {
+          if (e.isIntersecting && !raf) frame();
+          else if (!e.isIntersecting && raf) { cancelAnimationFrame(raf); raf = 0; }
+        });
+      }, { threshold: 0 }).observe(cvs);
+    }
+  })();
+</script>

@@ -1,452 +1,848 @@
 ---
-import { CAL_URL, CONTACT_EMAIL, localePath, type Locale } from "../i18n/ui";
+import HorizonteIso from "./HorizonteIso.astro";
+import NeuralSphere from "./NeuralSphere.astro";
+import { homeCopy } from "../i18n/home";
+import { localePath, CAL_URL, APP_URL, CONTACT_EMAIL, type Locale } from "../i18n/ui";
 
-interface Props {
-  locale: Locale;
-}
-const { locale } = Astro.props;
-
-const content = {
-  de: {
-    heroKicker: "KI-Agent für den Einkauf im Mittelstand",
-    heroH1a: "Ihr Einkauf arbeitet",
-    heroH1b: "jetzt auch nachts.",
-    heroSub:
-      "Synapsio ist der KI-Mitarbeiter für den Einkauf im Mittelstand. Er schlägt Bestellungen vor, schreibt mit Ihren Lieferanten, prüft Rechnungen. Und er fragt Sie, bevor er Geld ausgibt.",
-    heroCta: "Pilot-Gespräch buchen",
-    heroCta2: "So arbeitet der Agent",
-    vignetteTitle: "Synapsio Agent",
-    vignetteLive: "Live",
-    vignetteSideLabel: "Heute",
-    vignetteSide: [
-      { n: "12", s: "Vorgänge bearbeitet" },
-      { n: "1", s: "Freigabe offen" },
-      { n: "3", s: "Lieferantenmails beantwortet" },
-    ],
-    vignette: [
-      { t: "08:12", s: "Mail vom Lieferanten: Auftragsbestätigung" },
-      { t: "08:12", s: "Gelesen. Liefertermin übernommen: 12.08." },
-      { t: "08:14", s: "Rechnung (PDF) geprüft: Position 3 weicht ab" },
-      { t: "08:14", s: "Zur Freigabe vorgelegt" },
-      { t: "08:31", s: "Freigegeben. Erledigt." },
-    ],
-    scenesTitle: "Was heute Morgen passiert ist",
-    scenes: [
-      {
-        t: "08:12",
-        h: "Der Lieferant antwortet, der Agent versteht.",
-        p: "Eine Auftragsbestätigung kommt per Mail. Der Agent liest sie, übernimmt den Liefertermin und fragt beim Lieferanten nach, wenn etwas fehlt. Sie sehen nur das Ergebnis.",
-      },
-      {
-        t: "09:04",
-        h: "Die Rechnung prüft sich selbst.",
-        p: "Eine Rechnung kommt als PDF. Der Agent gleicht sie mit der Bestellung ab. Stimmt alles, ist sie erledigt. Weicht ein Posten ab, bekommen Sie eine klare Meldung mit Begründung.",
-      },
-      {
-        t: "09:47",
-        h: "Der Engpass, der keiner wurde.",
-        p: "Ein Artikel läuft auf einen Engpass zu. Der Agent hat es kommen sehen, Lieferanten nach Preis, Lieferzeit und Zuverlässigkeit verglichen und einen Bestellvorschlag vorbereitet. Sie entscheiden mit einem Klick.",
-      },
-    ],
-    railsTitle: "Und wer kontrolliert das? Sie.",
-    railsIntro:
-      "Ein Agent, der bestellt, braucht Grenzen. Bei Synapsio sind sie eingebaut, nicht angeflanscht.",
-    rails: [
-      {
-        h: "Ihre Geldgrenze",
-        p: "Unter der Schwelle, die Sie setzen, handelt der Agent selbst. Darüber wartet jede Aktion auf Ihre Freigabe.",
-      },
-      {
-        h: "Betrugsschutz",
-        p: "Ändert ein Lieferant plötzlich die Bankverbindung, wird nichts ausgeführt. Der Vorgang wird eingefroren und Ihnen zur Prüfung vorgelegt.",
-      },
-      {
-        h: "Ausgabenlimits",
-        p: "Tageslimits deckeln, was der Agent maximal bewegen kann.",
-      },
-      {
-        h: "Lückenlose Historie",
-        p: "Jede Entscheidung ist protokolliert: was passiert ist, warum, und wer es freigegeben hat.",
-      },
-    ],
-    weekTitle: "Kein ERP-Projekt. Ein erster Arbeitstag.",
-    weekP:
-      "Sie verbinden Ihre Bestände und Lieferanten. Der Agent lernt Ihr Geschäft kennen und stellt Ihnen Fragen, wie ein neuer Mitarbeiter das tun würde. Schon in den ersten Tagen kommen die ersten Bestellvorschläge. Und die Leine bestimmen Sie: Am Anfang geben Sie alles frei. Wie viel der Agent allein erledigen darf, wächst mit Ihrem Vertrauen.",
-    horizonsTitle: "Wohin die Reise geht",
-    horizons: [
-      {
-        label: "Heute, im Einsatz",
-        p: "Ein Agent, der Ihren Einkauf führt: von der Prognose bis zur geprüften Rechnung.",
-      },
-      {
-        label: "In Arbeit",
-        p: "Die Auftrags- und Logistikseite: vom Einkauf zur ganzen Lieferkette.",
-      },
-      {
-        label: "Unsere Vision",
-        p: "Ein Marktplatz, auf dem sich die Agenten von Firmen finden, und ein Netzwerk, in dem sie direkt miteinander handeln: Ihr Einkaufsagent spricht mit dem Verkaufsagenten Ihres Lieferanten.",
-      },
-    ],
-    trust: ["Daten in der EU (Frankfurt)", "Lückenloser Audit-Trail", "Entwickelt bei Berlin"],
-    pilotTitle: "Wir suchen Pilotkunden.",
-    pilotP:
-      "Synapsio ist jung und das Produkt ist echt: Sie können es heute unter app.synapsio.solutions sehen. Als Pilotkunde bekommen Sie den Agenten zu Pilotkonditionen, einen direkten Draht zu uns Gründern und echten Einfluss darauf, was als Nächstes gebaut wird.",
-    pilotAlt: "Oder schreiben Sie uns:",
-    sections: { scenes: "01", rails: "02", week: "03", horizons: "04", pilot: "05" },
-  },
-  en: {
-    heroKicker: "The AI agent for SMB purchasing",
-    heroH1a: "Your purchasing now",
-    heroH1b: "works nights, too.",
-    heroSub:
-      "Synapsio is the AI employee for SMB purchasing. It proposes orders, writes to your suppliers, checks invoices. And it asks you before it spends money.",
-    heroCta: "Book a pilot call",
-    heroCta2: "See how the agent works",
-    vignetteTitle: "Synapsio Agent",
-    vignetteLive: "Live",
-    vignetteSideLabel: "Today",
-    vignetteSide: [
-      { n: "12", s: "cases handled" },
-      { n: "1", s: "approval waiting" },
-      { n: "3", s: "supplier emails answered" },
-    ],
-    vignette: [
-      { t: "08:12", s: "Supplier email: order confirmation" },
-      { t: "08:12", s: "Read. Delivery date updated: Aug 12" },
-      { t: "08:14", s: "Invoice (PDF) checked: line 3 does not match" },
-      { t: "08:14", s: "Sent for your approval" },
-      { t: "08:31", s: "Approved. Done." },
-    ],
-    scenesTitle: "What happened this morning",
-    scenes: [
-      {
-        t: "08:12",
-        h: "The supplier replies, the agent understands.",
-        p: "An order confirmation arrives by email. The agent reads it, updates the delivery date and follows up with the supplier if something is missing. You only see the result.",
-      },
-      {
-        t: "09:04",
-        h: "The invoice checks itself.",
-        p: "An invoice arrives as a PDF. The agent matches it against the order. If everything fits, it is done. If a line is off, you get a clear note explaining why.",
-      },
-      {
-        t: "09:47",
-        h: "The stockout that never happened.",
-        p: "An item is heading toward a stockout. The agent saw it coming, compared suppliers on price, lead time and reliability, and prepared an order proposal. You decide with one click.",
-      },
-    ],
-    railsTitle: "And who is in control? You are.",
-    railsIntro:
-      "An agent that places orders needs limits. In Synapsio they are built in, not bolted on.",
-    rails: [
-      {
-        h: "Your money line",
-        p: "Below the threshold you set, the agent acts on its own. Above it, every action waits for your approval.",
-      },
-      {
-        h: "Fraud shield",
-        p: "If a supplier suddenly changes bank details, nothing is executed. The case is frozen and put in front of you.",
-      },
-      {
-        h: "Spend caps",
-        p: "Daily caps limit what the agent can move at most.",
-      },
-      {
-        h: "Complete history",
-        p: "Every decision is on record: what happened, why, and who approved it.",
-      },
-    ],
-    weekTitle: "Not an ERP project. A first day at work.",
-    weekP:
-      "You connect your inventory and suppliers. The agent gets to know your business and asks questions, the way a new employee would. Within the first days, the first order proposals arrive. And you hold the leash: in the beginning you approve everything. What the agent may do on its own grows with your trust.",
-    horizonsTitle: "Where this is going",
-    horizons: [
-      {
-        label: "Today, in operation",
-        p: "An agent that runs your purchasing: from forecast to checked invoice.",
-      },
-      {
-        label: "In progress",
-        p: "The order and logistics side: from purchasing to the whole supply chain.",
-      },
-      {
-        label: "Our vision",
-        p: "A marketplace where companies' agents find each other, and a network where they trade directly: your purchasing agent talks to your supplier's sales agent.",
-      },
-    ],
-    trust: ["Data hosted in the EU (Frankfurt)", "Complete audit trail", "Built near Berlin, Germany"],
-    pilotTitle: "We are looking for pilot customers.",
-    pilotP:
-      "Synapsio is young and the product is real: you can see it today at app.synapsio.solutions. As a pilot customer you get the agent on pilot terms, a direct line to us founders, and real influence on what gets built next.",
-    pilotAlt: "Or write to us:",
-    sections: { scenes: "01", rails: "02", week: "03", horizons: "04", pilot: "05" },
-  },
-}[locale];
+interface Props { locale?: Locale }
+const { locale = "de" } = Astro.props;
+const c = homeCopy[locale];
+const p = (path: string) => localePath(locale, path);
 ---
 
-<!-- Hero: centered, huge, composio-scale -->
-<section class="hairline-b bg-ground-deep">
-  <div class="container-site pt-20 pb-14 md:pt-28 md:pb-16 text-center">
-    <p class="mono-label">
-      <span class="hatch mr-3 align-middle"></span>{content.heroKicker}
-    </p>
-    <h1 class="display mx-auto mt-7 max-w-4xl">
-      {content.heroH1a}<br />{content.heroH1b}
-    </h1>
-    <p class="prose-site mx-auto mt-7 text-[1.14rem] leading-[1.6]">{content.heroSub}</p>
-    <div class="mt-10 flex flex-wrap justify-center gap-4">
-      <a href={CAL_URL} class="btn-primary">{content.heroCta}</a>
-      <a href={localePath(locale, "/produkt")} class="btn-secondary">{content.heroCta2}</a>
-    </div>
+<nav id="nav">
+  <div class="shell nav-in">
+    <span class="brand"><span class="synapsio-mark"></span><span class="wordmark">Synapsio</span></span>
+    <div class="nav-links"><a href={p("/produkt")}>{c.nav.product}</a><a href="#">{c.nav.about}</a><a href="#">{c.nav.investors}</a><a href="#">{c.nav.blog}</a></div>
+    <div class="lang"><a href="/" class={locale === "de" ? "on" : ""}>DE</a><span>/</span><a href="/en/" class={locale === "en" ? "on" : ""}>EN</a></div>
+    <a class="btn primary" href={CAL_URL}>{c.nav.cta}</a>
   </div>
+</nav>
 
-  <!-- Living console: full-width product object -->
-  <div class="container-site pb-20 md:pb-24">
-    <div class="panel ticks mx-auto max-w-4xl" data-vignette>
-      <div class="flex items-center justify-between border-b border-hairline-strong px-5 py-3.5">
-        <div class="flex items-center gap-2.5">
-          <span class="h-2 w-2 rounded-full bg-teal-soft"></span>
-          <span class="text-[0.92rem] font-semibold tracking-tight">{content.vignetteTitle}</span>
-        </div>
-        <span class="mono-label">{content.vignetteLive}</span>
-      </div>
-      <div class="grid md:grid-cols-[220px_1fr]">
-        <div class="hidden border-r border-hairline px-5 py-5 md:block">
-          <p class="mono-label mb-4">{content.vignetteSideLabel}</p>
-          <ul class="space-y-4">
-            {
-              content.vignetteSide.map((item) => (
-                <li>
-                  <span class="block font-mono text-[1.6rem] leading-none text-fg">{item.n}</span>
-                  <span class="mt-1 block text-[0.8rem] text-fg-muted">{item.s}</span>
-                </li>
-              ))
-            }
-          </ul>
-        </div>
-        <div>
-          <ol class="px-2 py-2">
-            {
-              content.vignette.map((step) => (
-                <li class="step flex items-center gap-3.5 px-3 py-3">
-                  <span class="dot h-2.5 w-2.5 shrink-0 rounded-full" />
-                  <span class="mono-num w-11 shrink-0 !text-[0.7rem]">{step.t}</span>
-                  <span class="text-[0.95rem] leading-snug">{step.s}</span>
-                </li>
-              ))
-            }
-          </ol>
-          <div class="mx-5 mb-4 mt-1 h-px bg-hairline">
-            <div class="progress-fill h-px w-0 bg-teal-soft"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+<main>
+  <div class="hero-sphere"><NeuralSphere /></div>
 
-<!-- 01 · Scenes -->
-<section>
-  <div class="container-site py-16 md:py-24 reveal">
-    <div class="section-head">
-      <p class="mono-label"><span class="hatch mr-3 align-middle"></span>{content.scenesTitle}</p>
-      <span class="mono-num">{content.sections.scenes}</span>
+  <section class="hero shell">
+    <span class="chip"><span class="sq"></span>{c.hero.chip}</span>
+    <h1><span class="ln"><span>{c.hero.h1a}</span></span><span class="ln"><span><em>{c.hero.h1em}</em>{c.hero.h1b}</span></span></h1>
+    <div class="hero-row">
+      <p class="sub">{c.hero.sub}</p>
+      <a class="hero-link" href={p("/produkt")}><span class="tag">{c.hero.linkTag}</span> {c.hero.link}</a>
     </div>
-    <div class="mt-2 grid md:grid-cols-3 rule-grid">
-      {
-        content.scenes.map((s) => (
-          <div class="pt-8 md:pt-10 pb-4">
-            <p class="font-mono text-[1.9rem] leading-none text-fg-muted">{s.t}</p>
-            <h3 class="h3 mt-5">{s.h}</h3>
-            <p class="prose-site mt-3 text-[0.96rem]">{s.p}</p>
-          </div>
-        ))
-      }
-    </div>
-  </div>
-</section>
 
-<!-- 02 · Rails -->
-<section class="hairline-t bg-ground-deep">
-  <div class="container-site py-16 md:py-24 reveal">
-    <div class="section-head">
-      <p class="mono-label"><span class="hatch mr-3 align-middle"></span>{locale === "de" ? "Kontrolle" : "Control"}</p>
-      <span class="mono-num">{content.sections.rails}</span>
-    </div>
-    <div class="mt-12 grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
-      <div>
-        <h2 class="h2">{content.railsTitle}</h2>
-        <p class="prose-site mt-6 text-[1.05rem]">{content.railsIntro}</p>
-      </div>
-      <div class="panel ticks grid sm:grid-cols-2">
-        {
-          content.rails.map((r, i) => (
-            <div
-              class:list={[
-                "p-7",
-                i % 2 === 0 ? "sm:border-r sm:border-hairline" : "",
-                i < 2 ? "border-b border-hairline" : "",
-              ]}
-            >
-              <span class="mono-num">0{i + 1}</span>
-              <h3 class="h3 mt-3">{r.h}</h3>
-              <p class="prose-site mt-2 text-[0.94rem]">{r.p}</p>
+    <div class="stage-wrap">
+      <div class="gwin a" id="gwinA"></div>
+      <div class="gwin b mail" id="gwinB"></div>
+      <div class="gwin c term" id="gwinC"></div>
+      <div class="surface" id="surface">
+        <div class="app">
+          <aside class="side">
+            <div class="logo">
+              <span class="synapsio-mark" style="width:28px;height:28px"></span>
+              <div><b>SYNAPSIO</b><small>{c.app.tagline}</small></div>
             </div>
-          ))
-        }
+            <nav class="snav">
+              <div class="grp">
+                <a data-tab="dashboard" class="on"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>{c.app.nav.dashboard}</a>
+              </div>
+              <div class="grp"><div class="glbl">{c.app.groups.ops}</div>
+                <a data-tab="inventory"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5"/></svg>{c.app.nav.inventory}</a>
+                <a data-tab="orders"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/><path d="M2 3h3l2.5 12h11"/></svg>{c.app.nav.orders}</a>
+                <a><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>{c.app.nav.approvals}<span class="badge">3</span></a>
+                <a><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 2h8l6 6v8l-6 6H8l-6-6V8z"/><path d="M12 8v4M12 16v.5"/></svg>{c.app.nav.exceptions}</a>
+              </div>
+              <div class="grp"><div class="glbl">{c.app.groups.net}</div>
+                <a><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>{c.app.nav.suppliers}</a>
+                <a><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 9l1-5h16l1 5M4 9v10a1 1 0 001 1h14a1 1 0 001-1V9M4 9h16"/></svg>{c.app.nav.marketplace}</a>
+                <a><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 7h13l5 5-5 5H3z"/><path d="M8 12H3"/></svg>{c.app.nav.supplierView}</a>
+              </div>
+              <div class="grp"><div class="glbl">{c.app.groups.intel}</div>
+                <a><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 4a3 3 0 00-3 3 3 3 0 00-1 5.8A3 3 0 006 18a3 3 0 006 0V4zM15 4a3 3 0 013 3 3 3 0 011 5.8A3 3 0 0118 18a3 3 0 01-6 0V4z"/></svg>{c.app.nav.brain}</a>
+                <a><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>{c.app.nav.intelligence}</a>
+                <a><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 20V10M12 20V4M18 20v-7"/></svg>{c.app.nav.reports}</a>
+              </div>
+              <div class="grp"><div class="glbl">{c.app.groups.set}</div>
+                <a><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a1.6 1.6 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.6 1.6 0 00-2.7 1.1V21a2 2 0 11-4 0v-.2a1.6 1.6 0 00-2.7-1.1l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.6 1.6 0 00-1.1-2.7H3a2 2 0 110-4h.2a1.6 1.6 0 001.1-2.7l-.1-.1a2 2 0 112.8-2.8l.1.1a1.6 1.6 0 001.8.3H10a1.6 1.6 0 001-1.5V3a2 2 0 114 0v.2a1.6 1.6 0 002.7 1.1l.1-.1a2 2 0 112.8 2.8l-.1.1a1.6 1.6 0 00-.3 1.8V10a1.6 1.6 0 001.5 1H21a2 2 0 110 4h-.2a1.6 1.6 0 00-1.4.9z"/></svg>{c.app.nav.settings}</a>
+              </div>
+              <div class="grp"><div class="glbl">{c.app.groups.admin}</div>
+                <a><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>{c.app.nav.admin}</a>
+              </div>
+            </nav>
+            <div class="sfoot">
+              <a><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 9a6 6 0 1112 0c0 5 2 6 2 6H4s2-1 2-6z"/><path d="M10 20a2 2 0 004 0"/></svg>{c.app.notifications}<span class="badge">5</span></a>
+              <div class="acct">jakob.ibrahim@synapsio.solutions</div>
+              <a><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>{c.app.signout}</a>
+            </div>
+          </aside>
+
+          <div class="main" id="main">
+            <div class="apptop">
+              <div class="orb-slot" id="orbSlot">
+                <span class="orb-halo"></span>
+                <canvas id="avaOrb" width="104" height="104"></canvas>
+                <div class="ava-nudge" id="avaNudge"></div>
+              </div>
+              <span class="spacer"></span>
+              <span class="beispiel">{c.app.sample}</span>
+              <span class="langpill">DE <b>EN</b></span>
+              <span class="toppill wk"><span class="sq"></span>{c.app.worker}</span>
+              <span class="avatar"><span class="synapsio-mark" style="width:18px;height:18px"></span></span>
+            </div>
+
+            <!-- DASHBOARD -->
+            <div class="panel on" data-panel="dashboard">
+              <div class="pagehead"><h2>Dashboard</h2><span class="upd"><span class="d"></span>{c.app.updated}</span></div>
+              <div class="autobar"><span class="sq"></span>{c.app.autobar}</div>
+              <div class="needs">
+                <h4>{c.app.needsTitle}</h4>
+                {c.app.needs.map((nd, i) => (
+                <div class="need"><span class="sq" style={"background:var(--" + (i === 0 ? "coral" : "amber") + ")"}></span><span class="t">{nd.t}<small>{nd.s}</small></span><span class="arw">→</span></div>))}
+              </div>
+              <div class="kpis">
+                <div class="kpi coral"><div class="lbl">{c.app.kpis[0].lbl}</div><div class="r1"><div class="val" data-to="309" data-prefix="€ " data-suffix="K">€ 0K</div><span class="icbg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5"/></svg></span></div><div class="r2"><div class="sub">{c.app.kpis[0].sub}</div><svg class="spark" viewBox="0 0 64 22" preserveAspectRatio="none"><path d="M0 17 L10 15 L20 16 L30 11 L40 12 L52 7 L64 4" stroke="var(--teal-soft)"/></svg></div></div>
+                <div class="kpi red"><div class="lbl">{c.app.kpis[1].lbl}</div><div class="r1"><div class="val" data-to="4">0</div><span class="icbg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l9 16H3z"/><path d="M12 9v4M12 16v.5"/></svg></span></div><div class="r2"><div class="sub">{c.app.kpis[1].sub}</div><svg class="spark" viewBox="0 0 64 22" preserveAspectRatio="none"><path d="M0 5 L10 7 L20 6 L30 10 L40 9 L52 15 L64 18" stroke="var(--red)"/></svg></div></div>
+                <div class="kpi amber"><div class="lbl">{c.app.kpis[2].lbl}</div><div class="r1"><div class="val" data-to="9">0</div><span class="icbg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 9a6 6 0 1112 0c0 5 2 6 2 6H4s2-1 2-6z"/><path d="M10 20a2 2 0 004 0"/></svg></span></div><div class="r2"><div class="sub">{c.app.kpis[2].sub}</div><svg class="spark" viewBox="0 0 64 22" preserveAspectRatio="none"><path d="M0 13 L10 12 L20 14 L30 9 L40 11 L52 7 L64 9" stroke="var(--amber)"/></svg></div></div>
+                <div class="kpi teal"><div class="lbl">{c.app.kpis[3].lbl}</div><div class="r1"><div class="val" data-to="12">0</div><span class="icbg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/><path d="M2 3h3l2.5 12h11"/></svg></span></div><div class="r2"><div class="sub">{c.app.kpis[3].sub}</div><svg class="spark" viewBox="0 0 64 22" preserveAspectRatio="none"><path d="M0 16 L10 14 L20 15 L30 10 L40 11 L52 8 L64 6" stroke="var(--teal-soft)"/></svg></div></div>
+                <div class="kpi teal"><div class="lbl">{c.app.kpis[4].lbl}</div><div class="r1"><div class="val" data-to="24">0</div><span class="icbg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 2L4 14h6l-1 8 9-12h-6z"/></svg></span></div><div class="r2"><div class="sub">{c.app.kpis[4].sub}</div><svg class="spark" viewBox="0 0 64 22" preserveAspectRatio="none"><path d="M0 18 L10 16 L20 13 L30 13 L40 9 L52 8 L64 3" stroke="var(--teal-soft)"/></svg></div></div>
+              </div>
+              <div class="brainbar">
+                <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 4a3 3 0 00-3 3 3 3 0 00-1 5.8A3 3 0 006 18a3 3 0 006 0V4zM15 4a3 3 0 013 3 3 3 0 011 5.8A3 3 0 0118 18a3 3 0 01-6 0V4z"/></svg>
+                <span class="lbl">{c.app.brain.lbl}</span>
+                <span class="track"><span class="fill"></span></span><span class="pct">62%</span>
+                <span class="meta">{c.app.brain.meta}</span>
+              </div>
+              <div class="impact">
+                <div class="ih">{c.app.impact.h}</div><div class="ihs">{c.app.impact.s}</div>
+                <div class="row">
+                  <div class="cell"><div class="big" data-to="24">0</div><div class="cap">{c.app.impact.caps[0]}</div></div>
+                  <div class="cell"><div class="big" data-to="57" data-prefix="€ " data-suffix="K">€ 0K</div><div class="cap">{c.app.impact.caps[1]}</div></div>
+                  <div class="cell"><div class="big" data-to="18" data-prefix="~" data-suffix="h">~0h</div><div class="cap">{c.app.impact.caps[2]}</div></div>
+                </div>
+                <div class="wchart"><div class="wl">{c.app.impact.chart}</div><div class="bars"><i style="height:22%"></i><i style="height:38%"></i><i style="height:30%"></i><i style="height:52%"></i><i style="height:44%"></i><i style="height:66%"></i><i style="height:58%"></i><i class="last" style="height:82%"></i></div></div>
+              </div>
+            </div>
+
+            <!-- INVENTORY -->
+            <div class="panel" data-panel="inventory">
+              <div class="pagehead"><h2>{c.app.nav.inventory}</h2><div class="ph-actions">{c.app.inv.actions.map((a, i) => (<span class={"ph-btn" + (i === 2 ? " primary" : "")}>{a}</span>))}</div></div>
+              <div class="inv-toolbar">
+                <span class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>{c.app.inv.search}</span>
+                <span class="drop">{c.app.inv.locations} <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></span>
+              </div>
+              <div class="filters">{c.app.inv.filters.map((f, i) => (<span class={"fpill" + (i === 0 ? " on" : "")}>{f}</span>))}</div>
+              <div class="tbl-scroll"><table class="tbl">
+                <thead><tr>{c.app.inv.head.map((h, i) => (<th class={i >= 2 && i <= 6 ? "r" : undefined}>{h}</th>))}<th></th></tr></thead>
+                <tbody>
+                  {c.app.inv.rows.map((r) => (
+                  <tr><td class="name"><span class="sku">{r.sku}</span><span class="pn">{r.pn}</span><span class="loc">◍ {c.app.inv.aisle} {r.loc.split(" · ")[0]} · {c.app.inv.rack} {r.loc.split(" · ")[1]}</span><span class="used">{c.app.inv.usedIn} {r.used} {c.app.inv.perUnit})</span></td><td class="num">{r.cat}</td><td class="num r">{r.stock}</td><td class="num r">{r.min}</td><td class="num r">{r.need}</td><td class={"num r " + r.covCls}>{r.cov} {c.app.inv.days}</td><td class="num r">{r.cost}</td><td><span class={"rb " + r.riskCls}><span></span>{r.risk}</span></td><td class="num">{r.sup}</td><td class="r ACT"></td></tr>))}
+                </tbody>
+              </table></div>
+            </div>
+
+            <!-- ORDERS -->
+            <div class="panel" data-panel="orders">
+              <div class="pagehead"><h2>{c.app.nav.orders}</h2><div class="ph-actions"><span class="ph-btn primary">{c.app.ord.newOrder}</span></div></div>
+              <div class="subtabs">{c.app.ord.subtabs.map((t, i) => (i === 0 ? <span class="on">{t}</span> : <span>{t}</span>))}</div>
+              <div class="tracking"><span class="dot"></span>{c.app.ord.tracking}</div>
+              <div class="filters">{c.app.ord.filters.map((f, i) => (<span class={"fpill" + (i === 0 ? " onteal" : "")}>{f}</span>))}</div>
+              <div class="tbl-scroll"><table class="tbl">
+                <thead><tr>{c.app.ord.head.map((h, i) => (<th class={i === 3 || i === 5 ? "r" : undefined}>{h}</th>))}</tr></thead>
+                <tbody>
+                  {c.app.ord.rows.map((r) => (
+                  <tr><td class="sku">{r.po}</td><td class="num">{r.sup}</td><td class="num">{r.item}</td><td class="num r">{r.amt}</td><td>{r.prep && <span class="prep">{c.app.ord.prep}</span>}<div class="stepper">{c.app.ord.steps.map((st, i) => (<span><i class={i < r.done ? "done" : ("wait" in r && r.wait && i === r.done ? "wait" : undefined)}></i><em>{st}</em></span>))}</div></td><td class="r"><span class="actbtns"><span>PDF</span>{r.why ? <span class="ai">{c.app.ord.why}</span> : <span>{c.app.ord.portal}</span>}</span></td></tr>))}
+                </tbody>
+              </table></div>
+              <div class="replies">
+                <h4>{c.app.ord.repliesTitle}</h4>
+                <div class="rgrid">
+                  {c.app.ord.replies.map((r) => (
+                  <div class="rcard"><div class="from">{r.from}</div><div class="subj">{r.subj}</div><div class="foot"><span class={"rbadge " + r.cls}>{r.badge}</span><span class="ago">{r.ago}</span></div></div>))}
+                </div>
+              </div>
+                  <div class="rcard"><div class="from">shipping@moeller-verpackung.de</div><div class="subj">Versandavis: Verpackung Typ B</div><div class="foot"><span class="rbadge pending">Ausstehend</span><span class="ago">vor 1 Tag</span></div></div>
+                  <div class="rcard"><div class="from">sales@nordschraube.de</div><div class="subj">Update: Q3 Lieferzeiten & Preise</div><div class="foot"><span class="rbadge pending">Ausstehend</span><span class="ago">vor 2 Tagen</span></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- 03 · Week 1 -->
-<section class="hairline-t">
-  <div class="container-site py-16 md:py-24 reveal">
-    <div class="section-head">
-      <p class="mono-label"><span class="hatch mr-3 align-middle"></span>{locale === "de" ? "Der Einstieg" : "Getting started"}</p>
-      <span class="mono-num">{content.sections.week}</span>
-    </div>
-    <div class="mt-12 grid gap-8 lg:grid-cols-[1fr_1fr] lg:gap-16">
-      <h2 class="h2 max-w-md">{content.weekTitle}</h2>
-      <p class="prose-site text-[1.08rem]">{content.weekP}</p>
-    </div>
-  </div>
-</section>
+  <section class="band"><div class="shell trust">{c.band.map((b) => (<span class="mono">{b}</span>))}</div></section>
 
-<!-- 04 · Horizons -->
-<section class="hairline-t bg-ground-deep">
-  <div class="container-site py-16 md:py-24 reveal">
-    <div class="section-head">
-      <p class="mono-label"><span class="hatch mr-3 align-middle"></span>{content.horizonsTitle}</p>
-      <span class="mono-num">{content.sections.horizons}</span>
+  <section class="figs-pin-wrap" id="figsPin">
+    <div class="figs-pin">
+      <div class="shell">
+        <div class="fig-lede">
+          <div class="fig-over"><span class="chip"><span class="sq"></span>{c.figs.chip}</span></div>
+          <p class="fig-lede-p"><b>{c.figs.ledeB}</b>{c.figs.ledeP}</p>
+        </div>
+        <div class="figs" id="figs"></div>
+      </div>
     </div>
-    <div class="mt-2 grid md:grid-cols-3 rule-grid">
-      {
-        content.horizons.map((h, i) => (
-          <div class="pt-8 md:pt-10 pb-4">
-            <p class="mono-label" style={i === 0 ? "color: var(--color-teal-soft)" : ""}>
-              {h.label}
-            </p>
-            <p class="prose-site mt-4 text-[0.98rem]">{h.p}</p>
+  </section>
+
+  <section class="ctrl">
+    <div class="shell">
+      <div class="ctrl-grid">
+        <aside class="ctrl-nav">
+          <span class="chip"><span class="sq"></span>{c.ctrl.chip}</span>
+          <h2 class="pf-h">{c.ctrl.h2}</h2>
+          <p class="pf-sub">{c.ctrl.sub}</p>
+          <ul id="pfNav">
+            {c.ctrl.nav.map((n) => (<li><b>{n.b}</b><span>{n.s}</span></li>))}
+          </ul>
+        </aside>
+        <div class="ctrl-track" id="ctrlTrack">
+            <article class="ctrl-block">
+              <h3>{c.ctrl.b1.h}</h3>
+              <p>{c.ctrl.b1.p}</p>
+              <div class="pf-panel">
+                <div class="thr">
+                  <div class="thr-top"><span class="thr-val">{c.ctrl.b1.val}</span><span class="thr-cap">{c.ctrl.b1.cap}</span></div>
+                  <div class="thr-track"><div class="thr-fill"></div><div class="thr-knob"></div></div>
+                  <div class="thr-scale"><span>{c.ctrl.b1.lo}</span><span>{c.ctrl.b1.hi}</span></div>
+                </div>
+                <div class="pp-orders">
+                  {c.ctrl.b1.orders.map((o, i) => (
+                    <div class={"oline" + (i === 2 ? " hot" : "")}><span class={"odot " + (i === 2 ? "coral" : "teal")}></span><span class="oname">{o.n}</span><span class="oamt">{o.a}</span><span class={"ob " + (i === 2 ? "freig" : "auto")}>{o.b}</span></div>))}
+                </div>
+              </div>
+              <div class="ctrl-sub">
+                {c.ctrl.b1.sub.map((x) => (<div><h4>{x.h}</h4><p>{x.p}</p></div>))}
+              </div>
+            </article>
+            <article class="ctrl-block">
+              <h3>{c.ctrl.b2.h}</h3>
+              <p>{c.ctrl.b2.p}</p>
+              <div class="pf-panel">
+                <div class="canvas">
+                  <div class="cv-in">
+                    <svg class="cv-svg" viewBox="0 0 660 400" preserveAspectRatio="none" aria-hidden="true">
+                      <path d="M232 52 C 300 52, 360 52, 428 52"/>
+                      <path d="M536 84 C 536 130, 167 126, 167 168"/>
+                      <path class="tealln" d="M310 202 C 348 202, 346 201, 384 201"/>
+                      <path class="hot" d="M310 250 C 348 250, 348 333, 384 333"/>
+                    </svg>
+                    <div class="cnode" style="left:16px; top:20px; width:216px;">
+                      <span class="cbadge">{c.ctrl.b2.n1b}</span>
+                      <div class="cn-h"><span class="cn-ic teal">◷</span><span class="cn-t">{c.ctrl.b2.n1t}</span></div>
+                      <div class="cn-s">{c.ctrl.b2.n1s}</div>
+                    </div>
+                    <div class="cnode" style="left:428px; top:20px; width:216px;">
+                      <span class="cbadge">{c.ctrl.b2.n2b}</span>
+                      <div class="cn-h"><span class="cn-ic teal">⇄</span><span class="cn-t">{c.ctrl.b2.n2t}</span></div>
+                      <div class="cn-s">{c.ctrl.b2.n2s}</div>
+                    </div>
+                    <div class="cnode" style="left:24px; top:168px; width:286px;">
+                      <span class="cbadge">{c.ctrl.b2.n3b}</span>
+                      <div class="cn-h"><span class="cn-ic amber">⋔</span><span class="cn-t">{c.ctrl.b2.n3t}</span></div>
+                      <div class="cn-checks">
+                        {c.ctrl.b2.checks.map((k) => (<div class="cn-chk"><span class="ck">✓</span>{k}</div>))}
+                      </div>
+                    </div>
+                    <div class="clabel teal" style="left:330px; top:190px;">{c.ctrl.b2.yes}</div>
+                    <div class="clabel coral" style="left:326px; top:288px;">{c.ctrl.b2.no}</div>
+                    <div class="cnode" style="left:384px; top:170px; width:256px;">
+                      <span class="cbadge ok">{c.ctrl.b2.n4b}</span>
+                      <div class="cn-h"><span class="cn-ic teal">✓</span><span class="cn-t">{c.ctrl.b2.n4t}</span></div>
+                      <div class="cn-s">{c.ctrl.b2.n4s}</div>
+                    </div>
+                    <div class="cnode" style="left:384px; top:302px; width:256px;">
+                      <span class="cbadge esc">{c.ctrl.b2.n5b}</span>
+                      <div class="cn-h"><span class="cn-ic coral">◔</span><span class="cn-t">{c.ctrl.b2.n5t}</span></div>
+                      <div class="cn-s">{c.ctrl.b2.n5s}</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="pp-note">{c.ctrl.b2.note}</div>
+              </div>
+              <div class="ctrl-sub">
+                {c.ctrl.b2.sub.map((x) => (<div><h4>{x.h}</h4><p>{x.p}</p></div>))}
+              </div>
+            </article>
+            <article class="ctrl-block">
+              <h3>{c.ctrl.b3.h}</h3>
+              <p>{c.ctrl.b3.p}</p>
+              <div class="bento">
+                <div class="bt big">
+                  <div class="donut-c">
+                    <svg class="donut" viewBox="0 0 100 100" aria-hidden="true">
+                      <circle class="track" cx="50" cy="50" r="42"/>
+                      <circle class="fill" cx="50" cy="50" r="42" pathLength="100" stroke-dasharray="62 100"/>
+                    </svg>
+                    <div class="donut-lbl"><b>62%</b><span>{c.ctrl.b3.used}</span></div>
+                  </div>
+                  <div class="bt-cap">{c.ctrl.b3.cap}</div>
+                </div>
+                <div class="bt"><div class="bt-l">{c.ctrl.b3.t1l}</div><div class="bt-v">{c.ctrl.b3.t1v}</div><div class="bt-sub">{c.ctrl.b3.t1s}</div></div>
+                <div class="bt"><div class="bt-l">{c.ctrl.b3.t2l}</div><div class="bt-v">{c.ctrl.b3.t2v}</div><div class="bt-sub">{c.ctrl.b3.t2s}</div></div>
+                <div class="bt wide"><div class="bt-row"><span class="bt-l">{c.ctrl.b3.t3l}</span><span class="bt-v sm">{c.ctrl.b3.t3v}</span></div><div class="bt-note">{c.ctrl.b3.t3n}</div></div>
+              </div>
+              <div class="ctrl-sub">
+                {c.ctrl.b3.sub.map((x) => (<div><h4>{x.h}</h4><p>{x.p}</p></div>))}
+              </div>
+            </article>
+            <article class="ctrl-block">
+              <h3>{c.ctrl.b4.h}</h3>
+              <p>{c.ctrl.b4.p}</p>
+              <div class="pf-panel audit">
+                <div class="term-h"><span class="td"></span><span class="td"></span><span class="td"></span><span class="tt">{c.ctrl.b4.term}</span></div>
+                <div class="pp-log">
+                  {c.ctrl.b4.log.map((l) => (<div class={"lg" + ("hot" in l && l.hot ? " hot" : "")}><span class="t">{l.t}</span><span>{l.s}</span></div>))}
+                </div>
+                <div class="why-card">
+                  <div class="why-h">{c.ctrl.b4.whyH}</div>
+                  <ul class="why-list">
+                    {c.ctrl.b4.why.map((w) => (<li>{w}</li>))}
+                  </ul>
+                </div>
+              </div>
+              <div class="ctrl-sub">
+                {c.ctrl.b4.sub.map((x) => (<div><h4>{x.h}</h4><p>{x.p}</p></div>))}
+              </div>
+            </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="shell">
+      <div class="sec-head">
+        <span class="chip"><span class="sq"></span>{c.sec.chip}</span>
+        <h2>{c.sec.h2}</h2>
+        <p class="sec-lede"><b>{c.sec.ledeB}</b>{c.sec.ledeP}</p>
+      </div>
+      <div class="sec-bento">
+
+        <article class="sb sb-map">
+          <div class="map-top"><span class="sb-lbl">{c.sec.mapLbl}</span><span class="map-region">{c.sec.mapRegion}</span></div>
+          <div class="dome-view">
+            <svg id="domeIso" aria-hidden="true"></svg>
           </div>
-        ))
-      }
+          <div class="map-foot">
+            <h4>{c.sec.mapH}</h4>
+            <p>{c.sec.mapP}</p>
+          </div>
+        </article>
+
+        <article class="sb sb-fact sb-a">
+          <svg class="sb-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="6" rx="1.4"/><rect x="3" y="14" width="18" height="6" rx="1.4"/><circle cx="6.5" cy="7" r="0.6" fill="currentColor" stroke="none"/><circle cx="6.5" cy="17" r="0.6" fill="currentColor" stroke="none"/></svg>
+          <span class="sb-lbl">{c.sec.facts[0].lbl}</span>
+          <h4>{c.sec.facts[0].h}</h4>
+          <p>{c.sec.facts[0].p}</p>
+        </article>
+
+        <article class="sb sb-fact sb-b">
+          <svg class="sb-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l7 3v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
+          <span class="sb-lbl">{c.sec.facts[1].lbl}</span>
+          <h4>{c.sec.facts[1].h}</h4>
+          <p>{c.sec.facts[1].p}</p>
+        </article>
+
+        <article class="sb sb-fact sb-c">
+          <svg class="sb-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="4"/><path d="M11 11l8 8M16 16l2-2M18 18l2-2"/></svg>
+          <span class="sb-lbl">{c.sec.facts[2].lbl}</span>
+          <h4>{c.sec.facts[2].h}</h4>
+          <p>{c.sec.facts[2].p}</p>
+        </article>
+
+        <article class="sb sb-fact sb-d">
+          <svg class="sb-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 10v7M14 10v7"/></svg>
+          <span class="sb-lbl">{c.sec.facts[3].lbl}</span>
+          <h4>{c.sec.facts[3].h}</h4>
+          <p>{c.sec.facts[3].p}</p>
+        </article>
+
+        <div class="sb sb-strip">
+          <div class="strip-head"><span class="sb-lbl">{c.sec.stripLbl}</span><h4>{c.sec.stripH}</h4></div>
+          <div class="strip-facts">
+            {c.sec.strip.map((f) => (<span><i></i>{f}</span>))}
+          </div>
+        </div>
+
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- Trust band -->
-<section class="hairline-t">
-  <div class="container-site py-6">
-    <div class="flex flex-wrap items-center justify-center gap-x-12 gap-y-2">
-      {
-        content.trust.map((item) => (
-          <span class="mono-label !normal-case !tracking-normal flex items-center gap-2.5 !text-[0.8rem]">
-            <span class="h-1 w-1 rounded-full bg-teal-soft" />
-            {item}
-          </span>
-        ))
-      }
+  <section class="sec">
+    <div class="shell">
+      <div class="sec-head">
+        <span class="chip"><span class="sq"></span>{c.hz.chip}</span>
+        <h2>{c.hz.h2}</h2>
+        <p class="sec-lede"><b>{c.hz.ledeB}</b>{c.hz.ledeP}</p>
+      </div>
+
+      <HorizonteIso locale={locale} />
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- 05 · Pilot invite -->
-<section class="hairline-t bg-ground-deep">
-  <div class="container-site py-20 md:py-28 reveal text-center">
-    <p class="mono-label">
-      <span class="hatch mr-3 align-middle"></span>{locale === "de" ? "Pilotprogramm" : "Pilot program"}
-      <span class="ml-3 mono-num">{content.sections.pilot}</span>
-    </p>
-    <h2 class="h2 mx-auto mt-6 max-w-2xl" style="font-size: clamp(2.1rem, 4.5vw, 3.2rem)">
-      {content.pilotTitle}
-    </h2>
-    <p class="prose-site mx-auto mt-6 text-[1.07rem]">{content.pilotP}</p>
-    <div class="mt-10 flex flex-wrap items-center justify-center gap-6">
-      <a href={CAL_URL} class="btn-primary">{content.heroCta}</a>
-      <p class="text-[0.92rem] text-fg-muted">
-        {content.pilotAlt}
-        <a
-          href={`mailto:${CONTACT_EMAIL}`}
-          class="ml-1 text-fg-soft underline underline-offset-4 hover:text-fg"
-        >
-          {CONTACT_EMAIL}
-        </a>
-      </p>
+  <section class="shell close">
+    <div class="pilot">
+      <div class="pilot-head">
+        <span class="chip"><span class="sq"></span>{c.pilot.chip}</span>
+        <h2>{c.pilot.h2a}<br>{c.pilot.h2b}</h2>
+        <p>{c.pilot.p}</p>
+      </div>
+
+      <div class="pilot-body">
+      <div class="pilot-l">
+        <span class="mono pilot-lbl">{c.pilot.lbl}</span>
+        <ol class="pilot-steps">
+          {c.pilot.steps.map((st, i) => (
+            <li>
+              <span class="s-n">{"0" + (i + 1)}</span>
+              <span class="s-t">{st.t}</span>
+              <span class="s-d">{st.d}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      <aside class="pilot-r">
+        <span class="mono pr-lbl">{c.pilot.cardLbl}</span>
+        <a class="btn lg primary pr-cta" href={CAL_URL}>{c.pilot.cta}</a>
+        <dl class="pr-spec">
+          {c.pilot.spec.map((r) => (<div><dt>{r[0]}</dt><dd>{r[1]}</dd></div>))}
+        </dl>
+        <a class="pr-alt" href="/Synapsio_Pitch.pdf">{c.pilot.alt}</a>
+      </aside>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<script>
-  // Living console: highlight walks the always-visible rows, then restarts.
-  const vignettes = document.querySelectorAll<HTMLElement>("[data-vignette]");
-  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  <footer class="shell">
+    <div class="foot-in">
+      <div class="foot-col foot-brand">
+        <span class="fb-top"><span class="synapsio-mark"></span><span class="wordmark">Synapsio</span></span>
+        <p class="foot-tag">{c.foot.tag}</p>
+        <span class="mono" style="text-transform:none;letter-spacing:0">{c.foot.entity}</span>
+      </div>
+      <div class="foot-col"><span class="mono">{c.foot.colProduct}</span><a href={p("/produkt")}>{c.foot.overview}</a><a href={APP_URL}>{c.foot.app}</a></div>
+      <div class="foot-col"><span class="mono">{c.foot.colCompany}</span><a href="#">{c.foot.about}</a><a href="#">LinkedIn</a><a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></div>
+      <div class="foot-col"><span class="mono">{c.foot.colLegal}</span><a href="/Imprint-Synapsio.pdf">{c.foot.imprint}</a><a href="/privacy-policy-synapsio.pdf">{c.foot.privacy}</a><a href="/terms-of-service-synapsio.pdf">{c.foot.terms}</a></div>
+    </div>
+    <div class="foot-bottom">
+      <span class="cpy">{c.foot.cpy}</span>
+      <span class="foot-status"><i></i>{c.foot.status}</span>
+    </div>
+  </footer>
+</main>
 
-  vignettes.forEach((root) => {
-    const steps = Array.from(root.querySelectorAll<HTMLElement>(".step"));
-    const bar = root.querySelector<HTMLElement>(".progress-fill");
-    if (reduced || steps.length === 0) {
-      root.classList.add("static");
-      if (bar) bar.style.width = "100%";
-      return;
-    }
+<!-- Copy for the inline scripts. A JSON island rather than define:vars: these scripts are
+     is:inline and hand-written, and a parsed blob keeps the strings out of the code entirely. -->
+<script is:inline type="application/json" id="synCopy" set:html={JSON.stringify({ ...c.js, figs: c.figs.items })}></script>
 
-    let idx = -1;
-    let timer: number | undefined;
-    let running = false;
+<script is:inline>
+  var SYN=JSON.parse(document.getElementById("synCopy").textContent);
+(function(){
+  "use strict";
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    const paint = () => {
-      steps.forEach((s, i) => {
-        s.classList.toggle("done", idx >= 0 && i < idx);
-        s.classList.toggle("active", i === idx);
-      });
-      if (bar) bar.style.width = idx < 0 ? "0" : `${((idx + 1) / steps.length) * 100}%`;
-    };
+  function animateCounters(scope){ scope.querySelectorAll("[data-to]").forEach(function(el){ if(el._done)return; el._done=true;
+    var to=parseFloat(el.getAttribute("data-to")),pre=el.getAttribute("data-prefix")||"",suf=el.getAttribute("data-suffix")||"";
+    if(reduced){el.textContent=pre+to+suf;return;} var t0=performance.now();
+    (function s(now){var k=Math.min(1,(now-t0)/900);el.textContent=pre+Math.round(to*(1-Math.pow(1-k,3)))+suf;if(k<1)requestAnimationFrame(s);})(t0); }); }
 
-    const tick = () => {
-      if (!running) return;
-      idx += 1;
-      if (idx >= steps.length) {
-        idx = -1;
-        paint();
-        timer = window.setTimeout(tick, 900);
-        return;
-      }
-      paint();
-      timer = window.setTimeout(tick, idx === steps.length - 1 ? 3000 : 1500);
-    };
+  /* inventory row action icons (cart · edit · refresh · trash) */
+  var ACT='<span class="ra"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="20" r="1"/><circle cx="18" cy="20" r="1"/><path d="M2 3h3l2.5 12h11"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 20h9M16.5 3.5a2 2 0 013 3L7 19l-4 1 1-4z"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 4v5h5M20 20v-5h-5M20 9a8 8 0 00-14-3M4 15a8 8 0 0014 3"/></svg><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></span>';
+  document.querySelectorAll("td.ACT").forEach(function(td){ td.innerHTML=ACT; });
 
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting && !running) {
-            running = true;
-            tick();
-          } else if (!entry.isIntersecting && running) {
-            running = false;
-            if (timer) window.clearTimeout(timer);
-          }
-        }
-      },
-      { threshold: 0.3 },
-    );
-    io.observe(root);
+  /* tabs */
+  var TABS=["dashboard","inventory","orders"];
+  var tabEls={},panelEls={};
+  document.querySelectorAll("a[data-tab]").forEach(function(a){tabEls[a.getAttribute("data-tab")]=a;});
+  document.querySelectorAll(".panel").forEach(function(p){panelEls[p.getAttribute("data-panel")]=p;});
+  var cur=0,lock=false;
+
+  /* Ava gutter windows — content changes per tab */
+  // Three distinct window styles per tab: a = Ava insight (chat), b = supplier email (mail), c = agent log (term)
+  var GUT=SYN.gut;
+  function fillAva(el,d){ if(!d){el.style.display="none";return;} el.style.display="";
+    var h='<div class="gh"><span class="gorb"><canvas class="ava-orb-canvas" width="40" height="40"></canvas></span><span class="gnm">Ava</span><span class="gvb">'+d.vb+'</span></div><div class="gsub">'+d.sub+'</div>';
+    d.rows.forEach(function(r){ h+=r[0]?('<div class="grow"><b>'+r[0]+'</b><span>'+r[1]+'</span></div>'):('<div class="grow"><span class="gd"></span><span>'+r[1]+'</span></div>'); });
+    if(d.tag) h+='<span class="gtag"><span class="d"></span>'+d.tag+'</span>';
+    el.innerHTML=h; }
+  function fillMail(el,d){ if(!d){el.style.display="none";return;} el.style.display="";
+    el.innerHTML='<div class="mh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>'+SYN.inbox+'</div>'+
+      '<div class="from">'+d.from+'</div><div class="subj">'+d.subj+'</div>'+
+      '<span class="mbadge '+d.badge[0]+'">'+d.badge[1]+'</span>'; }
+  function fillTerm(el,d){ if(!d){el.style.display="none";return;} el.style.display="";
+    var h='<div class="th"><i></i><i></i><i></i>synapsio · agent</div>';
+    d.lines.forEach(function(l){ h+='<div class="tl">'+(l[0]?('<span class="ts">'+l[0]+'</span>'):'<span class="ts">›</span>')+'<span'+(l[2]?' class="arr"':'')+'>'+l[1]+'</span></div>'; });
+    h+='<div class="tl"><span class="cur">▍</span></div>'; el.innerHTML=h; }
+  var gwinA=document.getElementById("gwinA"), gwinB=document.getElementById("gwinB"), gwinC=document.getElementById("gwinC");
+  function setGut(name){ var g=GUT[name]; fillAva(gwinA,g&&g.a); fillMail(gwinB,g&&g.b); fillTerm(gwinC,g&&g.c); initOrbs(); }
+
+  /* Ava nudge — page-specific, drops from the orb (real MVP behaviour) */
+  var NUDGE=SYN.nudge;
+  var nudgeEl=document.getElementById("avaNudge"), orbSlot=document.getElementById("orbSlot"), nudgeTimer=null, nudgeHide=null;
+  function showNudge(name){ var n=NUDGE[name]; if(!n){nudgeEl.classList.remove("on");return;}
+    nudgeEl.className="ava-nudge "+n.cls;
+    nudgeEl.innerHTML='<div class="lbl">'+n.lbl+'</div><div class="bd">'+n.bd+'</div><div class="act">'+n.act+'</div>';
+    void nudgeEl.offsetWidth; nudgeEl.classList.add("on");
+    clearTimeout(nudgeHide); nudgeHide=setTimeout(function(){ nudgeEl.classList.remove("on"); }, reduced?99999:4200); }
+  function setTab(name){ TABS.forEach(function(t){tabEls[t].classList.toggle("on",t===name);panelEls[t].classList.toggle("on",t===name);});
+    setGut(name);
+    nudgeEl.classList.remove("on"); clearTimeout(nudgeTimer); nudgeTimer=setTimeout(function(){showNudge(name);}, reduced?0:600); }
+  document.querySelectorAll("a[data-tab]").forEach(function(a){a.addEventListener("click",function(){lock=true;cur=TABS.indexOf(a.getAttribute("data-tab"));setTab(TABS[cur]);});});
+
+  requestAnimationFrame(function(){
+    document.body.classList.add("go");
+    if(reduced){animateCounters(document);showNudge("dashboard");return;}
+    setTimeout(function(){animateCounters(document.getElementById("surface"));},720);
+    setTimeout(function(){showNudge("dashboard");},1500);
+    setInterval(function(){ if(lock)return; cur=(cur+1)%TABS.length; setTab(TABS[cur]); },5600);
   });
 
-  // Scroll reveal
-  const revealables = document.querySelectorAll(".reveal");
-  if (revealables.length > 0) {
-    const ro = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("in-view");
-            ro.unobserve(entry.target);
-          }
-        }
-      },
-      { threshold: 0.15 },
-    );
-    revealables.forEach((el) => ro.observe(el));
+  var nav=document.getElementById("nav");
+  var surfaceEl=document.getElementById("surface");
+  function clamp(v){return v<0?0:v>1?1:v;}
+  function heroScroll(){
+    nav.classList.toggle("stuck",window.scrollY>8);
+    if(reduced){ surfaceEl.style.transform="scale(1)"; gwinA.style.opacity=1; gwinB.style.opacity=1; gwinC.style.opacity=1; return; }
+    var r=surfaceEl.getBoundingClientRect(), vh=window.innerHeight;
+    // p: 0 when the window first enters from the bottom, 1 once scrolled up into view
+    var p=clamp((vh - r.top)/(vh*0.92));
+    // pronounced Attio-style shrink: big on entry, settles smaller as side windows appear
+    surfaceEl.style.transform="scale("+(1.16-p*0.20).toFixed(3)+")";
+    var g=clamp((p-0.34)/0.34);
+    [gwinA,gwinB,gwinC].forEach(function(w,i){ w.style.opacity=g;
+      var dir = (i===1)? -1 : 1;   // B on the right slides in from the right
+      w.style.transform="translateX("+(dir*(1-g)*30).toFixed(1)+"px)"; });
   }
+  window.addEventListener("scroll",heroScroll,{passive:true});
+  window.addEventListener("resize",heroScroll,{passive:true});
+  heroScroll();
+
+  /* Ava orbs — dense firing sphere (teal core); shared render for main + gutter orbs */
+  var ORB_N=118, ORB_PTS=[];
+  for(var oi=0;oi<ORB_N;oi++){var oy2=1-(oi/(ORB_N-1))*2;var orr=Math.sqrt(Math.max(0,1-oy2*oy2));var oth=oi*2.399963;ORB_PTS.push({x:Math.cos(oth)*orr,y:oy2,z:Math.sin(oth)*orr,coral:oi%13===6,fire:Math.random()});}
+  var orbList=[], orbT=0.3, orbDpr=Math.min(window.devicePixelRatio||1,2), orbLoop=false;
+  function initOrbs(){
+    var cs=[]; var main=document.getElementById("avaOrb"); if(main) cs.push(main);
+    Array.prototype.forEach.call(document.querySelectorAll(".ava-orb-canvas"),function(c){cs.push(c);});
+    orbList=cs.map(function(c){ if(c._orb) return c._orb; var ctx=c.getContext("2d"); if(!ctx) return null;
+      var S=(parseInt(c.getAttribute("width"),10)||52)/2; c.width=S*orbDpr; c.height=S*orbDpr; ctx.scale(orbDpr,orbDpr); c._orb={ctx:ctx,S:S}; return c._orb; }).filter(Boolean);
+    if(reduced){ renderOrbs(); return; }
+    if(!orbLoop){ orbLoop=true; (function loop(){ orbT+=0.005; renderOrbs(); requestAnimationFrame(loop); })(); }
+  }
+  function renderOrbs(){ orbList.forEach(function(o){ var ctx=o.ctx,S=o.S,cx=S/2,cy=S/2,R=S/2-2,cs=Math.cos(orbT),sn=Math.sin(orbT); ctx.clearRect(0,0,S,S);
+    var proj=ORB_PTS.map(function(p){var x=p.x*cs-p.z*sn,z=p.x*sn+p.z*cs;return{sx:cx+x*R,sy:cy+p.y*R,z:z,coral:p.coral,fire:p.fire};});
+    proj.sort(function(a,b){return a.z-b.z;});
+    proj.forEach(function(p){var d=(p.z+1)/2;var fl=(Math.sin(orbT*3+p.fire*30)>0.985)?1:0;ctx.beginPath();ctx.arc(p.sx,p.sy,0.5+d*(R*0.055)+fl*0.7,0,6.2832);ctx.fillStyle="rgba("+(p.coral?"232,132,90":"95,212,200")+","+(0.14+d*0.6+fl*0.3).toFixed(2)+")";ctx.fill();}); }); }
+  initOrbs();
+  setGut("dashboard");
+
+  /* ===== isometric figures: Wahrnehmen · Produktion · Handeln · Lernen ===== */
+  var SVGNS="http://www.w3.org/2000/svg",COS30=Math.cos(Math.PI/6),SIN30=0.5;
+  function project(p){return[(p[0]-p[1])*COS30,(p[0]+p[1])*SIN30-p[2],p[0]+p[1]+p[2]];}
+  function neg(a){return[-a[0],-a[1],-a[2]];}
+  function box(o,u,v,w,ord,hot){function k(a,b,c){return[o[0]+a*u[0]+b*v[0]+c*w[0],o[1]+a*u[1]+b*v[1]+c*w[1],o[2]+a*u[2]+b*v[2]+c*w[2]];}
+    var A=k(0,0,0),B=k(1,0,0),C=k(1,1,0),D=k(0,1,0),E=k(0,0,1),F=k(1,0,1),G=k(1,1,1),H=k(0,1,1);
+    return[{pts:[A,B,C,D],nrm:neg(w),order:ord,hot:hot},{pts:[E,F,G,H],nrm:w,lit:true,order:ord,hot:hot},{pts:[A,B,F,E],nrm:neg(v),order:ord,hot:hot},{pts:[D,C,G,H],nrm:v,order:ord,hot:hot},{pts:[A,D,H,E],nrm:neg(u),order:ord,hot:hot},{pts:[B,C,G,F],nrm:u,order:ord,hot:hot}];}
+
+  var FIGS=[
+    {num:"FIG 01",label:SYN.figs[0].label,title:SYN.figs[0].title,text:SYN.figs[0].text,parts:7,rest:0.14,
+      build:function(p){var f=[],n=7,W=18,H=23,th=0.40,zGap=0.62;
+        for(var i=0;i<n;i++){var q=p[i],ang=q*(i-(n-1)/2)*0.038,ca=Math.cos(ang),sa=Math.sin(ang);
+          var ox=q*i*5.6-W/2-8,oy=q*i*2.3-H/2-3,z=i*zGap,u=[W*ca,W*sa,0],v=[-H*sa,H*ca,0];
+          f=f.concat(box([ox,oy,z],u,v,[0,0,th],i));
+          var a=(q-0.40)/0.5;a=a<0?0:a>1?1:a;if(i===n-1)a=1;
+          if(a>0.02){for(var L=0;L<4;L++){var fy=0.26+L*0.155,len=(L===0)?0.30:(L===3?0.34:0.56),zt=z+th+0.01;
+            f.push({line:true,alpha:a*0.5,order:i+0.5,pts:[[ox+0.20*u[0]+fy*v[0],oy+0.20*u[1]+fy*v[1],zt],[ox+(0.20+len)*u[0]+fy*v[0],oy+(0.20+len)*u[1]+fy*v[1],zt]]});}}}
+        return f;}},
+    {num:"FIG 02",label:SYN.figs[1].label,title:SYN.figs[1].title,text:SYN.figs[1].text,parts:3,rest:0.0,
+      build:function(p){ var f=[];   // warehouse rack: boxes on shelves, gaps where stock was drawn down, one box coral (knapp); hover picks several boxes off the shelf
+        var cols=3, rows=3, sw=6.2, sh=5.0, sd=6.0, gx=1.3, gz=1.7;
+        var pitchX=sw+gx, pitchZ=sh+gz, W=cols*pitchX-gx, Htot=rows*pitchZ-gz;
+        var x0=-W/2, y0=-sd/2, yb=y0+sd;
+        var occ=[[3,1,2],[1,0,3],[3,1,0]], si=0;   // bottom→top · 0 empty · 1 box · 2 coral(knapp) · 3 picked (slides out on hover, staggered)
+        for(var r=0;r<rows;r++){ for(var c=0;c<cols;c++){ var o=occ[r][c]; if(!o) continue;
+          var pad=1.4, slide=0; if(o===3){ slide=p[si]*7; si++; }
+          f=f.concat(box([x0+c*pitchX+pad/2, y0+pad/2+slide, r*pitchZ+0.9],[sw-pad,0,0],[0,sd-pad,0],[0,0,sh-pad], r*cols+c+1, o===2)); } }
+        function wire(a,b,al){ f.push({line:true,pts:[a,b],alpha:al===undefined?0.48:al,order:90}); }
+        for(var c=0;c<=cols;c++){ var x=x0+c*pitchX-gx/2;
+          wire([x,y0,0],[x,y0,Htot]); wire([x,yb,0],[x,yb,Htot],0.26); wire([x,y0,Htot],[x,yb,Htot],0.26); }
+        for(var r=0;r<=rows;r++){ var z=(r===rows)?Htot:r*pitchZ-gz/2;
+          wire([x0-gx/2,y0,z],[x0+W+gx/2,y0,z]); wire([x0-gx/2,yb,z],[x0+W+gx/2,yb,z],0.26); }
+        return f;}},
+    {num:"FIG 03",label:SYN.figs[2].label,title:SYN.figs[2].title,text:SYN.figs[2].text,parts:5,rest:0.3,
+      build:function(p){ var f=[];   // conveyor: a line of parcels flows through (teal), one lifted off for you (coral)
+        var beltL=42, beltD=8, beltH=1.4;
+        f=f.concat(box([-beltL/2,-beltD/2,-beltH],[beltL,0,0],[0,beltD,0],[0,0,beltH], 0));
+        for(var t=-beltL/2+3; t<beltL/2-2; t+=4){ f.push({line:true,pts:[[t,-beltD/2,0.02],[t,beltD/2,0.02]],alpha:0.20,order:1}); }
+        var pw=5.0, pdp=5.0, ph=4.0;
+        function parcel(cx,lift,ch,ord){
+          f=f.concat(box([cx-pw/2,-pdp/2,lift],[pw,0,0],[0,pdp,0],[0,0,ph], ord, ch));
+          var zt=lift+ph+0.02;
+          f.push({line:true,pts:[[cx,-pdp/2,zt],[cx,pdp/2,zt]],alpha:0.5,order:ord+0.5,hot:ch});
+          f.push({line:true,pts:[[cx-pw/2,0,zt],[cx+pw/2,0,zt]],alpha:0.32,order:ord+0.5,hot:ch}); }
+        var flow=p[0]*6;   // the belt runs — the whole line of auto parcels advances together
+        [-18,-11,-4,3].forEach(function(bx,k){ parcel(bx+flow, 0, false, 3+k); });
+        parcel(15, 4.6 + p[4]*3.5, true, 9);   // one lifted off the belt (needs you)
+        return f;}},
+    {num:"FIG 04",label:SYN.figs[3].label,title:SYN.figs[3].title,text:SYN.figs[3].text,parts:5,rest:0.35,
+      build:function(p){ var f=[];
+        // Rebuilt as SOLID geometry. It used to be flat rings and hairline pins, which made it
+        // the only wireframe drawing among three solid objects and read as unfinished next to
+        // them. Now it is a stepped target you climb: four tiers, and the agent's shots march
+        // inward and upward each week until one stands on the coral summit.
+        var TIER=[[11,0,1.15],[7.5,1.15,1.15],[4.6,2.30,1.15],[2.0,3.45,1.25]];
+        TIER.forEach(function(t,i){
+          f=f.concat(box([-t[0],-t[0],t[1]],[2*t[0],0,0],[0,2*t[0],0],[0,0,t[2]], -8+i, i===3)); });
+        // a marker stands on whichever tier it has reached, so converging also means climbing
+        function surfZ(x,y){ var m=Math.max(Math.abs(x),Math.abs(y));
+          return m<=2.0?4.70 : m<=4.6?3.45 : m<=7.5?2.30 : m<=11?1.15 : 0; }
+        function marker(x,y,ch,ord){ var w=0.82, h=2.6, z=surfZ(x,y);
+          f=f.concat(box([x-w,y-w,z],[2*w,0,0],[0,2*w,0],[0,0,h], ord, ch));
+          f.push({line:true,pts:[[x,y,z+h],[x,y,z+h+0.9]],alpha:0.5,order:ord+0.5,hot:ch}); }
+        var hits=[{a:0.5,r:9.6},{a:2.2,r:8.4},{a:3.5,r:10.2},{a:4.6,r:7.4},{a:5.7,r:9.0}];
+        for(var i=0;i<hits.length;i++){ var hd=hits[i], q=p[i], rr=hd.r*(1-q)+3.3*q;
+          marker(rr*Math.cos(hd.a), rr*Math.sin(hd.a), false, 10+i); }
+        marker(0,0,true,20);   // your target, on the summit
+        return f;}}
+  ];
+
+  var STIFF=260,ZETA=0.94,STAGGER=0.42;
+  function Spring(v){this.x=v;this.v=0;this.target=v;this.kScale=1;}
+  Spring.prototype.step=function(dt){if(reduced){this.x=this.target;this.v=0;return;}var k=STIFF*this.kScale,c=2*ZETA*Math.sqrt(k);this.v+=(-k*(this.x-this.target)-c*this.v)*dt;this.x+=this.v*dt;if(Math.abs(this.x-this.target)<0.0004&&Math.abs(this.v)<0.0025){this.x=this.target;this.v=0;}};
+  function cascade(t,i,n){if(n<=1)return t;var v=t*(1+STAGGER)-i*(STAGGER/(n-1));return v<0?0:v>1?1:v;}
+
+  var figsRoot=document.getElementById("figs")||document.createElement("div"),scenes=[],figCells=[];
+
+  FIGS.forEach(function(fig,idx){
+    var cell=document.createElement("div");cell.className="fig";cell.setAttribute("data-i",idx);
+    var stage=document.createElement("div");stage.className="fstage";
+    var svg=document.createElementNS(SVGNS,"svg");svg.setAttribute("class","iso");svg.setAttribute("aria-hidden","true");stage.appendChild(svg);
+    var cap=document.createElement("div");
+    var lab=document.createElement("span");lab.className="mono";lab.textContent=fig.num+" · "+fig.label;
+    var h3=document.createElement("h3");h3.textContent=fig.title;var pEl=document.createElement("p");pEl.textContent=fig.text;
+    cap.appendChild(lab);cap.appendChild(h3);cap.appendChild(pEl);cell.appendChild(stage);cell.appendChild(cap);figsRoot.appendChild(cell);figCells.push(cell);
+    var scene={fig:fig,svg:svg,stage:stage,springs:[],paths:[],targetT:fig.rest,hovering:false};
+    for(var i=0;i<fig.parts;i++)scene.springs.push(new Spring(cascade(fig.rest,i,fig.parts)));
+    var zeros=[],ones=[];for(var z=0;z<fig.parts;z++){zeros.push(0);ones.push(1);}
+    var count=Math.max(fig.build(zeros).length,fig.build(ones).length);
+    for(var c2=0;c2<count;c2++){var pa=document.createElementNS(SVGNS,"path");pa.setAttribute("class","face");svg.appendChild(pa);scene.paths.push(pa);}
+    fitBox(scene);scenes.push(scene);
+    cell.addEventListener("pointermove",function(e){var r=stage.getBoundingClientRect(),ny=(e.clientY-r.top)/r.height;scene.hovering=true;var t=(ny-0.14)/0.72;scene.targetT=t<0?0:t>1?1:t;});
+    cell.addEventListener("pointerleave",function(){scene.hovering=false;scene.targetT=fig.rest;});
+  });
+
+  function fitBox(scene){var mnX=Infinity,mnY=Infinity,mxX=-Infinity,mxY=-Infinity;
+    [0,0.35,0.7,1].forEach(function(t){var arr=[];for(var i=0;i<scene.fig.parts;i++)arr.push(cascade(t,i,scene.fig.parts));
+      scene.fig.build(arr).forEach(function(f){f.pts.forEach(function(pt){var s=project(pt);if(s[0]<mnX)mnX=s[0];if(s[0]>mxX)mxX=s[0];if(s[1]<mnY)mnY=s[1];if(s[1]>mxY)mxY=s[1];});});});
+    var w=mxX-mnX,h=mxY-mnY,pad=Math.max(w,h)*0.08;
+    scene.svg.setAttribute("viewBox",(mnX-pad)+" "+(mnY-pad)+" "+(w+pad*2)+" "+(h+pad*2));scene.svg.setAttribute("preserveAspectRatio","xMidYMid meet");}
+
+  var VIEW=[1,1,1],last=performance.now();
+  function frame(now){var dt=Math.min(0.032,(now-last)/1000);last=now;
+    scenes.forEach(function(scene){var ks=scene.hovering?1:0.45,n=scene.fig.parts,prog=[];
+      for(var i=0;i<n;i++){scene.springs[i].target=cascade(scene.targetT,i,n);scene.springs[i].kScale=ks;scene.springs[i].step(dt);prog.push(scene.springs[i].x);}
+      var faces=scene.fig.build(prog),solids=[],tops=[];
+      for(var j=0;j<faces.length;j++){var fc=faces[j];if(fc.nrm&&!fc.noCull){if(fc.nrm[0]*VIEW[0]+fc.nrm[1]*VIEW[1]+fc.nrm[2]*VIEW[2]<=0)continue;}
+        var pts=fc.pts,d="",depth=0;for(var q=0;q<pts.length;q++){var s=project(pts[q]);d+=(q===0?"M":"L")+s[0].toFixed(2)+" "+s[1].toFixed(2);depth+=s[2];}
+        var rec={d:fc.line?d:d+"Z",depth:depth/pts.length,order:fc.order===undefined?null:fc.order,lit:fc.lit,ghost:fc.ghost,line:fc.line,alpha:fc.alpha,hot:fc.hot};
+        if(fc.onTop)tops.push(rec);else solids.push(rec);}
+      solids.sort(function(a,b){if(a.order!==null&&b.order!==null&&a.order!==b.order)return a.order-b.order;return a.depth-b.depth;});
+      var drawn=solids.concat(tops);
+      for(var m=0;m<scene.paths.length;m++){var el=scene.paths[m];
+        if(m<drawn.length){var r2=drawn[m];el.setAttribute("d",r2.d);
+          var cls=r2.line?("face wire"+(r2.hot?" hot":"")):(r2.ghost?("face ghost"+(r2.hot?" hot":"")):(r2.lit?"face lit":("face"+(r2.hot?" hot":""))));
+          if(el._cls!==cls){el.setAttribute("class",cls);el._cls=cls;}
+          var a2=r2.line?Math.round(r2.alpha*32)/32:-1;if(el._a!==a2){el.style.strokeOpacity=a2<0?"":String(a2);el._a=a2;}el._cleared=false;
+        }else if(el._cleared!==true){el.setAttribute("d","");el._cleared=true;}}
+    });
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  /* figures reveal naturally as each enters the viewport (staggered) */
+  if(reduced){ figCells.forEach(function(c){c.classList.add("inview");}); }
+  else {
+    var figIO=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){
+      var i=figCells.indexOf(e.target); setTimeout(function(){ e.target.classList.add("inview"); }, (i<0?0:i)*130);
+      figIO.unobserve(e.target); } }); }, { threshold:0.22, rootMargin:"0px 0px -8% 0px" });
+    figCells.forEach(function(c){ figIO.observe(c); });
+  }
+
+  /* ===== control rails: sticky nav + continuous scroll + scroll-spy (Attio pattern) ===== */
+  (function(){
+    var track=document.getElementById("ctrlTrack"), nav=document.getElementById("pfNav");
+    if(!track||!nav) return;
+    var blocks=Array.prototype.slice.call(track.querySelectorAll(".ctrl-block"));
+    var items=Array.prototype.slice.call(nav.querySelectorAll("li"));
+    function setOn(i){ items.forEach(function(el,k){ el.classList.toggle("on",k===i); }); }
+    // reveal each block as it enters
+    if(reduced){ blocks.forEach(function(b){ b.classList.add("seen"); }); }
+    else { var rev=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add("seen"); rev.unobserve(e.target); } }); }, { threshold:0.14 });
+      blocks.forEach(function(b){ rev.observe(b); }); }
+    // scroll-spy: whichever block crosses the viewport centre lights its nav point
+    // scroll-spy: active = last block whose top crossed the reading line (~32% down)
+    var ticking=false;
+    function spyNow(){ ticking=false; var line=window.innerHeight*0.32, best=0;
+      blocks.forEach(function(b,i){ if(b.getBoundingClientRect().top <= line) best=i; }); setOn(best); }
+    function onSpy(){ if(!ticking){ ticking=true; requestAnimationFrame(spyNow); } }
+    window.addEventListener("scroll", onSpy, {passive:true});
+    window.addEventListener("resize", onSpy, {passive:true});
+    // click a nav point → scroll to its block
+    items.forEach(function(el,k){ el.style.cursor="pointer"; el.addEventListener("click",function(){ if(blocks[k]) blocks[k].scrollIntoView({behavior:"smooth",block:"start"}); }); });
+    spyNow();
+  })();
+})();
+</script>
+
+<script is:inline>
+/* Sicherheit bento — staggered scroll reveal (standalone) */
+(function(){
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var tiles = Array.prototype.slice.call(document.querySelectorAll(".sec .sb"));
+  if(!tiles.length) return;
+  if(reduced){ tiles.forEach(function(t){ t.classList.add("seen"); }); return; }
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(e.isIntersecting){
+        var i = tiles.indexOf(e.target);
+        e.target.style.transitionDelay = (Math.max(0,i)*70)+"ms";
+        e.target.classList.add("seen");
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold:0.18 });
+  tiles.forEach(function(t){ io.observe(t); });
+})();
+</script>
+
+<script is:inline>
+/* Sicherheit big tile — iso animation: the operation slides into a safe, door closes, copper handle locks it.
+   Plays on scroll-into-view, replays on hover, pauses off-screen; sealed frame is shown statically for reduced-motion. */
+(function(){
+  var svg=document.getElementById("domeIso"); if(!svg) return;
+  var tile=svg.closest(".sb-map")||svg;
+  var reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var SVGNS="http://www.w3.org/2000/svg",COS30=Math.cos(Math.PI/6),SIN30=0.5;
+  function project(p){return[(p[0]-p[1])*COS30,(p[0]+p[1])*SIN30-p[2],p[0]+p[1]+p[2]];}
+  function neg(a){return[-a[0],-a[1],-a[2]];}
+  function box(o,u,v,w,cls){function k(a,b,c){return[o[0]+a*u[0]+b*v[0]+c*w[0],o[1]+a*u[1]+b*v[1]+c*w[1],o[2]+a*u[2]+b*v[2]+c*w[2]];}
+    var A=k(0,0,0),B=k(1,0,0),C=k(1,1,0),D=k(0,1,0),E=k(0,0,1),F=k(1,0,1),G=k(1,1,1),H=k(0,1,1);
+    return[{pts:[A,B,C,D],nrm:neg(w),cls:cls},{pts:[E,F,G,H],nrm:w,lit:true,cls:cls},{pts:[A,B,F,E],nrm:neg(v),cls:cls},{pts:[D,C,G,H],nrm:v,cls:cls},{pts:[A,D,H,E],nrm:neg(u),cls:cls},{pts:[B,C,G,F],nrm:u,cls:cls}];}
+  function clamp(x,a,b){return x<a?a:x>b?b:x;}
+  function smooth(t,a,b){var x=clamp((t-a)/(b-a),0,1);return x*x*(3-2*x);}
+  function lerp(a,b,k){return a+(b-a)*k;}
+  function tf(fs,tr,sc,ctr){return fs.map(function(fc){return {pts:fc.pts.map(function(p){return [ctr[0]+sc*(p[0]-ctr[0])+tr[0],ctr[1]+sc*(p[1]-ctr[1])+tr[1],ctr[2]+sc*(p[2]-ctr[2])+tr[2]];}),nrm:fc.nrm,lit:fc.lit,cls:fc.cls};});}
+  function rotV(fs,pv,ang){var c=Math.cos(ang),s=Math.sin(ang);
+    return fs.map(function(fc){return {pts:fc.pts.map(function(p){var dx=p[0]-pv[0],dy=p[1]-pv[1];return[pv[0]+dx*c-dy*s,pv[1]+dx*s+dy*c,p[2]];}),nrm:fc.nrm?[fc.nrm[0]*c-fc.nrm[1]*s,fc.nrm[0]*s+fc.nrm[1]*c,fc.nrm[2]]:null,lit:fc.lit,cls:fc.cls};});}
+  function rotX(fs,ct,ang){var c=Math.cos(ang),s=Math.sin(ang);
+    return fs.map(function(fc){return {pts:fc.pts.map(function(p){var dy=p[1]-ct[1],dz=p[2]-ct[2];return[p[0],ct[1]+dy*c-dz*s,ct[2]+dy*s+dz*c];}),nrm:fc.nrm?[fc.nrm[0],fc.nrm[1]*c-fc.nrm[2]*s,fc.nrm[1]*s+fc.nrm[2]*c]:null,lit:fc.lit,cls:fc.cls};});}
+
+  function disc(center,R,depth,N,cls){var cx=center[0],cy=center[1],cz=center[2],fr=[],bk=[],fs=[];
+    for(var i=0;i<N;i++){var a=i/N*6.28319,y=cy+R*Math.cos(a),z=cz+R*Math.sin(a);fr.push([cx+depth,y,z]);bk.push([cx,y,z]);}
+    fs.push({pts:fr.slice(),nrm:[1,0,0],lit:true,cls:cls});
+    for(var i=0;i<N;i++){var j=(i+1)%N,am=(i+0.5)/N*6.28319;fs.push({pts:[bk[i],bk[j],fr[j],fr[i]],nrm:[0,Math.cos(am),Math.sin(am)],cls:cls});}
+    return fs;}
+  function sheet(){ return box([-4.5,-3.2,-0.13],[9,0,0],[0,6.4,0],[0,0,0.26],"pp"); }
+  // a flat content patch printed on the face of a document (letterhead, ruled lines, stamp)
+  function quad(x0,x1,y0,y1,z,cls){ return {pts:[[x0,y0,z],[x1,y0,z],[x1,y1,z],[x0,y1,z]],nrm:[0,0,1],lit:true,cls:cls}; }
+  function invoice(v){
+    // smaller sheet + fewer, well-separated content patches lifted clear of the surface (no self-clipping)
+    var f=box([-3.5,-2.5,-0.12],[7,0,0],[0,5,0],[0,0,0.24],"pp"), z=0.30;
+    var hd=v%3===0?"pa1":v%3===1?"pa2":"pa3";        // letterhead accent varies per document
+    f.push(quad(-2.8,0.4,1.15,1.9,z,hd));            // letterhead band
+    f.push(quad(1.4,2.7,1.05,2.0,z,hd));             // logo / crest block
+    f.push(quad(-2.8,2.5,0.15,0.5,z,"pl"));          // ruled text line
+    f.push(quad(-2.8,1.6,-0.55,-0.2,z,"pl"));        // ruled text line
+    f.push(quad(1.0,2.7,-2.1,-1.15,z,v%2?"pa2":"pa1")); // total / stamp block
+    return f;
+  }
+  function bez(S,C,E,k){ var m=1-k; return [m*m*S[0]+2*m*k*C[0]+k*k*E[0],m*m*S[1]+2*m*k*C[1]+k*k*E[1],m*m*S[2]+2*m*k*C[2]+k*k*E[2]]; }
+
+  function scene(t){
+    var f=[];
+    var S0=[-8,-8,0],sx1=8,sy1=8,sz1=16;
+    // ---- tiered pedestal the safe stands on (fills the frame, gives it presence) ----
+    f=f.concat(box([-14,-11,-4.0],[28,0,0],[0,22,0],[0,0,1.4],"base"));   // lower base step
+    f=f.concat(box([-11,-9,-2.6],[22,0,0],[0,18,0],[0,0,2.6],"step"));    // upper plinth (safe sits at z=0)
+    f.push({pts:[[-10,-8.5,0.03],[10,-8.5,0.03],[10,8.5,0.03],[-10,8.5,0.03]],nrm:[0,0,1],lit:true,cls:"inset"}); // recessed landing pad
+    // ---- safe base trim + top lid rim (heavy vault body) ----
+    f=f.concat(box([-8.8,-8.8,0],[17.6,0,0],[0,17.6,0],[0,0,1.6],"trim"));
+    f=f.concat(box([-8.6,-8.6,14.6],[17.2,0,0],[0,17.2,0],[0,0,1.6],"cap"));
+    // ---- safe body — drop the +x face (the doorway) ----
+    box(S0,[16,0,0],[0,16,0],[0,0,16],"sf").forEach(function(fc){ if(fc.nrm[0]===1&&fc.nrm[1]===0&&fc.nrm[2]===0)return; f.push(fc); });
+    // rivets on the visible +y wall
+    [[-6,3.5],[6,3.5],[-6,12.5],[6,12.5]].forEach(function(b){ f=f.concat(box([b[0]-0.4,8,b[1]-0.4],[0.8,0,0],[0,0.55,0],[0,0,0.8],"bolt")); });
+    // recessed vault-door frame around the opening (protrudes +x, door sits inside it)
+    f=f.concat(box([8,-8,14.4],[0.7,0,0],[0,16,0],[0,0,1.6],"frame"));    // top rail
+    f=f.concat(box([8,-8,0],[0.7,0,0],[0,16,0],[0,0,1.6],"frame"));       // bottom rail
+    f=f.concat(box([8,-8,1.6],[0.7,0,0],[0,1.6,0],[0,0,12.8],"frame"));   // latch-side stile
+    f=f.concat(box([8,6.4,1.6],[0.7,0,0],[0,1.6,0],[0,0,12.8],"frame"));  // hinge-side stile
+    // dark cavity: inner back wall + inner floor
+    f.push({pts:[[-7.5,-7.5,0.5],[-7.5,7.5,0.5],[-7.5,7.5,15.5],[-7.5,-7.5,15.5]],nrm:[1,0,0],cls:"dk"});
+    f.push({pts:[[-7.5,-7.5,0.5],[7.5,-7.5,0.5],[7.5,7.5,0.5],[-7.5,7.5,0.5]],nrm:[0,0,1],cls:"dk"});
+    // invoices & documents sweep in from far off-screen (upper-right) on a long, shallow arc, entering the
+    // safe THROUGH THE OPEN DOOR at mid-height. They MATERIALISE softly as they enter frame (no awkward mid-air
+    // pop-in) and DISSOLVE into the safe on arrival (masks the hard depth-sort occlusion behind the wall).
+    for(var i=0;i<5;i++){ var t0=0.02+i*0.075, t1=0.46+i*0.075, kk=smooth(t,t0,t1), ke=1-Math.pow(1-kk,1.9);
+      var S=[34+i*1.4,-20-i*0.9,26+i*0.7],            // far off-screen upper-right (clipped by tile until it arrives)
+          C=[15,-3-i*0.2,7+i*0.3],                    // control just OUTSIDE the doorway -> long shallow entry, no top-clip
+          E=[1.4+(i-2)*0.3,-1.0+(i-2)*0.24,3.0+i*0.9]; // settle toward the doorway-visible zone, flat stack
+      var P=bez(S,C,E,ke), tilt=lerp(-0.72,0,smooth(kk,0.15,1)), yaw=lerp(0.38*(i%2?1:-1),0,ke);
+      var op=smooth(kk,0.04,0.34)*(1-smooth(kk,0.80,1.0));   // fade in on entry, fade out into the safe
+      var faces=tf(rotX(rotV(invoice(i),[0,0],yaw),[0,0,0],tilt),[P[0],P[1],P[2]],1,[0,0,0]);
+      for(var q=0;q<faces.length;q++) faces[q].op=op;
+      f=f.concat(faces); }
+    // door: starts WIDE open, closes once all papers are in (t .74–.92)
+    var theta=(1-smooth(t,0.74,0.92))*(Math.PI*0.33);
+    var pivot=[sx1,sy1];
+    f=f.concat(rotV(box([sx1,S0[1],0.7],[0.6,0,0],[0,16,0],[0,0,14.6],"dr"),pivot,theta));
+    // round combination dial on the recessed door face; spins to seal (t .92–1.0)
+    var dc=[sx1+0.6,0,8], spin=smooth(t,0.92,1.0)*(Math.PI*2.6);
+    var wheel=disc(dc,3.2,0.8,16,"cu").concat(box([dc[0]+0.4,dc[1]-0.7,dc[2]-3.4],[1.0,0,0],[0,1.4,0],[0,0,6.8],"cu")); // dial + grip bar
+    wheel=rotV(rotX(wheel,[dc[0],dc[1],dc[2]],spin),pivot,theta);
+    f=f.concat(wheel);
+    return f;
+  }
+
+  // fixed viewBox from the SAFE geometry only (documents excluded, so the safe stays large & centred;
+  // the papers fly in from outside the tile and are clipped by the tile edge — no frame-expanding, no clip through faces)
+  var mnX=1e9,mnY=1e9,mxX=-1e9,mxY=-1e9;
+  [0,0.5,1].forEach(function(tt){ scene(tt).forEach(function(fc){ if(fc.cls&&fc.cls.charAt(0)==="p")return; fc.pts.forEach(function(p){ var s=project(p);
+    if(s[0]<mnX)mnX=s[0]; if(s[0]>mxX)mxX=s[0]; if(s[1]<mnY)mnY=s[1]; if(s[1]>mxY)mxY=s[1]; }); }); });
+  var vbW=mxX-mnX, vbH=mxY-mnY, cxm=(mnX+mxX)/2, minAR=1.62;
+  if(vbW/vbH < minAR){ vbW=vbH*minAR; mnX=cxm-vbW/2; }
+  var pad=Math.max(vbW,vbH)*0.11;
+  svg.setAttribute("viewBox",(mnX-pad)+" "+(mnY-pad)+" "+(vbW+pad*2)+" "+(vbH+pad*2));
+  svg.setAttribute("preserveAspectRatio","xMidYMid meet");
+
+  var pool=[];
+  function render(t){
+    var recs=[]; scene(t).forEach(function(fc){ if(fc.nrm && (fc.nrm[0]+fc.nrm[1]+fc.nrm[2])<=0) return;
+      var d="",depth=0,pts=fc.pts; for(var q=0;q<pts.length;q++){var s=project(pts[q]); d+=(q?"L":"M")+s[0].toFixed(2)+" "+s[1].toFixed(2); depth+=s[2];}
+      recs.push({d:d+"Z",depth:depth/pts.length,lit:fc.lit,cls:fc.cls,op:fc.op}); });
+    recs.sort(function(a,b){return a.depth-b.depth;});
+    var i=0; for(;i<recs.length;i++){ var r=recs[i],el=pool[i];
+      if(!el){el=document.createElementNS(SVGNS,"path");svg.appendChild(el);pool[i]=el;}
+      var cls="face"+(r.lit?" lit":"")+(r.cls?" "+r.cls:"");
+      if(el._c!==cls){el.setAttribute("class",cls);el._c=cls;}
+      var op=(r.op==null?1:r.op); if(el._o!==op){el.style.opacity=op;el._o=op;}
+      el.setAttribute("d",r.d); el.style.display=""; }
+    for(;i<pool.length;i++) pool[i].style.display="none";
+  }
+
+  if(reduced){ render(1); return; }
+  var DUR=4700,start=0,raf=0,playing=false,finished=false;
+  function tick(now){ if(!start)start=now; var t=(now-start)/DUR;
+    if(t>=1){ render(1); finished=true; playing=false; raf=0; return; }
+    render(t); raf=requestAnimationFrame(tick); }
+  function play(){ if(raf)cancelAnimationFrame(raf); start=0; playing=true; finished=false; raf=requestAnimationFrame(tick); }
+  render(0);
+  var firstSeen=false;
+  new IntersectionObserver(function(es){ es.forEach(function(e){
+    if(e.isIntersecting){ if(!firstSeen){ firstSeen=true; play(); } else if(!playing && !finished){ play(); } }
+    else if(raf){ cancelAnimationFrame(raf); raf=0; playing=false; }
+  }); }, {threshold:0.4}).observe(tile);
+  tile.addEventListener("pointerenter",function(){ play(); });
+})();
 </script>

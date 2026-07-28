@@ -24,3 +24,15 @@ dist-ssr
 *.sw?
 
 .astro
+
+# Local agent tooling (vendored skills, ~3.5MB) — reinstallable, not site source
+.claude/
+.agents/
+skills-lock.json
+
+# Scratch renders from .render-harness.mjs
+.render-*.png
+!.render-harness.mjs
+
+# Prototype surfaces: real routes that would publish if committed
+src/pages/prototypes/

@@ -1,0 +1,921 @@
+---
+// Drei Horizonte — ONE operation that grows, then joins a network.
+// Hand-rolled hairline isometric (same engine + craft as the Sicherheit safe and the four figures):
+//   01 Der Agent     one operation, working: lorry at the dock, goods staged in the yard
+//   02 Die Plattform the SAME site grows — Einkauf (live) left, Verkauf right, Lager behind.
+//                    Goods come IN on the left and go OUT on the right; nothing blocks the docks.
+//   03 Das Netzwerk  the site joins a freight marketplace — roads, a gantry yard, traffic
+// Switching horizons MORPHS between the states (and the frame pulls back with it).
+// Wings grow/retract ABOUT the corner they sprout from, so the reverse transition reads as
+// retraction rather than a wall sliding sideways into the hall.
+import { homeCopy } from "../i18n/home";
+import type { Locale } from "../i18n/ui";
+
+interface Props { locale?: Locale }
+const { locale = "de" } = Astro.props;
+const hz = homeCopy[locale].hz;
+---
+
+<div class="hzi" id="hzi">
+  <!-- Selector and copy sit SIDE BY SIDE in one bordered block, above a full-width stage.
+       The old shell was three unrelated bands — a full-width 3-column tab strip with ~350px of
+       dead space per cell, the stage, and the copy stranded bottom-left in an empty row. -->
+  <div class="hzi-top">
+    <div class="hzi-nav" role="tablist">
+      {hz.tabs.map((tb, i) => (
+        <button class={"hzi-tab" + (i === 0 ? " is-on" : "")} data-h={i} role="tab" aria-selected={i === 0 ? "true" : "false"}>
+          <span class="n">{"0" + (i + 1)}</span><span class="t">{tb.t}</span>
+          <span class={"hz-chip " + tb.cls}><span class="d"></span>{tb.chip}</span><i class="pg"></i>
+        </button>
+      ))}
+    </div>
+
+    <div class="hzi-copy">
+      {hz.panels.map((pn, i) => (
+        <div class={"hzi-panel" + (i === 0 ? " is-on" : "")} data-h={i}>
+          <h3 class="hz-h">{pn.h}</h3>
+          <p class="hz-body">{pn.p}</p>
+          <ul class="hz-list">{pn.li.map((x) => (<li>{x}</li>))}</ul>
+        </div>
+      ))}
+    </div>
+  </div>
+
+  <div class="hzi-view"><svg id="hziSvg" aria-hidden="true"></svg></div>
+</div>
+
+<script is:inline>
+(function(){
+  var root=document.getElementById("hzi"), svg=document.getElementById("hziSvg");
+  if(!root||!svg) return;
+  var view=root.querySelector(".hzi-view");
+  var reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var SVGNS="http://www.w3.org/2000/svg", COS30=Math.cos(Math.PI/6), SIN30=0.5;
+
+  /* ================= engine (z is up, painter sort, backface cull) ================= */
+  function project(p){ return [(p[0]-p[1])*COS30,(p[0]+p[1])*SIN30-p[2],p[0]+p[1]+p[2]]; }
+  function neg(a){ return [-a[0],-a[1],-a[2]]; }
+  function box(o,u,v,w,cls){
+    function k(a,b,c){ return [o[0]+a*u[0]+b*v[0]+c*w[0], o[1]+a*u[1]+b*v[1]+c*w[1], o[2]+a*u[2]+b*v[2]+c*w[2]]; }
+    var A=k(0,0,0),B=k(1,0,0),C=k(1,1,0),D=k(0,1,0),E=k(0,0,1),F=k(1,0,1),G=k(1,1,1),H=k(0,1,1);
+    return [{pts:[A,B,C,D],nrm:neg(w),cls:cls},{pts:[E,F,G,H],nrm:w,lit:true,cls:cls},
+            {pts:[A,B,F,E],nrm:neg(v),cls:cls},{pts:[D,C,G,H],nrm:v,cls:cls},
+            {pts:[A,D,H,E],nrm:neg(u),cls:cls},{pts:[B,C,G,F],nrm:u,cls:cls}];
+  }
+  function clamp(x,a,b){ return x<a?a:x>b?b:x; }
+  function smooth(t,a,b){ var x=clamp((t-a)/(b-a),0,1); return x*x*(3-2*x); }
+  function lerp(a,b,k){ return a+(b-a)*k; }
+
+  // A decal lying ON a big face cannot be sorted by its own average depth: the host's key sits at
+  // the host's CENTRE, so a decal on the half nearer the camera origin sorts BEHIND its own wall
+  // and silently vanishes. Decals carry `ref` — a point on the host — and sort at the host's
+  // depth + epsilon. `ref` is transformed with the geometry, so it survives scale/shift/rotate.
+  // ANY new panelY/pad decal must pass a host ref.
+  function panelY(x0,x1,z0,z1,y,cls,ref){ return {pts:[[x0,y,z0],[x1,y,z0],[x1,y,z1],[x0,y,z1]],nrm:[0,1,0],cls:cls,ref:ref}; }
+  function panelX(y0,y1,z0,z1,x,cls,ref){ return {pts:[[x,y0,z0],[x,y1,z0],[x,y1,z1],[x,y0,z1]],nrm:[1,0,0],cls:cls,ref:ref}; }
+  function pad(x0,x1,y0,y1,z,cls,ref){ return {pts:[[x0,y0,z],[x1,y0,z],[x1,y1,z],[x0,y1,z]],nrm:[0,0,1],lit:true,cls:cls,ref:ref}; }
+  function wire(a,b,cls){ return {pts:[a,b],nrm:null,cls:cls||"wire",open:true}; }
+  function shift(fs,d){ return fs.map(function(fc){
+    return {pts:fc.pts.map(function(p){return [p[0]+d[0],p[1]+d[1],p[2]+d[2]];}),nrm:fc.nrm,lit:fc.lit,cls:fc.cls,op:fc.op,open:fc.open,
+            ref:fc.ref?[fc.ref[0]+d[0],fc.ref[1]+d[1],fc.ref[2]+d[2]]:null}; }); }
+  function scaleF(fs,s){ return fs.map(function(fc){
+    return {pts:fc.pts.map(function(p){return [p[0]*s,p[1]*s,p[2]*s];}),nrm:fc.nrm,lit:fc.lit,cls:fc.cls,op:fc.op,open:fc.open,
+            ref:fc.ref?[fc.ref[0]*s,fc.ref[1]*s,fc.ref[2]*s]:null}; }); }
+  function rotZ(fs,a){ var c=Math.cos(a), s=Math.sin(a);
+    function r(p){ return [p[0]*c-p[1]*s, p[0]*s+p[1]*c, p[2]]; }
+    return fs.map(function(fc){
+      return {pts:fc.pts.map(r),nrm:fc.nrm?r(fc.nrm):null,lit:fc.lit,cls:fc.cls,op:fc.op,open:fc.open,
+              ref:fc.ref?r(fc.ref):null}; }); }
+  // multiplies, so a fade applied to a whole horizon does not wipe an opacity the geometry
+  // already carries (the tapered ends of the streets)
+  function fade(fs,o){ return fs.map(function(fc){ var c={}; for(var k in fc) c[k]=fc[k]; c.op=(fc.op==null?1:fc.op)*o; return c; }); }
+  // stamp a host ref on a whole object — used for goods standing IN a doorway, which must sort
+  // in front of the wall plane or they disappear behind their own building
+  function onHost(fs,ref){ return fs.map(function(fc){ var c={}; for(var k in fc) c[k]=fc[k]; c.ref=ref; return c; }); }
+  // grow/shrink about a fixed anchor — a wing must retract INTO the corner it sprouted from,
+  // otherwise running the morph backwards reads as a wall sliding sideways into the hall
+  function about(fs,k,ax,ay){ return shift(scaleF(shift(fs,[-ax,-ay,0]),k),[ax,ay,0]); }
+
+  /* ================= yard detail ================= */
+  // pallet stack — layered goods with a gap between layers, not one anonymous cube
+  function stack(x,y,n,cls){
+    var f=[], w=1.5, d=1.15;
+    f=f.concat(box([x,y,0],[w,0,0],[0,d,0],[0,0,0.16],"pl-b"));                    // the pallet itself
+    for(var i=0;i<n;i++){
+      var z=0.16+i*0.62;
+      f=f.concat(box([x+0.06,y+0.05,z],[w-0.12,0,0],[0,d-0.1,0],[0,0,0.56],cls||"pl"));
+    }
+    return f;
+  }
+  // steel container — corrugated flank + door end, the most legible freight object there is
+  function container(x,y,cls){
+    var f=[], L=5.0, W=2.1, H=2.2, ref=[x+L/2,y+W,H/2];
+    f=f.concat(box([x,y,0],[L,0,0],[0,W,0],[0,0,H],cls||"ct"));
+    for(var i=1;i<9;i++) f.push(panelY(x+i*(L/9)-0.05,x+i*(L/9)+0.05,0.15,H-0.15,y+W+0.01,"corr",ref)); // ribs
+    f.push(panelX(y+0.15,y+W-0.15,0.2,H-0.2,x+L+0.01,"ctd",[x+L,y+W/2,H/2]));      // door end
+    return f;
+  }
+  // articulated lorry, built pointing +y (nose toward the viewer) so its flank and windscreen
+  // are the faces that survive the cull. Parked broadside it blankets the dock wall.
+  // Proportion is what made this read as a boxy van rather than a lorry: a real artic is roughly
+  // 5:1 length-to-width and the first version was 2.5:1. Trailer 8.2 long on a 2.4 body, with a
+  // real fifth-wheel gap between tractor and trailer.
+  function lorry(cabCls){
+    var f=[], W=2.4, TL=8.2, cy=TL+0.75, tot=cy+2.25;
+    f=f.concat(box([0.15,0.2,0.5],[W-0.3,0,0],[0,tot-0.4,0],[0,0,0.28],"chs"));    // chassis rail
+    f=f.concat(box([0,0.3,0.78],[W,0,0],[0,TL,0],[0,0,2.5],"tr"));                 // trailer body
+    // A decal's ref must be the host face's ACTUAL centre. These three were computed from
+    // TL/2 and a guessed z, ignoring that the trailer starts at y=0.3 and z=0.78 — so they
+    // sorted BEHIND their own flank and disappeared. That is the "missing lines".
+    var TRF=[W,0.3+TL/2,0.78+1.25];                                                // +x flank centre
+    for(var i=1;i<9;i++){ var ry=0.3+i*(TL/9);
+      f.push(panelX(ry-0.06,ry+0.06,0.96,3.06,W+0.005,"trr",TRF)); }               // flank ribs
+    f.push(panelX(0.34,TL+0.26,3.06,3.22,W+0.005,"trt",TRF));                      // cant rail
+    f.push(panelX(0.40,TL+0.20,0.86,1.12,W+0.005,"trs",TRF));                      // side skirt
+    f=f.concat(box([0.55,TL+0.35,0.30,],[W-1.1,0,0],[0,0.34,0],[0,0,0.48],"chs")); // landing legs
+    f=f.concat(box([0.1,cy,0.55],[W-0.2,0,0],[0,2.05,0],[0,0,2.25],cabCls||"cb")); // tractor cab
+    f=f.concat(box([0.25,cy+0.15,2.80],[W-0.5,0,0],[0,1.35,0],[0,0,0.42],cabCls||"cb")); // deflector
+    var CBF=[0.1+(W-0.2)/2,cy+2.05,0.55+1.125], CBS=[W-0.1,cy+1.025,0.55+1.125];
+    f.push(panelY(0.42,W-0.42,1.40,2.14,cy+2.06,"gl",CBF));                        // windscreen
+    f.push(panelY(0.30,W-0.30,0.62,0.98,cy+2.06,"chs2",CBF));                      // bumper
+    f.push(panelY(0.36,0.74,1.02,1.30,cy+2.06,"lamp2",CBF));                       // headlights
+    f.push(panelY(W-0.74,W-0.36,1.02,1.30,cy+2.06,"lamp2",CBF));
+    f.push(panelY(0.34,W-0.34,2.20,2.36,cy+2.06,"chs2",CBF));                      // sun visor
+    f.push(panelX(cy+0.30,cy+1.42,0.80,2.10,W-0.095,"cbd",CBS));                   // cab door
+    f.push(panelX(cy+0.34,cy+0.52,1.44,1.58,W-0.09,"chs2",CBS));                   // door handle
+    f=f.concat(box([-0.12,cy+0.25,1.95],[0.12,0,0],[0,0.5,0],[0,0,0.35],"chs"));   // mirror arm
+    f=f.concat(box([0.14,cy-0.30,0.80],[0.20,0,0],[0,0.20,0],[0,0,1.75],"chs"));   // exhaust stack
+    [0.55,2.05,TL-1.2,cy+0.25].forEach(function(wy){
+      f=f.concat(box([-0.06,wy,0],[W+0.12,0,0],[0,0.95,0],[0,0,0.62],"tyre"));
+      f.push(panelX(wy+0.22,wy+0.73,0.15,0.47,W+0.07,"hub",[W+0.06,wy+0.475,0.33])); // hub
+      f=f.concat(box([-0.03,wy-0.14,0.62],[W+0.06,0,0],[0,1.22,0],[0,0,0.14],"chs")); // mudguard
+    });
+    return f;
+  }
+  // NO forklifts and NO figures. Anything this small resolves to a couple of light pixels and
+  // reads as dirt on the page rather than as an object — the pallet on a forklift's forks was
+  // being read as it dropping something. Activity is carried by things big enough to be legible:
+  // the lorries, the stacked goods and the containers.
+  // Reduced lorry for distant use (the ring road). At that size ribs, hubs and slats are
+  // sub-pixel — they cost frame time and add noise without adding a single readable detail.
+  function lorrySimple(cabCls){
+    var f=[], W=2.4, TL=8.2, cy=TL+0.9, tot=cy+2.2;
+    // WHEELS FIRST. Without them the thing is two boxes hovering over the tarmac, which is
+    // exactly why the ring traffic read as floating blocks — at this size the tyres are only a
+    // couple of pixels, but they are what plants the vehicle on the road.
+    [0.7,2.15,cy+0.35].forEach(function(wy){
+      f=f.concat(box([-0.07,wy,0],[W+0.14,0,0],[0,1.0,0],[0,0,0.62],"tyre"));
+    });
+    f=f.concat(box([0.15,0.25,0.42],[W-0.3,0,0],[0,tot-0.5,0],[0,0,0.34],"chs"));  // chassis rail
+    f=f.concat(box([0,0.3,0.76],[W,0,0],[0,TL,0],[0,0,2.5],"tr"));                 // trailer box
+    f.push(panelX(0.5,TL+0.1,2.52,3.18,W+0.005,"trt",[W,0.3+TL/2,0.76+1.25]));     // upper band
+    // a real gap between trailer and tractor, and a cab tall enough to read as a cab
+    f=f.concat(box([0.08,cy,0.5],[W-0.16,0,0],[0,2.2,0],[0,0,2.45],cabCls||"cb"));
+    f.push(panelY(0.40,W-0.40,1.50,2.30,cy+2.21,"gl",[W/2,cy+2.2,1.7]));           // windscreen
+    f.push(panelY(0.30,W-0.30,0.62,1.05,cy+2.21,"chs2",[W/2,cy+2.2,1.7]));         // grille
+    return f;
+  }
+  // Yard lamp. The head lights only when the site is drawn NEAR (horizons 01/02): at the network
+  // framing it would be a ~2 px bright dot switching on and off, i.e. the speck problem with a
+  // strobe attached.
+  function lamp(x,y,T,near){
+    var f=[], head="pole", on=false;
+    if(near){
+      // three incommensurate sine terms: mostly lit, with short irregular dropouts. A single
+      // sine gives an even blink, which reads as a beacon rather than a failing lamp.
+      var s=Math.sin(T*2.1+x)*0.5+Math.sin(T*5.7+y*1.7)*0.3+Math.sin(T*11.3+x*2.9)*0.2;
+      on=s>-0.60; head=on?"lh-on":"lh-off";
+    }
+    if(near){
+      // the light itself: a cone widening downward onto a pool on the tarmac. Built as an
+      // 8-sided frustum, so the outward normals cull the back half automatically and what
+      // remains is the front of the cone. Kept very low contrast — this is a yard lamp, not neon.
+      var N=8, r0=0.36, r1=2.25, z0=3.36, cx=x+0.08, cy=y+0.08, i, pool=[];
+      for(i=0;i<N;i++){ var a=i/N*Math.PI*2; pool.push([cx+Math.cos(a)*r1,cy+Math.sin(a)*r1,0.03]); }
+      f.push({pts:pool,nrm:[0,0,1],lit:true,cls:on?"pool-on":"pool-off"});
+      for(i=0;i<N;i++){
+        var a0=i/N*Math.PI*2, a1=(i+1)/N*Math.PI*2;
+        f.push({pts:[[cx+Math.cos(a0)*r0,cy+Math.sin(a0)*r0,z0],
+                     [cx+Math.cos(a1)*r0,cy+Math.sin(a1)*r0,z0],
+                     [cx+Math.cos(a1)*r1,cy+Math.sin(a1)*r1,0.04],
+                     [cx+Math.cos(a0)*r1,cy+Math.sin(a0)*r1,0.04]],
+                 nrm:[(Math.cos(a0)+Math.cos(a1))/2,(Math.sin(a0)+Math.sin(a1))/2,0],
+                 cls:on?"cone-on":"cone-off"});
+      }
+    }
+    f=f.concat(box([x,y,0],[0.16,0,0],[0,0.16,0],[0,0,3.4],"pole"));
+    f=f.concat(box([x-0.30,y-0.30,3.40],[0.76,0,0],[0,0.76,0],[0,0,0.14],head));
+    return f;
+  }
+  // gantry crane — spans the container rows in the marketplace yard
+  function gantry(x,y,span){
+    var f=[];
+    [y,y+span].forEach(function(ly){
+      f=f.concat(box([x,ly,0],[0.42,0,0],[0,0.42,0],[0,0,4.6],"pole"));
+      f=f.concat(box([x+3.6,ly,0],[0.42,0,0],[0,0.42,0],[0,0,4.6],"pole"));
+    });
+    f=f.concat(box([x-0.2,y-0.2,4.6],[4.4,0,0],[0,span+0.8,0],[0,0,0.42],"gird"));
+    f=f.concat(box([x+1.3,y+span*0.42,3.9],[1.3,0,0],[0,1.3,0],[0,0,0.7],"fk2"));  // trolley
+    return f;
+  }
+
+  /* ================= buildings ================= */
+  // A hall: body, roof cap, seams, roof plant, pilasters and dock doors on its +y wall.
+  // Everything that reads as "warehouse" lives here so wings and peers inherit the same craft.
+  function hall(ox,oy,L,D,H,opt){
+    opt=opt||{};
+    var f=[], dy=oy+D, FRONT=[ox+L/2,dy,H/2], ROOF=[ox+L/2,oy+D/2,H+0.5];
+    f=f.concat(box([ox,oy,0],[L,0,0],[0,D,0],[0,0,H],"bd"));
+    f=f.concat(box([ox-0.25,oy-0.25,H],[L+0.5,0,0],[0,D+0.5,0],[0,0,0.5],"rf"));
+    // panel seams — a bare roof cap is the largest flat area in the frame and reads as a slab
+    var ns=Math.max(2,Math.round(D/2.1));
+    for(var s=1;s<ns;s++){ var sy=oy+D*s/ns; f.push(pad(ox+0.4,ox+L-0.4,sy-0.05,sy+0.05,H+0.53,"seam",ROOF)); }
+    f.push(pad(ox+L*0.16,ox+L*0.84,oy+D/2-0.5,oy+D/2+0.5,H+0.54,"sky",ROOF));
+    // roof plant at three different sizes — uniform blocks are what read as "inorganic"
+    f=f.concat(box([ox+L*0.10,oy+D*0.16,H+0.5],[1.7,0,0],[0,1.35,0],[0,0,0.9],"rf"));
+    f=f.concat(box([ox+L*0.63,oy+D*0.20,H+0.5],[1.15,0,0],[0,1.0,0],[0,0,0.5],"rf"));
+    f=f.concat(box([ox+L*0.42,oy+D*0.74,H+0.5],[0.62,0,0],[0,0.62,0],[0,0,1.25],"rf"));
+    f=f.concat(box([ox+L*0.80,oy+D*0.70,H+0.5],[1.5,0,0],[0,0.5,0],[0,0,0.32],"rf")); // duct run
+    if(opt.accent) f.push(pad(ox+L*0.16,ox+L*0.84,oy+D*0.62,oy+D*0.62+1.5,H+0.55,opt.accent,ROOF));
+    // dock doors
+    var n=opt.doors||0, pitch=n?L/n:0;
+    for(var i=0;i<n;i++){
+      var x0=ox+i*pitch+pitch/2-1.0;
+      f.push(panelY(x0-0.18,x0+2.18,0.18,3.42,dy+0.01,"df",FRONT));
+      f.push(panelY(x0,x0+2.0,0.30,3.24,dy+0.02,"dk",FRONT));
+      for(var r=1;r<5;r++) f.push(panelY(x0+0.06,x0+1.94,0.30+r*0.58,0.30+r*0.58+0.06,dy+0.03,"dkr",FRONT)); // shutter slats
+      f.push(panelY(x0-0.18,x0+2.18,3.42,3.70,dy+0.02,"hdr",FRONT));
+      f=f.concat(box([x0,dy+0.02,0],[2.0,0,0],[0,0.85,0],[0,0,0.30],"cn"));        // dock bumper/ramp
+      // goods visible INSIDE one open bay. Drawn as decals coplanar with the wall: a real 3D
+      // stack set back inside the building projects up-and-right of its own door and floats on
+      // the facade, which is exactly what it did.
+      if(i===1){
+        f.push(panelY(x0+0.20,x0+0.92,0.32,1.44,dy+0.04,"gd",FRONT));
+        f.push(panelY(x0+0.20,x0+0.92,1.52,2.30,dy+0.04,"gd",FRONT));
+        f.push(panelY(x0+1.06,x0+1.80,0.32,1.10,dy+0.04,"gd2",FRONT));
+      }
+    }
+    for(var j=0;j<=n;j++) f.push(panelY(ox+j*pitch-0.16,ox+j*pitch+0.16,0.18,H-0.35,dy+0.01,"rib",FRONT));
+    // window band on the office end of the +x gable, so the hall is not blank on that side
+    if(opt.win) f.push(panelX(oy+D*0.18,oy+D*0.72,H*0.52,H*0.72,ox+L+0.01,"gl2",[ox+L,oy+D/2,H/2]));
+    return f;
+  }
+  // the agent: a small lit control room. It is the only thing in the frame that glows at all.
+  function leitstand(x,y,on){
+    var f=[], W=3.5, Dp=3.2, H=3.0;
+    f=f.concat(box([x,y,0],[W,0,0],[0,Dp,0],[0,0,H],"bd"));
+    f=f.concat(box([x-0.25,y-0.25,H],[W+0.5,0,0],[0,Dp+0.5,0],[0,0,0.45],"rf"));
+    f=f.concat(box([x+W*0.55,y+Dp*0.3,H+0.45],[0.5,0,0],[0,0.5,0],[0,0,1.5],"pole"));   // mast
+    f.push(panelY(x+0.4,x+W-0.5,1.45,2.42,y+Dp+0.01,on?"lit-on":"lit-off",[x+W/2,y+Dp,H/2]));
+    f.push(panelY(x+0.4,x+W-0.5,0.35,0.95,y+Dp+0.01,"gl",[x+W/2,y+Dp,H/2]));            // door/lower glass
+    return f;
+  }
+
+
+  /* ================= the site ================= */
+  // The yard runs along +y in front of every dock face. HARD RULE: nothing is ever placed on a
+  // dock face or a driving lane — v4 drove a lorry through the control room and v6 grew the
+  // Verkauf wing straight across the doors.
+  var CORE={x:-6.5,y:-4,L:13,D:8,H:5}, FRONTY=CORE.y+CORE.D;   // = 4, the dock line
+  // The two footprints a site can have, as LOCAL boxes. The network layout needs these up front:
+  // a site is positioned by its yard's FRONT EDGE (fy), because that edge is the kerb of the
+  // street it fronts. x0/x1 are the yard's extent along the dock line.
+  var FULL={x0:CORE.x-10.2, x1:CORE.x+CORE.L+14.0, fy:FRONTY+13.0};   // hall + both wings (k=1)
+  var LITE={x0:CORE.x-1.2,  x1:CORE.x+CORE.L+3.0,  fy:FRONTY+9.5};    // a peer: hall only
+
+  function site(wingK, T, lite, near){
+    var f=[], TT=(T==null?0:T), k=clamp(wingK,0,1);
+    var wl=9.0, xL=CORE.x-wl, xR=CORE.x+CORE.L;
+    // ---- yard ----
+    var YD=lite?9.5:13.0;
+    var yx0=lite?LITE.x0:(k>0.01?xL:CORE.x)-1.2, yx1=lite?LITE.x1:(k>0.01?xR+wl:CORE.x+CORE.L)+5.0;
+    f=f.concat(box([yx0,FRONTY,0],[yx1-yx0,0,0],[0,YD,0],[0,0,0.10],"ap"));
+    // ONE continuous kerb line, no dashed lane. A row of short light dashes is a line of tiny
+    // bright marks running diagonally across the yard, and at this scale — especially once the
+    // site shrinks into the network — it reads as a stream of specks spilling down the page,
+    // not as road marking. Same failure mode as the standalone figures: small + light = dirt.
+    f.push(pad(yx0+0.6,yx1-0.6,FRONTY+YD-0.8,FRONTY+YD-0.68,0.11,"lane"));
+    // ---- the hall ----
+    f=f.concat(hall(CORE.x,CORE.y,CORE.L,CORE.D,CORE.H,{doors:4,win:true}));
+    // ---- wings (horizon 02): all three keep the dock line CLEAR ----
+    if(k>0.004){
+      // Einkauf — live, grows left; retracts into the hall's left-front corner
+      f=f.concat(fade(about(hall(xL,CORE.y,wl,CORE.D,4.2,{doors:2,accent:"ac-live"}),k,CORE.x,FRONTY),smooth(k,0,0.14)));
+      // Verkauf — in Arbeit, grows right (goods out), retracts into the right-front corner
+      f=f.concat(fade(about(hall(xR,CORE.y,wl,CORE.D,4.2,{doors:2,accent:"ac-wip",win:true}),k,CORE.x+CORE.L,FRONTY),smooth(k,0,0.14)));
+      // Lager — in Arbeit, a high bay BEHIND the hall, so storage never blocks a door
+      f=f.concat(fade(about(hall(CORE.x+1.5,CORE.y-8.2,10,8.2,7.6,{accent:"ac-wip"}),k,CORE.x+CORE.L/2,CORE.y),smooth(k,0,0.14)));
+    }
+    // ---- the agent: a gatehouse at the FRONT corner of the yard. Anywhere further back it
+    // stands in front of the docks, the lorry or the stored goods — in isometric a larger y
+    // always draws over everything behind it, so "in the yard" means "in front of the yard".
+    // It must also fit INSIDE the apron, and clear of BOTH docked lorries' 8.7-unit length —
+    // parked at the right-hand end it was inside the Verkauf wing's lorry. ----
+    // A peer is a working site too, just seen from further away: one lorry on the dock and one
+    // pallet stack, and nothing else. It gets NO control room — that is our building, not theirs,
+    // and at peer scale a second small block in the yard only lands in front of the dock doors.
+    if(lite){
+      f=f.concat(shift(scaleF(lorrySimple("cb"),0.62),[CORE.x+4.9,FRONTY,0]));
+      // a container, NOT a pallet stack: five sites each carrying a 4 px warm blob is the
+      // small-light-and-repeated pattern that has read as dirt three times now. A container is
+      // big enough to be an object and cool enough not to shout. It sits low in the yard, where
+      // its screen box clears the docked lorry's.
+      f=f.concat(container(CORE.x+10.0,FRONTY+6.5,"ct"));
+      return f;
+    }
+    f=f.concat(leitstand(CORE.x+13.5,FRONTY+9.6,Math.sin(TT*1.5)>-0.2));
+
+    // ---- work in progress ----
+    // two lorries on the bank of four docks — a hall with four doors and one truck reads as
+    // abandoned, and the empty middle of the yard had nothing holding it
+    f=f.concat(shift(scaleF(lorry("cb"),0.78),[CORE.x+4.9,FRONTY,0]));      // door 2
+    f=f.concat(shift(scaleF(lorry("cb2"),0.78),[CORE.x+10.4,FRONTY,0]));    // door 4
+    // outbound lorry at the Verkauf wing, only once that wing exists
+    // backed into the Verkauf wing's own second door — at xR+3.4 it sat across the staged
+    // pallets and over the gatehouse
+    if(k>0.55) f=f.concat(fade(shift(scaleF(lorry("cb2"),0.78),[xR+5.8,FRONTY,0]),smooth(k,0.55,0.8)));
+    // staged goods live PAST the end of the dock run, never across a door — a blocked dock is
+    // the first thing anyone who has stood in a yard will notice
+    // They slide outboard as the Verkauf wing grows: parked at a fixed x they were past the end
+    // of the dock run in horizon 01 but standing straight across the wing's doors in horizon 02.
+    var sgx=CORE.x+CORE.L+0.9+wl*k;
+    f=f.concat(stack(sgx,FRONTY+0.4,3,"pl"));
+    f=f.concat(stack(sgx+1.7,FRONTY+0.4,2,"pl2"));
+    f=f.concat(stack(sgx+2.0,FRONTY+2.2,3,"pl"));
+    // Two containers, STAGGERED. Set end-to-end on the same line the near one simply hid the
+    // far one and they read as a single lump; offset, they read as a yard with two boxes in it.
+    // ONE container. Screen position is what governs overlap: sx=(x-y)·cos30, and the yard is a
+    // narrow strip in y, so two containers anywhere on it land in nearly the same screen column
+    // and merge into a single lump no matter how far apart they are in model space.
+    f=f.concat(container(CORE.x-1.0,FRONTY+4.0,"ct"));
+    // ONE lamp, at the far left where the yard's screen column is otherwise empty. The second
+    // one could not be placed anywhere on this apron without standing inside the gatehouse or
+    // in the pallet stacks.
+    // pulled in from the apron edge so the whole light pool lands ON the tarmac.
+    // Once the site is drawn small (horizon 03) the lamp is dropped ENTIRELY, not just unlit:
+    // without its pool of light all that is left is a hairline pole and a 2 px head — the same
+    // small-and-light-reads-as-dirt failure as the figures and the apron dashes.
+    if(near){
+      f=f.concat(lamp(CORE.x+3.0,FRONTY+10.0,TT,true));
+      if(k>0.55) f=f.concat(fade(lamp(xR+8.4,FRONTY+10.0,TT,true),smooth(k,0.55,0.85)));
+    }
+    return f;
+  }
+
+  /* ================= the marketplace (horizon 03) ================= */
+  // A freight exchange, not an office block: a terminal with a teal band, a gantry spanning
+  // rows of containers, lorries queueing on the apron. Rows of steel read as "market" instantly.
+  function market(k,T){
+    var f=[], s=clamp(k,0,1), TT=(T==null?0:T);
+    if(s<0.02) return f;
+    // The plaza has to stay INSIDE the ring's inner edge. At 26x20 its +y corner projected to
+    // sy 11.5 against an inner edge at 11.2, so the corner of the paving crossed the carriageway.
+    f=f.concat(box([-12.5,-10,0],[25,0,0],[0,18.6,0],[0,0,0.10],"ap"));              // plaza
+    f.push(pad(-11.5,11.5,4.0,4.14,0.11,"lane")); f.push(pad(-11.5,11.5,-4.0,-3.86,0.11,"lane"));
+    f=f.concat(hall(-5.5,-9.4,11,5.2,6.4,{doors:3,win:true}));                       // terminal
+    f.push(panelY(-4.6,4.6,4.35,5.15,-4.19,"mk",[0,-4.2,3.2]));                      // exchange band
+    f=f.concat(box([-1.6,-8.6,6.9],[3.2,0,0],[0,3.2,0],[0,0,3.0],"bd"));             // control tower
+    f=f.concat(box([-1.9,-8.9,9.9],[3.8,0,0],[0,3.8,0],[0,0,0.42],"rf"));
+    f.push(panelY(-1.2,1.2,7.6,8.6,-5.39,"lit-on",[0,-5.4,8.4]));
+    // Two lorries backed into the terminal's own docks, and the container yard moved forward
+    // to clear their length: at 6.7 units long they overlapped each other and overran the apron.
+    f=f.concat(shift(scaleF(lorry("cb"),0.62),[-4.63,-4.2,0]));
+    f=f.concat(shift(scaleF(lorry("cb2"),0.62),[2.71,-4.2,0]));
+    f=f.concat(gantry(-1.0,2.9,5.6));
+    [[-9.0,3.6],[-3.5,3.6],[2.0,3.6],[-9.0,6.2],[-3.5,6.2],[2.0,6.2]].forEach(function(c,i){
+      f=f.concat(container(c[0],c[1],i%2?"ct2":"ct"));
+    });
+    // no figures or lamp posts on the plaza: horizon 03 is framed so wide that a person is ~4px
+    // and a lamp is just its head — both read as specks of dirt floating over the yard.
+    // People belong in 01/02, where the camera is close enough for them to mean something.
+    return f;
+  }
+
+  /* ================= the morph: h = 0 → 1 → 2 ================= */
+  /* --- the ring road ---------------------------------------------------------------------
+     A CLOSED circuit around the marketplace. Traffic that runs a loop has no start and no end,
+     so it can never reset, fade in, teleport or reverse on the spot — every previous scheme
+     (shuttle, one-way + fade, U-turns) had a discontinuity somewhere and Jakob caught all of
+     them. The ellipse is defined in SCREEN space and inverted to model coords, because a circle
+     in model space projects to a tall diamond.                                              */
+  // sized to hug the marketplace apron (a diamond reaching sx ±20, sy ±11.5). Wider than this
+  // and the empty gap inside it reads as a racetrack rather than a service road round a hub.
+  var RING_A=26.5, RING_B=14.6;
+  // A point offset a CONSTANT perpendicular distance from the ring, in screen space. Scaling the
+  // semi-axes instead (a+off, b+off) does NOT hold the gap: at the top and bottom of the ellipse
+  // the two carriageways collapse to ~1.4 units apart — narrower than a lorry — and opposing
+  // traffic drove through itself there.
+  function ringXY(th,off){
+    var sx=RING_A*Math.cos(th), sy=RING_B*Math.sin(th);
+    var tx=-RING_A*Math.sin(th), ty=RING_B*Math.cos(th), L=Math.hypot(tx,ty)||1;
+    var ex=sx-ty/L*off, ey=sy+tx/L*off;
+    return [(ex/COS30+2*ey)/2,(2*ey-ex/COS30)/2];
+  }
+  // the carriageway as ONE filled face: outer contour forward, inner contour reversed, so the
+  // non-zero fill rule punches the hole. Cheaper and cleaner than stroking two ellipses.
+  function ringRoad(){
+    // BOTH contours must close back to their own first point. Running 0..N-1 and then jumping
+    // straight to the inner contour leaves the final 1/N slice unfilled — a visible notch.
+    var N=48, pts=[], i, th, p;
+    for(i=0;i<=N;i++){ th=(i%N)/N*Math.PI*2; p=ringXY(th,3.4);  pts.push([p[0],p[1],0.09]); }
+    for(i=N;i>=0;i--){ th=(i%N)/N*Math.PI*2; p=ringXY(th,-3.4); pts.push([p[0],p[1],0.09]); }
+    var f=[{pts:pts,nrm:[0,0,1],lit:true,cls:"ring"}];
+    // Markings are what make tarmac read as a ROAD. These are safe where the apron dashes were
+    // not: the ring is large, so each dash lands ~20 px long instead of 1-2 px of grit.
+    // EVERY marking carries the ring's centre as its ref. The carriageway is a single vast
+    // polygon whose average depth sits at the middle of the ellipse, so without this the entire
+    // far half of the markings sorts behind the surface and gets painted over.
+    var RC=[0,0,0.09];
+    [3.0,-3.0].forEach(function(off){
+      for(i=0;i<N;i++){
+        var a=ringXY(i/N*Math.PI*2,off), b=ringXY((i+1)/N*Math.PI*2,off);
+        f.push({pts:[[a[0],a[1],0.1],[b[0],b[1],0.1]],nrm:null,cls:"rmk",open:true,ref:RC});
+      }
+    });
+    var M=26;
+    for(i=0;i<M;i++){
+      var c=ringXY(i/M*Math.PI*2,0), d=ringXY((i+0.5)/M*Math.PI*2,0);
+      f.push({pts:[[c[0],c[1],0.1],[d[0],d[1],0.1]],nrm:null,cls:"rmkd",open:true,ref:RC});
+    }
+    return f;
+  }
+  // lamps standing just outside the ring, lighting the carriageway. Four, at the quarter points,
+  // so none of them lands in a street junction (those sit at roughly 46°/134°/226°/314°).
+  function ringLamps(T){
+    var f=[], N=4;
+    for(var i=0;i<N;i++){
+      var p=ringXY(i/N*Math.PI*2,5.0);
+      f=f.concat(lamp(p[0],p[1],T,true));
+    }
+    return f;
+  }
+
+  /* --- the streets, and the plots that front them -----------------------------------------
+     Two straight streets cross behind the marketplace, one on each MODEL axis, and the ring
+     links them. Every site FRONTS a street — its dock line and its yard edge ARE the kerb —
+     which is how a real estate is laid out, and the only arrangement that reads as connected.
+     v13's spurs ran radially at whatever bearing the peer happened to sit at, so they arrived
+     at the side or the back of a yard and simply stopped in mid-air next to it.
+
+     Of the four 90° rotations only TWO are usable at all: a dock wall facing model +y (rot 0)
+     or model +x (rot -90). The other two turn the docks away from the camera, where the
+     backface cull silently deletes them and the site becomes a blank shed. So an x-street
+     carries its sites on the NORTH side, a y-street on the WEST side — and every dock face in
+     the scene points at the camera.
+
+     Streets are rectangles in MODEL space, not screen space: the width has to run along a model
+     axis or the strip comes off the isometric grid and no site can sit square against it.      */
+  var SW=3.1;                                   // street half width, model units
+  // ax: 0 = fronts an x-street (sits north of it, rot 0); 1 = fronts a y-street (west, rot -90).
+  // c = that street's centreline on the other axis; near = distance along the street to the end
+  // of the plot nearest the ring.
+  function plot(ax,dir,s,bx,near,c){
+    c=c||0;
+    var o={ax:ax,dir:dir,s:s,bx:bx,near:near,c:c,far:near+s*(bx.x1-bx.x0)};
+    if(ax===0){ o.rot=0;            o.x=dir>0?near-s*bx.x0:-near-s*bx.x1; o.y=c-SW-s*bx.fy; }
+    else      { o.rot=-Math.PI/2;   o.x=c-SW-s*bx.fy; o.y=dir>0?near+s*bx.x1:-near+s*bx.x0; }
+    return o;
+  }
+  // `near` clears the ring's outer edge — at 25 a plot's inner corner lands exactly ON it.
+  // The last two sites front BRANCH streets that T off the north and south arms. They exist for
+  // a structural reason: everything on the four arms extends the frame along a screen diagonal,
+  // so an axis-only layout is locked at 1.73:1 and left a third of a 2.4:1 stage empty. A branch
+  // running +x at a large -y (or the mirror) moves a site sideways on screen without adding any
+  // height, which is the only way to fill the width.
+  //
+  // ⚠ A BRANCH MUST BE CLEARED AGAINST THE PLOTS ON THE ARM IT LEAVES. The north branch runs
+  // EAST while the north arm's plot is on the west, so they never meet. The south branch runs
+  // WEST — the same side as the south arm's plot — so it has to start BEYOND that plot's far end
+  // (35.4), not across its frontage, and its own site has to sit clear of that plot's x band.
+  // At BR2 = 30 the branch was driven straight through the building and yard of the south peer.
+  // Checking sites against each other is not enough: check every site against every carriageway.
+  var BR1=30.0, BR2=41.0;                       // where the two branches leave their arm
+  var OWN=plot(0, 1,0.50,FULL,27.0);            // ours: east arm, screen right
+  var PEERS=[
+    plot(0,-1,0.44,LITE,27.5),                  // west arm, up-left
+    plot(1, 1,0.46,LITE,27.5),                  // south arm, down-left  (y 27.5 … 35.4)
+    plot(1,-1,0.42,LITE,27.5),                  // north arm, up-right
+    plot(0, 1,0.40,LITE,12.0,-BR1),             // north branch, screen far right
+    plot(0,-1,0.42,LITE,17.0, BR2)              // south branch, screen far left
+  ];
+  // Where a street centreline meets the INNER edge of the ring band. Sampled, not solved: the
+  // band is an OFFSET curve, and scaling an ellipse's semi-axes does not hold a constant gap.
+  function bandCross(d){
+    var bt=0, bd=1e9;
+    for(var i=0;i<480;i++){
+      var q=ringXY(i/480*Math.PI*2,3.4), t=q[0]*d[0]+q[1]*d[1];
+      if(t<=0) continue;
+      var dd=Math.hypot(q[0]-d[0]*t,q[1]-d[1]*t);
+      if(dd<bd){ bd=dd; bt=t; }
+    }
+    return bt;
+  }
+  function street(p0,d,t0,t1,taper){
+    var n=[-d[1],d[0]];
+    function P(t,o,z){ return [p0[0]+d[0]*t+n[0]*o, p0[1]+d[1]*t+n[1]*o, z==null?0.088:z]; }
+    var f=[{pts:[P(t0,-SW),P(t1,-SW),P(t1,SW),P(t0,SW)],nrm:[0,0,1],lit:true,cls:"ring"}];
+    // An open road dissolves at its far end instead of stopping at a hard diagonal cut, which
+    // reads as unfinished scaffolding rather than a road carrying on out of frame. A street that
+    // TERMINATES in a junction gets no taper — it simply ends against the other carriageway.
+    // Six steps, not three: at three the opacity bands are wide enough to read as stripes.
+    // `nm` keeps the taper out of the frame measurement — it is ~invisible geometry, and letting
+    // it size the viewBox shrank every horizon for the sake of a fade.
+    for(var q=0;taper&&q<6;q++){
+      f.push({pts:[P(t1+q*1.1,-SW),P(t1+q*1.1+1.1,-SW),P(t1+q*1.1+1.1,SW),P(t1+q*1.1,SW)],
+              nrm:[0,0,1],lit:true,cls:"ring",nm:true,op:Math.pow(1-(q+1)/7,1.5)});
+    }
+    // markings carry the strip's own centre as their ref — a long face keys on its middle, so
+    // without it every marking on the near half sorts behind the tarmac it is painted on.
+    // They start clear of the junction at t0: markings that run into an intersection are what
+    // made the near end look like a cut-off stub rather than a road joining another road.
+    var C=[p0[0]+d[0]*(t0+t1)/2,p0[1]+d[1]*(t0+t1)/2,0.088], m0=t0+5.0;
+    function mk(a,b,cls){ f.push({pts:[a,b],nrm:null,cls:cls,open:true,ref:C}); }
+    mk(P(m0,-SW+0.45,0.1),P(t1,-SW+0.45,0.1),"rmk");
+    mk(P(m0, SW-0.45,0.1),P(t1, SW-0.45,0.1),"rmk");
+    var n2=Math.max(2,Math.round((t1-m0)/6));
+    for(var i=0;i<n2;i++)
+      mk(P(m0+(i+0.15)*(t1-m0)/n2,0,0.1),P(m0+(i+0.72)*(t1-m0)/n2,0,0.1),"rmkd");
+    return f;
+  }
+  // static geometry — built once, then only faded.
+  // The four arms start 0.6 INSIDE the ring band, where street and ring share a fill and the
+  // junction has no seam; the two branches start inside the arm they T off, for the same reason.
+  var LANES=(function(){
+    function far(ax,dir,c){ var m=0; [OWN].concat(PEERS).forEach(function(p){
+      if(p.ax===ax&&p.dir===dir&&p.c===c) m=Math.max(m,p.far); }); return m; }
+    var B=bandCross;
+    return [
+      {p:[0,0],d:[ 1,0],t0:B([ 1,0])-0.6,t1:far(0, 1,0)+2.5,taper:1},   // east arm — ours
+      {p:[0,0],d:[-1,0],t0:B([-1,0])-0.6,t1:far(0,-1,0)+2.5,taper:1},   // west arm
+      // the north arm runs past its plot and on out; the south arm ENDS in the branch junction
+      {p:[0,0],d:[0,-1],t0:B([0,-1])-0.6,t1:Math.max(far(1,-1,0)+2.5,BR1+SW+0.5),taper:1},
+      {p:[0,0],d:[0, 1],t0:B([0, 1])-0.6,t1:BR2+SW,taper:0},
+      {p:[0,-BR1],d:[ 1,0],t0:-SW,t1:far(0, 1,-BR1)+2.5,taper:1},       // north branch
+      {p:[0, BR2],d:[-1,0],t0:-SW,t1:far(0,-1, BR2)+2.5,taper:1}        // south branch
+    ];
+  })();
+  var STREETS=(function(){
+    var f=[];
+    LANES.forEach(function(L){ f=f.concat(street(L.p,L.d,L.t0,L.t1,L.taper)); });
+    return f;
+  })();
+  // Site-plan self-check. Every plot's footprint against every carriageway, and every plot
+  // against every other — the branch-through-a-building bug was invisible to the eye at network
+  // scale until it was cropped, and arithmetic in my head is what put it there.
+  function planClashes(){
+    var out=[], all=[{n:"own",p:OWN}].concat(PEERS.map(function(p,i){ return {n:"peer"+i,p:p}; }));
+    function boxOf(o){
+      var p=o.p, b=p.bx, s=p.s, lx=[b.x0,b.x1], ly=[b.back==null?CORE.y-0.25:b.back,b.fy], X=[],Y=[];
+      lx.forEach(function(a){ ly.forEach(function(c){
+        X.push(p.rot?p.x+s*c:p.x+s*a); Y.push(p.rot?p.y-s*a:p.y+s*c); }); });
+      return {n:o.n,x0:Math.min.apply(0,X),x1:Math.max.apply(0,X),y0:Math.min.apply(0,Y),y1:Math.max.apply(0,Y)};
+    }
+    var boxes=all.map(boxOf);
+    LANES.forEach(function(L,i){
+      var a=[L.p[0]+L.d[0]*L.t0-Math.abs(L.d[1])*SW, L.p[1]+L.d[1]*L.t0-Math.abs(L.d[0])*SW],
+          b=[L.p[0]+L.d[0]*L.t1+Math.abs(L.d[1])*SW, L.p[1]+L.d[1]*L.t1+Math.abs(L.d[0])*SW],
+          r={x0:Math.min(a[0],b[0]),x1:Math.max(a[0],b[0]),y0:Math.min(a[1],b[1]),y1:Math.max(a[1],b[1])};
+      boxes.forEach(function(q){
+        var ox=Math.min(q.x1,r.x1)-Math.max(q.x0,r.x0), oy=Math.min(q.y1,r.y1)-Math.max(q.y0,r.y0);
+        if(ox>0.05&&oy>0.05) out.push("lane"+i+" x "+q.n+" ("+ox.toFixed(1)+"x"+oy.toFixed(1)+")");
+      });
+    });
+    boxes.forEach(function(q,i){ boxes.slice(i+1).forEach(function(w){
+      var ox=Math.min(q.x1,w.x1)-Math.max(q.x0,w.x0), oy=Math.min(q.y1,w.y1)-Math.max(q.y0,w.y0);
+      if(ox>0.05&&oy>0.05) out.push(q.n+" x "+w.n+" ("+ox.toFixed(1)+"x"+oy.toFixed(1)+")");
+    }); });
+    return out;
+  }
+  window.__hziPlan=planClashes;
+  // Traffic on the road IS the network. STRAIGHT one-way runs that dissolve at both ends
+  // (Jakob's own call, and the right one): the U-turn version swung the arc into the peer's
+  // footprint, and two lorries could arrive at their turns together, which looked choreographed.
+  // The earlier fade read as teleporting only because it lasted 0.75 s — over ~20% of the run
+  // at each end it dissolves instead of popping.
+  // One lorry on the ring, at angle th. Heading comes from a finite difference along the
+  // ellipse, so it always points where it is actually going.
+  function ringLorry(th,dir,cabCls){
+    var off=dir>0?1.7:-1.7;                       // a carriageway each way, constant separation
+    var p=ringXY(th,off), q=ringXY(th+0.03*dir,off);
+    var ang=Math.atan2(q[1]-p[1],q[0]-p[0])-Math.PI/2;
+    // recentre before rotating — the lorry is modelled from its corner, so rotating it in place
+    // swung it off the carriageway
+    return shift(rotZ(shift(scaleF(lorrySimple(cabCls),0.56),[-0.7,-5.6,0]),ang),[p[0],p[1],0]);
+  }
+
+  /* Everything in horizon 03 except our own site, the ring traffic and the lamps is STATIC, so it
+     is built once. Once a piece has finished fading in, the pre-shifted copy is concatenated
+     as-is — no map, no allocation. render() only ever reads faces, so sharing them is safe.     */
+  var RINGGEO=ringRoad(), MARKET=market(1,0);
+  var PEERGEO=PEERS.map(function(p){ return rotZ(scaleF(site(0,null,true),p.s),p.rot); });
+  var PEERFIX=PEERS.map(function(p,i){ return shift(PEERGEO[i],[p.x,p.y,0]); });
+
+  function scene(h, T){
+    var f=[], TT=(T==null?0:T);
+    var wingK = smooth(h,0.05,1.0);
+    var netK  = smooth(h,1.05,2.0);
+    var shrink= lerp(1,OWN.s,netK);
+    // our own site slides out to its plot and never turns: its plot is chosen so that rot 0 —
+    // the orientation it already has in horizons 01 and 02 — is the one that faces the street.
+    var ox=lerp(0,OWN.x,netK), oy=lerp(0,OWN.y,netK);
+    if(netK>0.02){
+      var done=netK>0.999;
+      f=f.concat(done?RINGGEO:fade(RINGGEO,netK));
+      f=f.concat(done?STREETS:fade(STREETS,netK));
+      if(netK>0.5) f=f.concat(fade(ringLamps(TT),smooth(netK,0.5,0.85)));
+      // the marketplace fades in with the rest instead of appearing whole in one frame
+      var mk=smooth(netK,0.02,0.45);
+      f=f.concat(mk>0.999?MARKET:fade(MARKET,mk));
+      for(var i=0;i<PEERS.length;i++){
+        var pp=PEERS[i], app=smooth(netK,0.10+i*0.10,0.55+i*0.10);
+        if(app<0.01) continue;
+        // peers are OTHER companies: plain sites, no status colours, varied footprint and scale
+        // — five identical copies at one size read as copy-paste. They slide out along their own
+        // street as they appear.
+        if(app>0.999){ f=f.concat(PEERFIX[i]); continue; }
+        var g=lerp(0.55,1,app);
+        f=f.concat(fade(shift(PEERGEO[i],[pp.x*g,pp.y*g,0]),app));
+      }
+      // Traffic circulates the ring continuously in both directions. Because the circuit is
+      // closed there is no spawn point, no despawn and no reversal — the thing Jakob kept
+      // catching was always a discontinuity, and a loop simply has none.
+      if(netK>0.35){
+        var W=0.155, tv=smooth(netK,0.35,0.7);
+        for(var q=0;q<5;q++){
+          f=f.concat(fade(ringLorry(TT*W+q/5*Math.PI*2,1,q%2?"cb":"cb2"),tv));
+          f=f.concat(fade(ringLorry(-TT*W+(q/5+0.11)*Math.PI*2,-1,q%2?"cb2":"cb"),tv));
+        }
+      }
+    }
+    f=f.concat(shift(scaleF(site(wingK,TT,false,netK<0.35),shrink),[ox,oy,0]));
+    return f;
+  }
+
+  /* ================= frame: measured per horizon, lerped so the camera pulls back ================= */
+  var AR=2.4;
+  function rawBox(h){
+    var mnX=1e9,mnY=1e9,mxX=-1e9,mxY=-1e9;
+    // Sample the whole animation cycle, not one pose: the frame has to contain every position a
+    // vehicle ever reaches, or (with overflow hidden) it clips and (with overflow visible) it
+    // paints outside the stage. Measuring at T=null alone was the reason for both.
+    [null,2,4,6,8,10,12].forEach(function(t){
+      scene(h,t).forEach(function(fc){ if(fc.nm) return; fc.pts.forEach(function(p){ var s=project(p);
+        if(s[0]<mnX)mnX=s[0]; if(s[0]>mxX)mxX=s[0]; if(s[1]<mnY)mnY=s[1]; if(s[1]>mxY)mxY=s[1]; }); });
+    });
+    // padding must come from the CONTENT's extent and the aspect match must happen AFTER it —
+    // padding the already-inflated width rendered every horizon ~30% smaller than the stage
+    var p=Math.max(mxX-mnX,mxY-mnY)*0.06;
+    return [mnX-p,mnY-p,(mxX-mnX)+p*2,(mxY-mnY)+p*2];
+  }
+  function frameFor(b,ar){
+    var vx=b[0],vy=b[1],vw=b[2],vh=b[3];
+    if(vw/vh<ar){ var nw=vh*ar; vx-=(nw-vw)/2; vw=nw; }
+    return [vx,vy,vw,vh];
+  }
+  /* Horizon 01 is nearly square (~1.2) against a wide stage, so it is the stage's HEIGHT that
+     limits how big it draws — narrowing the stage element per horizon changes nothing, because
+     the band either side of it is page background, not part of any frame. Tried and reverted.
+     The only lever on the near horizons is stage height, which is why it is generous. */
+  var VB=[];
+  function remeasure(){
+    var r=svg.getBoundingClientRect();
+    if(r.width>0&&r.height>0) AR=r.width/r.height;
+    VB=[frameFor(rawBox(0),AR),frameFor(rawBox(1),AR),frameFor(rawBox(2),AR)];
+  }
+  function viewBoxAt(h){
+    var i=clamp(Math.floor(h),0,1), k=smooth(h-i,0,1), a=VB[i], b=VB[i+1];
+    return [lerp(a[0],b[0],k),lerp(a[1],b[1],k),lerp(a[2],b[2],k),lerp(a[3],b[3],k)];
+  }
+
+  var GROUND={ap:1,lane:1,ring:1,rmk:1,rmkd:1,"pool-on":1,"pool-off":1};
+  var pool=[];
+  function render(h,T){
+    var vb=viewBoxAt(h);
+    svg.setAttribute("viewBox",vb[0].toFixed(2)+" "+vb[1].toFixed(2)+" "+vb[2].toFixed(2)+" "+vb[3].toFixed(2));
+    var recs=[];
+    scene(h,T).forEach(function(fc){
+      if(fc.nrm && (fc.nrm[0]+fc.nrm[1]+fc.nrm[2])<=0) return;     // backface cull
+      var d="",depth=0,pts=fc.pts;
+      for(var q=0;q<pts.length;q++){ var s=project(pts[q]); d+=(q?"L":"M")+s[0].toFixed(2)+" "+s[1].toFixed(2); depth+=s[2]; }
+      depth/=pts.length;
+      if(fc.ref) depth=fc.ref[0]+fc.ref[1]+fc.ref[2]+0.02;         // decals sort on their host
+      // ground plates span so much x+y that their mean depth lands in FRONT of the wall they
+      // abut — they were painting over the dock doors. Scenery goes under everything on it.
+      if(GROUND[fc.cls]) depth-=1000;
+      recs.push({d:d+(fc.open?"":"Z"),depth:depth,lit:fc.lit,cls:fc.cls,op:fc.op});
+    });
+    recs.sort(function(a,b){ return a.depth-b.depth; });
+    var i=0;
+    for(;i<recs.length;i++){
+      var r=recs[i], el=pool[i];
+      if(!el){ el=document.createElementNS(SVGNS,"path"); svg.appendChild(el); pool[i]=el; }
+      var cls="face"+(r.lit?" lit":"")+(r.cls?" "+r.cls:"");
+      if(el._c!==cls){ el.setAttribute("class",cls); el._c=cls; }
+      var op=(r.op==null?1:r.op); if(el._o!==op){ el.style.opacity=op; el._o=op; }
+      el.setAttribute("d",r.d); el.style.display="";
+    }
+    for(;i<pool.length;i++) pool[i].style.display="none";
+  }
+
+  /* ================= horizon control ================= */
+  var tabs=[].slice.call(root.querySelectorAll(".hzi-tab"));
+  var panels=[].slice.call(root.querySelectorAll(".hzi-panel"));
+  var target=0, cur=0, raf=0, running=false, autoT=0, t0=performance.now();
+
+  function setHorizon(i){
+    target=i;
+    tabs.forEach(function(t,k){
+      t.classList.toggle("is-on",k===i); t.setAttribute("aria-selected",k===i?"true":"false");
+      var pg=t.querySelector(".pg");
+      if(!pg) return;
+      // restart the creeping line from zero: removing and re-adding the class does nothing
+      // without forcing a reflow between the two, so the animation would never replay
+      pg.classList.remove("run");
+      if(k===i&&!reduced){ void pg.offsetWidth; pg.classList.add("run"); }
+    });
+    panels.forEach(function(p,k){ p.classList.toggle("is-on",k===i); });
+    if(reduced){ cur=i; render(cur,null); }
+  }
+  tabs.forEach(function(tb){ tb.addEventListener("click",function(){ setHorizon(+tb.dataset.h); resetAuto(); }); });
+
+  function resetAuto(){ clearInterval(autoT); if(!reduced) autoT=setInterval(function(){ setHorizon((target+1)%3); },9000); }
+  root.addEventListener("pointerenter",function(){ clearInterval(autoT); });
+  root.addEventListener("pointerleave",resetAuto);
+
+  function tick(now){
+    var T=(now-t0)/1000;
+    cur += (target-cur)*0.075;
+    if(Math.abs(target-cur)<0.0015) cur=target;
+    render(cur,T);
+    raf=requestAnimationFrame(tick);
+  }
+  // the progress line starts with the timer, not on page load — it must not run through while the
+  // block is still below the fold
+  function start(){ if(running||reduced) return; running=true; raf=requestAnimationFrame(tick); resetAuto(); setHorizon(target); }
+  function stop(){ running=false; if(raf) cancelAnimationFrame(raf); raf=0; clearInterval(autoT); }
+
+  remeasure();
+  render(0,0);
+  // deterministic in-view check rather than IntersectionObserver: IO does not re-evaluate reliably
+  // when the viewport is RESIZED rather than scrolled, which left the morph frozen at horizon 01.
+  function inView(){ var r=svg.getBoundingClientRect(); return r.bottom>-80 && r.top<(window.innerHeight||0)+80; }
+  var pending=false;
+  function poll(){ if(pending) return; pending=true;
+    requestAnimationFrame(function(){ pending=false; inView()?start():stop(); }); }
+  window.addEventListener("resize",function(){ remeasure(); if(reduced) render(cur,null); });
+  if(!reduced){
+    window.addEventListener("scroll",poll,{passive:true});
+    window.addEventListener("resize",poll);
+    poll();
+  }
+})();
+</script>
+
+<style is:global>
+  .hzi { width: 100%; }
+
+  /* One connected block: the three horizons on the left, the active horizon's copy on the right,
+     sharing a border. The selector is a LIST, not a tab strip — three rows of ~56px carry the
+     same information the old 3-column strip spread over a full-width band, and the copy fills
+     what used to be dead space beside it. */
+  .hzi-top { display: grid; grid-template-columns: minmax(280px, 0.6fr) 1.4fr;
+             border-top: 1px solid var(--hairline-strong); border-bottom: 1px solid var(--hairline); }
+  /* the three rows divide the block's full height — otherwise the column ends short and leaves a
+     dead panel under the last horizon */
+  .hzi-nav { display: grid; grid-template-rows: repeat(3, 1fr); border-right: 1px solid var(--hairline); }
+  .hzi-tab { position: relative; display: grid; grid-template-columns: auto 1fr auto; align-items: center;
+             gap: 14px; width: 100%; text-align: left; background: none; border: none; cursor: pointer;
+             padding: 15px 20px 15px 22px; color: inherit; font: inherit;
+             transition: background 260ms ease; }
+  .hzi-tab + .hzi-tab { border-top: 1px solid var(--hairline); }
+  .hzi-tab[data-h="0"] { --acc: var(--teal-soft); } .hzi-tab[data-h="1"] { --acc: var(--amber); } .hzi-tab[data-h="2"] { --acc: var(--fg-muted); }
+  /* the accent rail grows down the row's left edge — the only thing that moves on selection */
+  .hzi-tab::before { content: ""; position: absolute; left: 0; top: 50%; bottom: 50%; width: 2px;
+                     background: var(--acc); transition: top 420ms cubic-bezier(.2,.7,.3,1), bottom 420ms cubic-bezier(.2,.7,.3,1); }
+  .hzi-tab.is-on::before { top: 0; bottom: 0; }
+  .hzi-tab .n { font-family: var(--mono); font-size: 12px; color: var(--fg-muted); transition: color 260ms ease; }
+  .hzi-tab .t { font-size: 15px; font-weight: 500; color: var(--fg-soft); letter-spacing: -.01em; transition: color 260ms ease; }
+  .hzi-tab .hz-chip { opacity: .45; transition: opacity 260ms ease; }
+  .hzi-tab.is-on { background: rgba(255,255,255,.022); }
+  .hzi-tab.is-on .t { color: var(--fg); font-weight: 600; }
+  .hzi-tab.is-on .n { color: var(--acc); }
+  .hzi-tab.is-on .hz-chip { opacity: 1; }
+  .hzi-tab:hover .t { color: var(--fg); }
+  /* autoplay: a hairline creeping across the active row, so the rotation is announced rather than
+     just happening. Paused while the pointer is in the block, exactly like the timer itself. */
+  .hzi-tab .pg { position: absolute; left: 0; bottom: -1px; height: 1px; width: 0; background: var(--acc); opacity: .55; }
+  .hzi-tab .pg.run { animation: hziPg 9000ms linear forwards; }
+  .hzi:hover .hzi-tab .pg.run { animation-play-state: paused; }
+  @keyframes hziPg { from { width: 0; } to { width: 100%; } }
+
+  .hzi-copy { padding: 24px 28px 26px; }
+  .hzi-panel { display: none; }
+  /* prose and proof points side by side. A single 54ch column left ~450px of the cell empty,
+     which is the same dead-space problem one level down. */
+  .hzi-panel.is-on { display: grid; grid-template-columns: 1.12fr 1fr; column-gap: 44px;
+                     align-items: start; animation: hziFade 420ms ease; }
+  @keyframes hziFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .hzi-panel .hz-h { grid-column: 1 / -1; font-size: 19px; font-weight: 600; margin: 0 0 14px; letter-spacing: -.015em; }
+  .hzi-panel .hz-body { color: var(--fg-muted); font-size: 14px; line-height: 1.62; margin: 0; }
+  .hzi-panel .hz-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0; }
+  .hzi-panel .hz-list li { position: relative; padding: 0 0 9px 16px; font-size: 13px; color: var(--fg-soft); }
+  .hzi-panel .hz-list li + li { padding-top: 9px; border-top: 1px solid var(--hairline); }
+  .hzi-panel .hz-list li::before { content: ""; position: absolute; left: 0; top: 6px; width: 5px; height: 5px; background: var(--teal-soft); }
+  .hzi-panel .hz-list li + li::before { top: 15px; }
+
+  @media (max-width: 900px) {
+    .hzi-top { grid-template-columns: 1fr; }
+    .hzi-nav { border-right: none; border-bottom: 1px solid var(--hairline); }
+    .hzi-copy { padding: 18px 4px 20px; }
+    .hzi-panel.is-on { grid-template-columns: 1fr; row-gap: 16px; }
+    .hzi-tab { padding: 13px 14px 13px 16px; }
+    .hzi-tab .t { font-size: 14px; }
+    /* narrow stage: the near horizons become WIDTH-bound, so the generous desktop height would
+       only add empty space above and below them */
+    .hzi-view { height: clamp(280px, 44vh, 420px); }
+  }
+
+  /* Stage size drives everything. The frame pads to the stage's WIDTH, so a stage wider than the
+     content throws the difference away — at 2.58 the network filled only 72% of it. And the near
+     horizons are nearly square, so their size is capped by the stage's HEIGHT: this is generous
+     on purpose, and it is the only lever they have. */
+  .hzi-view { width: 100%; height: clamp(360px, 64vh, 680px); margin: 22px auto 26px; }
+  /* overflow MUST stay hidden. With `visible`, any geometry that moves outside the measured
+     viewBox paints outside the stage — moving vehicles were shedding fragments onto the copy
+     below the illustration. The frame is measured across several animation poses (see measure())
+     so nothing legitimate gets clipped. */
+  .hzi-view svg { width: 100%; height: 100%; display: block; overflow: hidden; }
+
+  /* faces — flat matte fill + crisp edge, one lit top tone. Stroke widths are DEVICE PIXELS:
+     .face sets vector-effect:non-scaling-stroke. */
+  .hzi-view .face.bd { fill: #142c37; }        .hzi-view .face.bd.lit { fill: #1c3d4a; }
+  .hzi-view .face.rf { fill: #0e2029; }        .hzi-view .face.rf.lit { fill: #17384a; }
+  .hzi-view .face.seam { fill: #0d222e; }
+  .hzi-view .face.hdr { fill: #2a5065; }
+  .hzi-view .face.cn { fill: #122a34; }        .hzi-view .face.cn.lit { fill: #1a3846; }
+  .hzi-view .face.ap { fill: #0c1c24; stroke: var(--edge-soft); } .hzi-view .face.ap.lit { fill: #102530; }
+  .hzi-view .face.lane { fill: rgba(160,190,200,.16); stroke: none; }
+  /* the opening reads as an opening only if it is LIGHTER than the wall — a dark recess on a
+     dark wall is invisible. Slats give the shutter its texture. */
+  .hzi-view .face.dk { fill: #1e4153; stroke: var(--edge-soft); }
+  .hzi-view .face.dkr { fill: #17323f; stroke: none; }
+  .hzi-view .face.df { fill: #0a1920; stroke: var(--edge-soft); }
+  .hzi-view .face.rib { fill: #1f4351; stroke: none; }
+  .hzi-view .face.sky { fill: #24485a; }
+  .hzi-view .face.gl2 { fill: #1b3f52; stroke: rgba(160,200,215,.3); }
+  /* freight */
+  .hzi-view .face.tr { fill: #1b3b48; }        .hzi-view .face.tr.lit { fill: #24505f; }
+  .hzi-view .face.trr { fill: rgba(6,18,24,.42); stroke: none; }
+  .hzi-view .face.trt { fill: #2b5c6d; stroke: none; }
+  .hzi-view .face.chs { fill: #0c1c23; }       .hzi-view .face.chs.lit { fill: #12262f; }
+  .hzi-view .face.cb { fill: #66402f; }        .hzi-view .face.cb.lit { fill: #7d5039; }
+  .hzi-view .face.cb2 { fill: #2f5a56; }       .hzi-view .face.cb2.lit { fill: #3b6f6a; }
+  .hzi-view .face.gl { fill: #0b1c24; stroke: var(--edge-soft); }
+  .hzi-view .face.chs2 { fill: #0e2029; stroke: none; }
+  .hzi-view .face.gd { fill: #56412a; stroke: rgba(190,160,115,.2); }
+  .hzi-view .face.gd2 { fill: #364b54; stroke: rgba(165,195,210,.18); }
+  .hzi-view .face.tyre { fill: #071015; stroke: none; }
+  .hzi-view .face.hub { fill: #16303b; stroke: none; }
+  .hzi-view .face.ct { fill: #1d4150; }        .hzi-view .face.ct.lit { fill: #265464; }
+  /* a second container tone for variety, but held well back — the cab is the only object in the
+     frame allowed to be properly warm, and two big rust masses fought each other */
+  .hzi-view .face.ct2 { fill: #4a3b31; }       .hzi-view .face.ct2.lit { fill: #5d4b3d; }
+  .hzi-view .face.corr { fill: rgba(6,16,21,.34); stroke: none; }
+  .hzi-view .face.ctd { fill: #16323d; stroke: var(--edge-soft); }
+  .hzi-view .face.pl { fill: #7a5a30; }        .hzi-view .face.pl.lit { fill: #9a7440; }
+  .hzi-view .face.pl2 { fill: #46606a; }       .hzi-view .face.pl2.lit { fill: #587985; }
+  .hzi-view .face.pl-b { fill: #4a3a22; }      .hzi-view .face.pl-b.lit { fill: #5d4a2c; }
+  .hzi-view .face.fk2 { fill: #12262f; }       .hzi-view .face.fk2.lit { fill: #1a3745; }
+  /* the ring carriageway: one filled face with a punched hole, so it needs no stroke (a stroke
+     would draw the seam between the outer and inner contours) */
+  .hzi-view .face.ring { fill: #0b1a22; stroke: none; }
+  .hzi-view .face.ring.lit { fill: #0f2029; stroke: none; }
+  .hzi-view .face.pole { fill: #16303b; }      .hzi-view .face.pole.lit { fill: #1e4150; }
+  /* yard lamp head — a warm sodium tone, never a saturated glow */
+  .hzi-view .face.lh-on { fill: #6e5c37; }     .hzi-view .face.lh-on.lit { fill: #b09355; }
+  .hzi-view .face.lh-off { fill: #1a3340; }    .hzi-view .face.lh-off.lit { fill: #244352; }
+  /* the light cone and its pool. Very low alpha on purpose: this has to read as a lamp doing
+     its job at night, not as a glow effect. */
+  .hzi-view .face.cone-on { fill: rgba(214,178,104,.070); stroke: none; }
+  .hzi-view .face.cone-off { fill: rgba(214,178,104,.018); stroke: none; }
+  .hzi-view .face.pool-on { fill: rgba(214,178,104,.115); stroke: none; }
+  .hzi-view .face.pool-off { fill: rgba(214,178,104,.030); stroke: none; }
+  /* close-up lorry detail */
+  .hzi-view .face.trs { fill: #16323e; stroke: none; }
+  .hzi-view .face.cbd { fill: rgba(0,0,0,.16); stroke: rgba(232,237,240,.16); }
+  /* headlights: warm but held back — at network framing they are 2 px, and at full brightness
+     ten of them across the scene read as specks rather than as lamps */
+  .hzi-view .face.lamp2 { fill: #9d885c; stroke: none; }
+  .hzi-view .face.gird { fill: #1a3844; }      .hzi-view .face.gird.lit { fill: #234a5a; }
+  /* status accents, not paint: amber at full strength is far brighter than the teal */
+  .hzi-view .face.mk { fill: #35706f; stroke: rgba(122,196,190,.6); }
+  .hzi-view .face.ac-live { fill: #35706f; stroke: rgba(122,196,190,.5); }
+  .hzi-view .face.ac-wip { fill: #8a6733; stroke: rgba(230,180,105,.45); }
+  .hzi-view .face.lit-on { fill: #4fb0a6; stroke: rgba(140,225,215,.7); }
+  .hzi-view .face.lit-off { fill: #2c6d69; stroke: rgba(120,190,185,.4); }
+  /* road markings: solid edge lines + a broken centre. Tarmac without them reads as a slab. */
+  .hzi-view .face.rmk { fill: none; stroke: rgba(232,237,240,.17); stroke-width: 1; }
+  .hzi-view .face.rmkd { fill: none; stroke: rgba(232,237,240,.36); stroke-width: 1.3; stroke-linecap: round; }
+  .hzi-view .face.wire { fill: none; stroke: rgba(232,237,240,.3); stroke-linecap: round; }
+
+</style>

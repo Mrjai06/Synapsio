@@ -1,0 +1,10 @@
+---
+import Base from "../../layouts/Base.astro";
+import Produkt from "../../components/Produkt.astro";
+import { produktCopy } from "../../i18n/produkt";
+const c = produktCopy.en;
+---
+
+<Base locale="en" path="/produkt" title={c.meta.title} description={c.meta.description}>
+  <Produkt locale="en" />
+</Base>

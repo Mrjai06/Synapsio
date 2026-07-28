@@ -1,0 +1,115 @@
+---
+// A real screenshot of the product, contained in a hairline frame with a caption.
+// Contained rather than full-bleed on purpose: this page argues like a document, and evidence
+// sits inside the argument rather than interrupting it.
+//
+// Reveal follows Emil's rules: ease-out (never ease-in), under 300ms, transform+opacity only,
+// and it does not re-run on scroll-back. prefers-reduced-motion disables it entirely.
+// Until a file exists the frame renders a labelled placeholder, so a missing shot is obvious
+// in review rather than silently collapsing the layout.
+interface Props {
+  src?: string;          // e.g. "/shots/02-reorder.png"
+  alt: string;
+  caption?: string;      // the sentence under the frame: what to look at, not what it is
+  note?: string;         // optional short mono annotation, top-right of the frame
+  ratio?: string;        // width/height of the shot, so the box holds its space before load
+  maxw?: string;         // cap the frame at the crop's own width; upscaling a crop looks soft
+}
+const { src, alt, caption, note, ratio = "16 / 10", maxw } = Astro.props;
+
+// Astro builds statically, so we can just ask the filesystem whether the shot has landed yet.
+// A missing file renders the labelled placeholder instead of a broken-image icon.
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+const file = src ? join(process.cwd(), "public", src) : "";
+const have = !!src && existsSync(file);
+// Read the PNG's real dimensions (IHDR: width/height are big-endian uint32 at bytes 16 and 20)
+// and use them as the frame's aspect ratio. A guessed ratio plus object-fit:cover silently crops
+// the screenshot, which on a product page means cutting off the thing you meant to show.
+let ar = ratio;
+if (have) {
+  try {
+    const b = readFileSync(file);
+    if (b.length > 30 && b.toString("ascii", 0, 4) === "RIFF" && b.toString("ascii", 8, 12) === "WEBP") {
+    const fmt = b.toString("ascii", 12, 16);
+    if (fmt === "VP8X") ar = `${1 + b.readUIntLE(24, 3)} / ${1 + b.readUIntLE(27, 3)}`;
+    else if (fmt === "VP8 ") ar = `${b.readUInt16LE(26) & 0x3fff} / ${b.readUInt16LE(28) & 0x3fff}`;
+    else if (fmt === "VP8L") {
+      const n = b.readUInt32LE(21);
+      ar = `${(n & 0x3fff) + 1} / ${((n >> 14) & 0x3fff) + 1}`;
+    }
+  } else if (b.length > 24 && b.readUInt32BE(12) === 0x49484452) ar = `${b.readUInt32BE(16)} / ${b.readUInt32BE(20)}`;
+  } catch {}
+}
+---
+
+<figure class="shot" data-shot>
+  <div class="shot-frame" style={`aspect-ratio:${ar}${maxw ? `;max-width:${maxw}` : ""}`}>
+    {note && <span class="shot-note">{note}</span>}
+    {have
+      ? <img src={src} alt={alt} loading="lazy" decoding="async" />
+      : <span class="shot-todo">Screenshot fehlt<em>{src}</em></span>}
+  </div>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style is:global>
+  .shot { margin: 0; }
+  .shot-frame {
+    position: relative;
+    border: 1px solid var(--app-line-2);
+    border-radius: 12px;
+    background: var(--app-card-2);
+    overflow: hidden;
+    /* the shot is a dark UI on a dark page; a hairline inset keeps its edge from dissolving */
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.02) inset, 0 30px 70px -50px rgba(0, 0, 0, 0.9);
+  }
+  .shot-frame img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top left; }
+  .shot-note {
+    position: absolute; top: 10px; right: 12px; z-index: 2;
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--fg-soft); background: rgba(10, 20, 26, 0.82);
+    border: 1px solid var(--app-line); border-radius: 5px; padding: 4px 8px;
+  }
+  .shot-todo {
+    position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 6px; text-align: center; padding: 20px;
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--fg-soft);
+    background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0 10px, transparent 10px 20px);
+  }
+  .shot-todo em { font-style: normal; letter-spacing: 0; text-transform: none; font-size: 12px; opacity: 0.7; }
+  .shot figcaption { margin-top: 12px; font-size: 14px; line-height: 1.55; color: var(--fg-soft); max-width: 62ch; }
+
+  /* The reveal is gated on html[data-js] so that a no-JS render shows the shots plainly
+     instead of hiding the page's only evidence behind an observer that never runs.
+     Every rule in this group MUST carry the same html[data-js] prefix: without it the
+     hide rule (0,2,1) outranks a bare [data-shot].in (0,2,0) and the shots stay invisible
+     forever. Keep the prefix on all three. */
+  html[data-js] [data-shot] { opacity: 0; transform: translateY(10px); }
+  html[data-js] [data-shot].in { opacity: 1; transform: none; transition: opacity 260ms var(--ease-out), transform 260ms var(--ease-out); }
+  @media (prefers-reduced-motion: reduce) {
+    html[data-js] [data-shot] { opacity: 1; transform: none; }
+    html[data-js] [data-shot].in { transition: none; }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    if (window.__shotObs) return;
+    var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function run() {
+      var els = document.querySelectorAll("[data-shot]:not(.in)");
+      if (reduced) { els.forEach(function (e) { e.classList.add("in"); }); return; }
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+        });
+      }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+      els.forEach(function (e) { io.observe(e); });
+    }
+    window.__shotObs = true;
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", run);
+    else run();
+  })();
+</script>

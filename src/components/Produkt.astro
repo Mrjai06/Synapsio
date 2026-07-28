@@ -1,0 +1,248 @@
+---
+// /produkt — the DEEP DIVE, six themes of prose.
+//
+// Every section deliberately gets a DIFFERENT shape. An earlier pass ran all six through one
+// template and the uniformity itself read as machine-made, which was the exact complaint the
+// rewrite was meant to answer: the tell was never the container, it was the repetition. So:
+//   loop   full-width screenshot        read   wide strip crop (the parsed replies)
+//   ai     no image, centred statement  calc   hairline coverage curve, drawn here
+//   gate   tight crop of the controls   memory no image, plain wide measure
+// Section padding varies with the shape so the scroll does not feel metronomic.
+import { produktCopy } from "../i18n/produkt";
+import { localePath, CAL_URL, APP_URL, type Locale } from "../i18n/ui";
+import { homeCopy } from "../i18n/home";
+import Shot from "./Shot.astro";
+
+interface Props { locale?: Locale }
+const { locale = "de" } = Astro.props;
+const c = produktCopy[locale];
+const h = homeCopy[locale];
+const p = (path: string) => localePath(locale, path);
+  const SHOTS_DE = {
+    loop:  { f:"/shots/01-dashboard.webp", n:"Dashboard", a:"Synapsio Dashboard mit offenen Punkten und Kennzahlen",
+             c:"Was der Agent in der Nacht erledigt hat, steht am Morgen hier. Offen bleibt nur, was Ihre Freigabe braucht." },
+    ai:    { f:"/shots/02-reorder.webp", n:"Nachbestellung", a:"Begründung einer Nachbestellung im Produkt",
+             c:"Das gewählte Verfahren, die Zahlen dahinter und der Satz, warum es diese Bestellung wurde. So sieht es im Produkt aus." },
+    read:  { f:"/shots/04-orders.webp", n:"Bestellungen", a:"Bestellungen mit Statusverlauf und Lieferantenantworten",
+             c:"Links der Weg der Bestellung, rechts die Antworten der Lieferanten, gelesen und zugeordnet." },
+    calc:  { f:"/shots/03-inventory.webp", n:"Bestand", a:"Bestandsliste mit Reichweite je Artikel",
+             c:"Reichweite in Tagen statt Mindestbestand. Die Spalte, um die sich der Rest dreht." },
+    gate:  { f:"/shots/07-settings.webp", n:"Grenzen", a:"Einstellungen mit Freigabeschwelle und Limits",
+             c:"Vier Regler. Was Sie hier setzen, gilt ab der nächsten Bestellung." },
+    memory:{ f:"/shots/05-approvals.webp", n:"Freigaben", a:"Freigabe-Warteschlange mit Begründung der KI",
+             c:"Jede Vorlage kommt mit ihrer Begründung. Freigeben oder ablehnen, beides ist ein Signal." },
+  };
+  const SHOTS_EN = {
+    loop:  { f:"/shots/01-dashboard.webp", n:"Dashboard", a:"Synapsio dashboard with open items and key figures",
+             c:"What the agent handled overnight is here in the morning. What is left open is what needs your approval." },
+    ai:    { f:"/shots/02-reorder.webp", n:"Reorder", a:"The reasoning behind a reorder, in the product",
+             c:"The method it chose, the figures behind it and the sentence explaining the order. This is how it looks in the product." },
+    read:  { f:"/shots/04-orders.webp", n:"Orders", a:"Orders with their status flow and supplier replies",
+             c:"On the left the path of the order, on the right the supplier replies, read and matched." },
+    calc:  { f:"/shots/03-inventory.webp", n:"Stock", a:"Stock list showing days of cover per item",
+             c:"Days of cover instead of a minimum level. The column everything else turns on." },
+    gate:  { f:"/shots/07-settings.webp", n:"Limits", a:"Settings with the approval threshold and caps",
+             c:"Four controls. What you set here applies from the next order." },
+    memory:{ f:"/shots/05-approvals.webp", n:"Approvals", a:"The approval queue with the AI's reasoning",
+             c:"Every item comes with its reasoning. Approving or rejecting are both signals." },
+  };
+
+  const SHOTS = locale === "de" ? SHOTS_DE : SHOTS_EN;
+
+  // the shape each theme takes; see the file header
+  const LAY: Record<string, string> = {
+    loop: "wide", ai: "statement", read: "strip", calc: "curve", gate: "crop", memory: "plain",
+  };
+  // crops of the same screenshots, tight enough to be legible at the size they render
+  const CROP = locale === "de"
+    ? { read: { f:"/shots/c-replies.webp", n:"Lieferantenantworten", a:"Drei gelesene Lieferantenantworten mit Zuordnung",
+                c:"Drei Antworten, gelesen und der richtigen Bestellung zugeordnet. Niemand hat sie geöffnet." },
+        gate: { f:"/shots/c-limits.webp", n:"Grenzen", a:"Freigabeschwelle, Monatsbudget und Währung in den Einstellungen",
+                c:"Die Grenzen selbst. Was hier steht, gilt ab der nächsten Bestellung." } }
+    : { read: { f:"/shots/c-replies.webp", n:"Supplier replies", a:"Three supplier replies, read and matched",
+                c:"Three replies, read and matched to the right order. Nobody opened them." },
+        gate: { f:"/shots/c-limits.webp", n:"Limits", a:"Approval threshold, monthly budget and currency in settings",
+                c:"The limits themselves. What is set here applies from the next order." } };
+
+
+const L = locale === "de"
+  ? { fields: ["Artikel", "Menge", "Termin", "Preis"], mail: "Lieferantenmail", parse: "gelesen",
+      stock: "Bestand", time: "Zeit", rop: "Nachbestellpunkt", lead: "Lieferzeit", order: "Bestellpunkt",
+      thr: "Freigabeschwelle", pass: "läuft durch", stop: "zu Ihnen", log: "Protokoll", back: "fließt zurück",
+      loopSteps: ["Lesen", "Rechnen", "Entscheiden", "Handeln", "Mitschreiben"],
+      loopLbl: "Der Kreislauf", stepsLbl: "Was in jedem Schritt passiert", terms: "Begriffe", vs: "Regel gegen Verfahren",
+      safety: "Sicherheitsbestand", riskLbl: "Lieferantenrisiko, laufend gerechnet",
+      risk: [["Nordschraube AG", "niedrig", "24%"], ["Steel Precision", "mittel", "58%"], ["Dichttech GmbH", "erhöht", "81%"]],
+      signals: "Signale", sig: ["Verbrauch", "Reichweite", "Termintreue"],
+      opts: ["Steel Precision · 4.120 € · 12 Tage", "Nordschraube AG · 3.980 € · 6 Tage", "Dichttech GmbH · 3.850 € · 21 Tage"],
+      why: "Begründung", whyTxt: "Nicht der billigste, aber der einzige vor dem Engpass." }
+  : { fields: ["Item", "Qty", "Date", "Price"], mail: "Supplier email", parse: "read",
+      stock: "Stock", time: "Time", rop: "Reorder point", lead: "Lead time", order: "Order point",
+      thr: "Approval threshold", pass: "goes through", stop: "to you", log: "Log", back: "feeds back",
+      loopSteps: ["Read", "Calculate", "Decide", "Act", "Record"],
+      loopLbl: "The loop", stepsLbl: "What happens in each step", terms: "Terms", vs: "Rule versus method",
+      safety: "Safety stock", riskLbl: "Supplier risk, calculated continuously",
+      risk: [["Nordschraube AG", "low", "24%"], ["Steel Precision", "medium", "58%"], ["Dichttech GmbH", "raised", "81%"]],
+      signals: "Signals", sig: ["Consumption", "Cover", "Reliability"],
+      opts: ["Steel Precision · €4,120 · 12 days", "Nordschraube AG · €3,980 · 6 days", "Dichttech GmbH · €3,850 · 21 days"],
+      why: "Reason", whyTxt: "Not the cheapest, but the only one before the shortage." };
+---
+
+<nav id="nav">
+  <div class="shell nav-in">
+    <a class="brand" href={p("/")}><span class="synapsio-mark"></span><span class="wordmark">Synapsio</span></a>
+    <div class="nav-links"><a href={p("/produkt")} class="on">{h.nav.product}</a><a href="#">{h.nav.about}</a><a href="/Synapsio_Pitch.pdf">{h.nav.investors}</a><a href="#">{h.nav.blog}</a></div>
+    <div class="lang"><a href="/produkt" class={locale === "de" ? "on" : ""}>DE</a><span>/</span><a href="/en/produkt" class={locale === "en" ? "on" : ""}>EN</a></div>
+    <a class="btn primary" href={CAL_URL}>{h.nav.cta}</a>
+  </div>
+</nav>
+
+<main>
+  <section class="shell pr-hero">
+    <span class="chip"><span class="sq"></span>{c.hero.chip}</span>
+    <h1>{c.hero.h1a} <em>{c.hero.h1em}</em>{c.hero.h1b}</h1>
+    <div class="pr-hero-row">
+      <p>{c.hero.sub}</p>
+      <div class="pr-hero-cta">
+        <a class="btn lg primary" href={CAL_URL}>{c.hero.cta}</a>
+        <a class="pr-alt" href={APP_URL}>{c.hero.alt}</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- A concrete surface before any abstraction (oxide.computer/product/compute opens the same
+       way). Deliberately NOT the startpage's app mock: this is the decision record, which the
+       startpage never shows, and it is the thing the whole page is about. -->
+  <section class="shell pr-fold">
+    <p class="pr-fold-cap">{c.fold.cap}</p>
+  </section>
+
+  <div class="shell">
+    {c.themes.map((t, i) => {
+      const lay = LAY[t.key] ?? "wide";
+      const pr = (c.prose as any)[t.key];
+      const sh = SHOTS[t.key];
+      return (
+      <section class={"th-full lay-" + lay}>
+        <div class="th-hd">
+          <div><span class="pr-num">{"0" + (i + 1)} · {t.label}</span><h2>{t.h}</h2></div>
+          <p class="th-lede"><b>{t.lede.lead}</b>{t.lede.rest}</p>
+        </div>
+
+        {lay === "wide" && <Shot src={sh.f} alt={sh.a} note={sh.n} caption={sh.c} />}
+        {lay === "strip" && <Shot src={CROP.read.f} alt={CROP.read.a} note={CROP.read.n} caption={CROP.read.c} />}
+        {lay === "crop" && <Shot src={CROP.gate.f} alt={CROP.gate.a} caption={CROP.gate.c} maxw="704px" />}
+
+        {lay === "curve" && (
+          /* The one drawing on the page. A reorder point is a line stock falls through, and the
+             gap between falling through it and the goods arriving is the whole problem. No
+             screenshot says that, so it is drawn. Static SVG, no script. */
+          <figure class="curve" data-shot>
+            <div class="curve-frame">
+              <svg viewBox="0 0 1200 340" role="img" aria-label={L.rop + " / " + L.lead}>
+                <line x1="60" y1="292" x2="1140" y2="292" class="cv-ax" />
+                <line x1="60" y1="24" x2="60" y2="292" class="cv-ax" />
+                <rect x="60" y="252" width="1080" height="40" class="cv-safe" />
+                <line x1="60" y1="200" x2="1140" y2="200" class="cv-rop" />
+                <path d="M60 50 L320 200 L460 252 L460 58 L720 200 L860 250 L860 52 L1120 175" class="cv-line" />
+                <g class="cv-lead">
+                  <line x1="320" y1="316" x2="460" y2="316" /><line x1="320" y1="310" x2="320" y2="322" /><line x1="460" y1="310" x2="460" y2="322" />
+                  <line x1="720" y1="316" x2="860" y2="316" /><line x1="720" y1="310" x2="720" y2="322" /><line x1="860" y1="310" x2="860" y2="322" />
+                </g>
+                <circle cx="320" cy="200" r="4" class="cv-dot" /><circle cx="720" cy="200" r="4" class="cv-dot" />
+                <text x="68" y="194" class="cv-t cv-t-rop">{L.rop}</text>
+                <text x="68" y="246" class="cv-t cv-t-safe">{L.safety}</text>
+                <text x="390" y="336" class="cv-t cv-c cv-t-lead">{L.lead}</text>
+                <text x="68" y="18" class="cv-t cv-t-stock">{L.stock}</text>
+                <text x="1140" y="316" class="cv-t cv-e">{L.time}</text>
+              </svg>
+            </div>
+            <figcaption>{c.curveCap}</figcaption>
+          </figure>
+        )}
+
+        {lay === "statement" ? (
+          <div class="pr pr-mid">
+            <p class="pr-say pr-say-lead">{pr.say}</p>
+            <div class="pr-body">
+              {pr.paras.map((p) => (<p class="pr-p">{p.lead && <b>{p.lead}</b>} {p.text}</p>))}
+            </div>
+          </div>
+        ) : lay === "plain" ? (
+          <div class="pr pr-plain">
+            <div class="pr-body">
+              {pr.paras.map((p) => (<p class="pr-p">{p.lead && <b>{p.lead}</b>} {p.text}</p>))}
+            </div>
+            <p class="pr-say pr-say-end">{pr.say}</p>
+          </div>
+        ) : (
+          <div class="pr">
+            <div class="pr-body">
+              {pr.paras.map((p) => (<p class="pr-p">{p.lead && <b>{p.lead}</b>} {p.text}</p>))}
+            </div>
+            <aside class="pr-margin"><p class="pr-say">{pr.say}</p></aside>
+          </div>
+        )}
+      </section>
+      );
+    })}
+  </div>
+
+  <!-- The questions the buyer actually arrived with. No price and no hosting line: there is
+       no public price, and the published privacy policy names no subprocessor and no server
+       location, so there is nothing verifiable to repeat here. -->
+  <section class="shell prac">
+    <span class="chip"><span class="sq"></span>{c.practical.chip}</span>
+    <h2>{c.practical.h}</h2>
+    <div class="prac-body">
+      {c.practical.paras.map((q) => (
+        <p class="pr-p">{q.lead && <b>{q.lead}</b>} {q.text}</p>
+      ))}
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="shell">
+      <div class="sec-head">
+        <span class="chip"><span class="sq"></span>{c.status.chip}</span>
+        <h2>{c.status.h}</h2>
+        <p class="sec-lede">{c.status.p}</p>
+      </div>
+      <div class="st-prose">
+        {c.status.paras.map((st) => (
+          <p class="pr-p"><b class={"st-lbl " + st.cls}><i></i>{st.lbl}.</b> {st.text}</p>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="shell close">
+    <div class="pr-close">
+      <span class="chip"><span class="sq"></span>{c.close.chip}</span>
+      <h2>{c.close.h}</h2>
+      <p class="pr-close-p">{c.close.p}</p>
+      <div class="pr-close-act">
+        <a class="btn lg primary" href={CAL_URL}>{c.close.cta}</a>
+        <a class="pr-alt" href="/Synapsio_Pitch.pdf">{c.close.alt}</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="shell">
+    <div class="foot-in">
+      <div class="foot-col foot-brand">
+        <span class="fb-top"><span class="synapsio-mark"></span><span class="wordmark">Synapsio</span></span>
+        <p class="foot-tag">{h.foot.tag}</p>
+        <span class="mono" style="text-transform:none;letter-spacing:0">{h.foot.entity}</span>
+      </div>
+      <div class="foot-col"><span class="mono">{h.foot.colProduct}</span><a href={p("/produkt")}>{h.foot.overview}</a><a href={APP_URL}>{h.foot.app}</a></div>
+      <div class="foot-col"><span class="mono">{h.foot.colLegal}</span><a href="/Imprint-Synapsio.pdf">{h.foot.imprint}</a><a href="/privacy-policy-synapsio.pdf">{h.foot.privacy}</a><a href="/terms-of-service-synapsio.pdf">{h.foot.terms}</a></div>
+    </div>
+    <div class="foot-bottom">
+      <span class="cpy">{h.foot.cpy}</span>
+      <span class="foot-status"><i></i>{h.foot.status}</span>
+    </div>
+  </footer>
+</main>
+
+<script is:inline>document.documentElement.setAttribute("data-js","1");</script>
