@@ -1,0 +1,183 @@
+---
+// Full-bleed data tape. Each post is a RECORD on a perforated strip that curves over a drum.
+//
+// Reference is punched tape / a chart recorder, not cinema film: square-ish dense perforations,
+// a tick ruler on both edges, records laid out as register rows rather than posters.
+//
+// ── POLISH PASS (critique 14/28) — the structural decisions, so they are not undone ──
+//
+// 1. The perforations and rulers are a STATIC OVERLAY over the whole strip, not children of the
+//    records. When each record carried its own, every record's transform moved its holes: the
+//    punch line wobbled 12px between a centred record and the ends, and the strip resolved as
+//    separate slabs rather than one tape. A straight sprocket line IS the read of "continuous".
+//    The overlay paints ground-coloured discs on top, which is visually identical to a hole and
+//    geometrically immune to whatever the records do underneath.
+// 2. NO translateZ. Under perspective it shrinks the record horizontally as well, which is the
+//    same wedge that removing scale() was supposed to fix. rotateX alone keeps width constant.
+// 3. The opacity ramp is floored. It used to reach 0.38, where the lede measured 2.27:1 against
+//    its own background. Depth is carried by the sheen and the curve; text stays legible.
+//
+// MOTION: the OBJECT animates on scroll, prose does not fade in. Requested for this surface.
+// Reduced motion flattens it entirely (verified: no --d is ever written).
+//
+// Styles live in the page's global block, not a scoped <style> here: as a component used only
+// inside the prototype harness its scoped sheet was not reaching the document.
+//
+// NO INVENTED DATA: index, date, tag and reading time are all real. No fake record ids.
+interface Post {
+  day: string; month: string; tag: string; rt: string; title: string; lede: string; href: string;
+}
+interface Props { posts: Post[] }
+const { posts } = Astro.props;
+
+// Group by month, and split lead from the rest.
+//
+// WHY (critique: flexibility 1/4, control 2/4, chunking + progressive disclosure both failed):
+// every record used to cost an identical slab with an identical two-line lede, so the reader had
+// no way to triage a long index. Now the newest post is the LEAD and carries its lede; everything
+// behind it is COMPACT, title and metadata only, at roughly half the height. Skimming is reading
+// the compact titles; committing is the lead. Month bands restore the chunking that Kontor and
+// Archiv had and the tape lost.
+//
+// This costs no interaction, which matters: the site's rule is that visitors do not click things.
+const groups: { month: string; items: (Post & { lead: boolean; n: number })[] }[] = [];
+posts.forEach((post, i) => {
+  const item = { ...post, lead: i === 0, n: i + 1 };
+  const last = groups[groups.length - 1];
+  if (last && last.month === post.month) last.items.push(item);
+  else groups.push({ month: post.month, items: [item] });
+});
+---
+
+<div class="ft">
+  <div class="ft-stage">
+    {
+      groups.map((g) => (
+        <>
+          <div class="ft-band"><span>{g.month}</span></div>
+          {g.items.map((p) => (
+            <a
+              class={"ft-rec" + (p.lead ? " lead" : "")}
+              href={p.href}
+              data-n={String(p.n).padStart(2, "0")}
+              data-date={`${p.day}. ${p.month}`}
+              data-tag={p.tag}
+              data-rt={`${p.rt} Lesezeit`}
+              data-lede={p.lede}
+            >
+              <span class="ft-main">
+                <h3>{p.title}</h3>
+              </span>
+            </a>
+          ))}
+        </>
+      ))
+    }
+  </div>
+
+  {/* Instrument column. The ruler is a POSITION indicator, not decoration: one tick per record,
+      the one in focus lit and labelled. The panel below it carries that record's detail, so the
+      focus mechanic finally withholds and reveals something instead of only changing lighting.
+      Both are driven by the --f value the tape already computes. Hidden below 1200px. */}
+  <aside class="ft-inst" aria-hidden="true">
+   <div class="ft-inst-in">
+    <div class="ft-scale">
+      {posts.map((p, i) => (
+        <span class="ft-tick" data-tick={i}><i></i><b>{String(i + 1).padStart(2, "0")}</b></span>
+      ))}
+    </div>
+    <div class="ft-panel">
+      <span class="ft-panel-date"></span>
+      <span class="ft-panel-tag"></span>
+      <p class="ft-panel-lede"></p>
+      <span class="ft-panel-rt"></span>
+    </div>
+   </div>
+  </aside>
+
+  {/* Static overlay: rulers and perforations, outside the 3D so the punch line stays straight. */}
+  <div class="ft-frame" aria-hidden="true">
+    <span class="ft-ruler top"></span>
+    <span class="ft-perf left"></span>
+    <span class="ft-perf right"></span>
+    <span class="ft-edge left"></span>
+    <span class="ft-edge right"></span>
+    <span class="ft-ruler bottom"></span>
+  </div>
+</div>
+
+<script is:inline>
+  // Re-callable: the harness mounts this after load.
+  window.__ftInit = function () {
+    if (!document.querySelector(".ft-stage")) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    // Each record eases toward its target every frame rather than snapping per scroll event.
+    // The loop parks once everything is within half a thousandth of target (verified: 0 rAF
+    // calls idle, 38 over 2s after a scroll, 0 again).
+    var EASE = 0.18;
+    var running = false;
+
+    function frame() {
+      var recs = document.querySelectorAll(".ft-rec");
+      if (!recs.length) { running = false; return; }
+      var vh = window.innerHeight, cy = vh / 2, moving = false;
+
+      // Read every rect first, then write. Interleaving getBoundingClientRect() with
+      // style writes forces a synchronous layout per record per frame.
+      var targets = [];
+      for (var i = 0; i < recs.length; i++) {
+        var r = recs[i].getBoundingClientRect();
+        var t = (r.top + r.height / 2 - cy) / (vh * 0.40);
+        targets.push(t > 1 ? 1 : t < -1 ? -1 : t);
+      }
+      for (var j = 0; j < recs.length; j++) {
+        var el = recs[j];
+        var cur = el.__d;
+        if (cur === undefined) cur = targets[j];
+        var next = cur + (targets[j] - cur) * EASE;
+        if (Math.abs(targets[j] - next) > 0.0005) moving = true;
+        el.__d = next;
+        var ad = Math.abs(next);
+        el.style.setProperty("--d", next.toFixed(4));
+        el.style.setProperty("--ad", ad.toFixed(4));
+        el.style.setProperty("--f", Math.max(0, 1 - ad * 2.2).toFixed(3));
+      }
+
+      // whichever record is nearest the centre line is "in focus"
+      var best = 0, bestD = Infinity;
+      for (var k = 0; k < recs.length; k++) {
+        var ad2 = Math.abs(recs[k].__d);
+        if (ad2 < bestD) { bestD = ad2; best = k; }
+      }
+      if (best !== window.__ftActive) { window.__ftActive = best; paint(recs[best], best); }
+
+      if (moving) requestAnimationFrame(frame);
+      else running = false;
+    }
+
+    // Only runs when the focused record CHANGES, not every frame: the panel is text, and
+    // rewriting it 60 times a second would be pure layout churn for no visible gain.
+    function paint(rec, idx) {
+      var q = function (sel) { return document.querySelector(sel); };
+      var d = q(".ft-panel-date"), t = q(".ft-panel-tag"),
+          l = q(".ft-panel-lede"), r = q(".ft-panel-rt");
+      if (d) d.textContent = rec.getAttribute("data-date") || "";
+      if (t) t.textContent = rec.getAttribute("data-tag") || "";
+      if (l) l.textContent = rec.getAttribute("data-lede") || "";
+      if (r) r.textContent = rec.getAttribute("data-rt") || "";
+      var ticks = document.querySelectorAll(".ft-tick");
+      for (var i = 0; i < ticks.length; i++) ticks[i].classList.toggle("on", i === idx);
+    }
+
+    function kick() { if (!running) { running = true; requestAnimationFrame(frame); } }
+
+    if (!window.__ftBound) {
+      window.__ftBound = true;
+      window.addEventListener("scroll", kick, { passive: true });
+      window.addEventListener("resize", kick, { passive: true });
+    }
+    frame();
+  };
+  window.__ftInit();
+</script>

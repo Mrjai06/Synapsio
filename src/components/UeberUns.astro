@@ -1,0 +1,200 @@
+---
+// /ueber-uns — five sections, five different shapes, in the house rule that no two sections on a
+// page may share a layout family:
+//   hero        chip + headline + one measure of text
+//   origin      narrow prose column with a full-bleed statement line cut through it
+//   team        large square portraits, two up
+//   principles  numbered rows across the full width, hairline divided
+//   facts       key/value register block, mono values
+//   close       centred
+//
+// A person with an empty bio is NOT rendered. That keeps someone off the page until their
+// details are confirmed, instead of shipping a placeholder that reads as a real claim.
+import { ueberUnsCopy } from "../i18n/ueber-uns";
+import { localePath, CAL_URL, type Locale } from "../i18n/ui";
+import SiteNav from "./SiteNav.astro";
+import SiteFooter from "./SiteFooter.astro";
+
+interface Props { locale?: Locale }
+const { locale = "de" } = Astro.props;
+const c = ueberUnsCopy[locale];
+const p = (path: string) => localePath(locale, path);
+
+const people = c.team.people.filter((x) => x.bio !== "" && x.photo !== "");
+const pending = c.team.people.filter((x) => x.bio === "" || x.photo === "");
+if (pending.length) {
+  // Loud in the build log, silent on the page. Without this the omission is invisible.
+  console.warn(
+    `[ueber-uns:${locale}] ${pending.length} person(s) not rendered, details missing: ` +
+      pending.map((x) => x.name).join(", "),
+  );
+}
+---
+
+<SiteNav locale={locale} path="/ueber-uns" active="ueber-uns" />
+
+<main>
+  <section class="shell ab-hero">
+    <span class="chip"><span class="sq"></span>{c.hero.chip}</span>
+    <h1>{c.hero.h1a}<em>{c.hero.h1em}</em>{c.hero.h1b}</h1>
+    <p class="ab-sub">{c.hero.sub}</p>
+  </section>
+
+  <section class="ab-origin">
+    <div class="shell">
+      <h2>{c.origin.h2}</h2>
+      <div class="ab-measure">
+        <p>{c.origin.p1}</p>
+        <p>{c.origin.p2}</p>
+      </div>
+    </div>
+    <div class="ab-say"><div class="shell"><p>{c.origin.statement}</p></div></div>
+    <div class="shell">
+      <div class="ab-measure">
+        <p>{c.origin.p3}</p>
+        <p><a class="ab-link" href={p("/produkt")}>{c.origin.link}</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="shell ab-team">
+    <h2>{c.team.h2}</h2>
+    <p class="ab-lede">{c.team.lede}</p>
+    <div class="ab-people">
+      {
+        people.map((x) => (
+          <article class="ab-person">
+            <div class="ab-frame">
+              <img src={x.photo} alt={x.name} width="640" height="640" loading="lazy" decoding="async" />
+            </div>
+            <h3>{x.name}</h3>
+            <span class="mono ab-role">{x.role}</span>
+            <p>{x.bio}</p>
+            {x.linkedin && (
+              <a class="ab-link" href={x.linkedin} rel="noopener noreferrer" target="_blank">
+                LinkedIn
+              </a>
+            )}
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="ab-principles">
+    <div class="shell">
+      <h2>{c.principles.h2}</h2>
+      <div class="ab-rows">
+        {
+          /* No 01/02/03 column: enumerating three principles is the banned section-number
+             eyebrow, and the reader can already count to three. The heading is the label. */
+          c.principles.items.map((it) => (
+            <div class="ab-row">
+              <h3>{it.h}</h3>
+              <p>{it.p}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="shell ab-facts">
+    <h2>{c.facts.h2}</h2>
+    <dl class="ab-reg">
+      {
+        c.facts.rows.map(([k, v]) => (
+          <div>
+            <dt class="mono">{k}</dt>
+            <dd>{v}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </section>
+
+  <section class="shell ab-close">
+    <h2>{c.close.h2}</h2>
+    <p>{c.close.p}</p>
+    <div class="ab-cta">
+      <a class="btn lg primary" href={CAL_URL}>{c.close.cta}</a>
+      <a class="ab-link" href={p("/investoren")}>{c.close.alt}</a>
+    </div>
+  </section>
+
+  <SiteFooter locale={locale} />
+</main>
+
+<style>
+  /* ---- hero ---- */
+  .ab-hero { padding-block:clamp(52px,9vh,104px) clamp(34px,5vh,58px); }
+  .ab-hero h1 { margin:22px 0 0; max-width:19ch; font-size:clamp(2.1rem,4.6vw,3.5rem); font-weight:600;
+    letter-spacing:-0.032em; line-height:1.06; text-wrap:balance; }
+  .ab-hero h1 em { font-style:normal; color:var(--fg-muted); }
+  .ab-sub { margin:22px 0 0; max-width:56ch; font-size:1.05rem; color:var(--fg-soft); }
+
+  /* ---- origin: narrow measure, cut by one full-bleed statement ---- */
+  .ab-origin { padding:clamp(40px,6vh,72px) 0 clamp(48px,7vh,86px); border-top:1px solid var(--hairline); }
+  .ab-origin h2, .ab-team h2, .ab-principles h2, .ab-facts h2, .ab-close h2 {
+    font-size:clamp(1.45rem,2.6vw,2rem); font-weight:600; letter-spacing:-0.02em; }
+  .ab-measure { max-width:60ch; margin-top:20px; }
+  .ab-measure p { margin:0 0 17px; color:var(--fg-soft); font-size:16px; line-height:1.7; letter-spacing:0.004em; }
+  .ab-measure p:last-child { margin-bottom:0; }
+  /* The band is full bleed; the SENTENCE inside it still has to start on the page's text edge.
+     Putting the max-width on the .shell itself would defeat its margin-inline:auto and centre the
+     whole thing, which is why this is an inner element. */
+  .ab-say { margin:clamp(34px,5vh,58px) 0; padding:clamp(24px,3.4vh,38px) 0;
+    border-top:1px solid var(--hairline-strong); border-bottom:1px solid var(--hairline-strong); }
+  .ab-say p { margin:0; max-width:30ch; font-size:clamp(1.3rem,2.6vw,1.95rem); font-weight:500;
+    letter-spacing:-0.018em; line-height:1.3; color:var(--fg); text-wrap:balance; }
+
+  /* ---- team: portraits ---- */
+  .ab-team { padding-block:clamp(44px,6.5vh,80px); border-top:1px solid var(--hairline); }
+  .ab-lede { margin:10px 0 0; color:var(--fg-muted); font-size:15px; }
+  .ab-people { margin-top:clamp(26px,4vh,44px); display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:clamp(22px,3.4vw,52px); max-width:840px; }
+  @media (max-width:640px){ .ab-people{ grid-template-columns:1fr; max-width:380px; } }
+  .ab-frame { border:1px solid var(--hairline-strong); border-radius:12px; overflow:hidden;
+    background:var(--app-card-2); aspect-ratio:1; }
+  .ab-frame img { display:block; width:100%; height:100%; object-fit:cover;
+    /* the portraits are shot on a light grey seamless; at full saturation two white squares are
+       the loudest thing on a near-black page and outshout the headline, so they are pulled well
+       back. Not to pure grayscale: the faces should still read as people, not as artefacts. */
+    filter:grayscale(0.55) contrast(0.92) brightness(0.78); }
+  .ab-person h3 { margin:16px 0 0; font-size:17px; font-weight:600; letter-spacing:-0.012em; }
+  .ab-role { display:block; margin-top:5px; }
+  .ab-person p { margin:11px 0 0; color:var(--fg-soft); font-size:14.5px; line-height:1.6; max-width:38ch; }
+  .ab-person .ab-link { display:inline-block; margin-top:11px; }
+
+  /* ---- principles: numbered rows, full width ---- */
+  .ab-principles { padding:clamp(44px,6.5vh,80px) 0; border-top:1px solid var(--hairline); }
+  .ab-rows { margin-top:clamp(20px,3vh,34px); border-top:1px solid var(--hairline); }
+  .ab-row { display:grid; grid-template-columns:minmax(0,22ch) minmax(0,1fr);
+    gap:clamp(14px,2.4vw,40px); align-items:baseline; padding:clamp(20px,2.8vh,30px) 0;
+    border-bottom:1px solid var(--hairline); }
+  @media (max-width:820px){ .ab-row{ grid-template-columns:1fr; gap:6px; } }
+  .ab-row h3 { font-size:15.5px; font-weight:600; }
+  .ab-row p { margin:0; color:var(--fg-muted); font-size:14.5px; line-height:1.6; max-width:52ch; }
+
+  /* ---- facts: register block ---- */
+  .ab-facts { padding-block:clamp(44px,6.5vh,80px); border-top:1px solid var(--hairline); }
+  .ab-reg { margin:clamp(18px,2.6vh,30px) 0 0; max-width:640px; }
+  .ab-reg > div { display:grid; grid-template-columns:minmax(0,150px) minmax(0,1fr); gap:16px;
+    padding:13px 0; border-bottom:1px solid var(--hairline); }
+  .ab-reg > div:first-child { border-top:1px solid var(--hairline); }
+  @media (max-width:560px){ .ab-reg > div{ grid-template-columns:1fr; gap:3px; } }
+  .ab-reg dt { color:var(--fg-muted); }
+  .ab-reg dd { margin:0; color:var(--fg); font-size:14.5px; }
+
+  /* ---- close ---- */
+  .ab-close { padding-block:clamp(50px,7vh,90px) clamp(56px,8vh,100px); border-top:1px solid var(--hairline);
+    text-align:center; }
+  .ab-close p { margin:14px auto 0; max-width:50ch; color:var(--fg-soft); font-size:15.5px; }
+  .ab-cta { margin-top:26px; display:flex; align-items:center; justify-content:center;
+    gap:clamp(16px,3vw,30px); flex-wrap:wrap; }
+
+  .ab-link { color:var(--fg); text-decoration:none; font-size:14.5px; font-weight:500;
+    border-bottom:1px solid var(--hairline-strong); padding-bottom:2px;
+    transition:color 160ms ease, border-color 160ms ease; }
+  .ab-link:hover { color:var(--coral); border-bottom-color:var(--coral); }
+</style>

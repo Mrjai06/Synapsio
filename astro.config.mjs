@@ -15,7 +15,9 @@ export default defineConfig({
   },
   integrations: [
     sitemap({
-      filter: (page) => !page.includes("/dev/"),
+      // /prototypes/ are throwaway variant harnesses and must never be indexed. They were
+      // reaching the sitemap because only /dev/ was filtered.
+      filter: (page) => !page.includes("/dev/") && !page.includes("/prototypes/"),
     }),
   ],
   vite: {

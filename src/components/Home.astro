@@ -1,6 +1,8 @@
 ---
 import HorizonteIso from "./HorizonteIso.astro";
 import NeuralSphere from "./NeuralSphere.astro";
+import SiteNav from "./SiteNav.astro";
+import SiteFooter from "./SiteFooter.astro";
 import { homeCopy } from "../i18n/home";
 import { localePath, CAL_URL, APP_URL, CONTACT_EMAIL, type Locale } from "../i18n/ui";
 
@@ -10,14 +12,7 @@ const c = homeCopy[locale];
 const p = (path: string) => localePath(locale, path);
 ---
 
-<nav id="nav">
-  <div class="shell nav-in">
-    <span class="brand"><span class="synapsio-mark"></span><span class="wordmark">Synapsio</span></span>
-    <div class="nav-links"><a href={p("/produkt")}>{c.nav.product}</a><a href="#">{c.nav.about}</a><a href="#">{c.nav.investors}</a><a href="#">{c.nav.blog}</a></div>
-    <div class="lang"><a href="/" class={locale === "de" ? "on" : ""}>DE</a><span>/</span><a href="/en/" class={locale === "en" ? "on" : ""}>EN</a></div>
-    <a class="btn primary" href={CAL_URL}>{c.nav.cta}</a>
-  </div>
-</nav>
+<SiteNav locale={locale} path="/" />
 
 <main>
   <div class="hero-sphere"><NeuralSphere /></div>
@@ -192,7 +187,9 @@ const p = (path: string) => localePath(locale, path);
           <h2 class="pf-h">{c.ctrl.h2}</h2>
           <p class="pf-sub">{c.ctrl.sub}</p>
           <ul id="pfNav">
-            {c.ctrl.nav.map((n) => (<li><b>{n.b}</b><span>{n.s}</span></li>))}
+            {/* the sub-label needs its own element: the reveal animates grid-template-rows on the
+                span, and a bare text node becomes an anonymous grid item that cannot collapse */}
+            {c.ctrl.nav.map((n) => (<li><b>{n.b}</b><span><i>{n.s}</i></span></li>))}
           </ul>
         </aside>
         <div class="ctrl-track" id="ctrlTrack">
@@ -414,22 +411,7 @@ const p = (path: string) => localePath(locale, path);
     </div>
   </section>
 
-  <footer class="shell">
-    <div class="foot-in">
-      <div class="foot-col foot-brand">
-        <span class="fb-top"><span class="synapsio-mark"></span><span class="wordmark">Synapsio</span></span>
-        <p class="foot-tag">{c.foot.tag}</p>
-        <span class="mono" style="text-transform:none;letter-spacing:0">{c.foot.entity}</span>
-      </div>
-      <div class="foot-col"><span class="mono">{c.foot.colProduct}</span><a href={p("/produkt")}>{c.foot.overview}</a><a href={APP_URL}>{c.foot.app}</a></div>
-      <div class="foot-col"><span class="mono">{c.foot.colCompany}</span><a href="#">{c.foot.about}</a><a href="#">LinkedIn</a><a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></div>
-      <div class="foot-col"><span class="mono">{c.foot.colLegal}</span><a href="/Imprint-Synapsio.pdf">{c.foot.imprint}</a><a href="/privacy-policy-synapsio.pdf">{c.foot.privacy}</a><a href="/terms-of-service-synapsio.pdf">{c.foot.terms}</a></div>
-    </div>
-    <div class="foot-bottom">
-      <span class="cpy">{c.foot.cpy}</span>
-      <span class="foot-status"><i></i>{c.foot.status}</span>
-    </div>
-  </footer>
+  <SiteFooter locale={locale} />
 </main>
 
 <!-- Copy for the inline scripts. A JSON island rather than define:vars: these scripts are

@@ -1,0 +1,176 @@
+---
+// The blog's signature object: an isometric card-catalogue drawer that opens as you scroll.
+//
+// WHY THIS AND NOT A GLOBE: NeuralSphere already owns "rotating sphere" in the startpage hero and
+// the security section owns the dome. A device appears once on this site. A drawer of index cards
+// is also what a blog index literally is, so the object carries meaning instead of decoration.
+//
+// MOTION CONTRACT (the site's rule, kept): the OBJECT animates on scroll, the prose does not.
+// Nothing here fades a headline in. The drawer slides, the cards fan, and the reading text below
+// is simply there. Reduced motion pins it to the open state.
+//
+// ISO ENGINE: same projection as HorizonteIso/IsoSilo but drawn as static SVG polygons rather
+// than a per-frame canvas render, because nothing here needs a render loop. Scroll drives ONE
+// custom property (--p, 0 to 1) and CSS transforms do the rest, so it stays on the compositor.
+//
+// Traps already paid for elsewhere and honoured here:
+//  · paint the open state at init when reduced-motion is on, so it is never an empty box
+//  · the drawer front is drawn AFTER the cards so it occludes them correctly (painter order)
+//  · the cabinet is opaque; no translucency, which made earlier iso pieces read as scaffolding
+
+interface Props {
+  /** how many cards sit in the drawer */
+  cards?: number;
+}
+const { cards = 26 } = Astro.props;
+
+// Isometric basis. x runs down-right, y runs down-left, z is up.
+const RX = [0.866, 0.5];
+const RY = [-0.866, 0.5];
+const P = (x: number, y: number, z: number): [number, number] => [
+  x * RX[0] + y * RY[0],
+  x * RX[1] + y * RY[1] - z,
+];
+const pts = (...p: [number, number][]) => p.map(([x, y]) => `${x.toFixed(2)},${(y).toFixed(2)}`).join(" ");
+
+// Cabinet: a single drawer unit seen from the front-right.
+const W = 150; // along x, the face the drawer pulls out of
+const D = 96; // along y, depth into the scene
+const H = 74; // reserved: tray depth reference
+
+// An OPEN drawer, not a cabinet. The first attempt drew a full cabinet shell and its faces read
+// as abstract chevrons at this scale: too many competing planes, and the drawer front hid the
+// thing the object exists to show. A shallow open tray with cards standing in it is legible
+// immediately, which is the whole job of a signature object.
+const WALL = 15; // wall height: must clear the card tops or the tray stops containing them
+
+// tray corners, floor at z = 0
+const f00 = P(0, 0, 0), f10 = P(W, 0, 0), f11 = P(W, D, 0), f01 = P(0, D, 0);
+// wall tops
+const w00 = P(0, 0, WALL), w10 = P(W, 0, WALL), w11 = P(W, D, WALL), w01 = P(0, D, WALL);
+
+// The tray travels toward the viewer along -y as it opens.
+const OUT = 46;
+const outVec = [-RY[0] * OUT, -RY[1] * OUT];
+
+// Cards stand upright across the tray, spread along x, leaning slightly as a real stack does.
+// Dense and shallow. At 7 deep cards the object read as a set of fins: a card catalogue is
+// recognised by MANY thin cards packed tight, not by a few large planes.
+const CARD_W = 1.5;
+const CARD_H = 22;
+const CARD_Y0 = 14;
+const CARD_D = 52;
+const gap = (W - 34) / cards;
+const cardList = Array.from({ length: cards }, (_, i) => {
+  const x = 17 + gap * i;
+  const a = P(x, CARD_Y0, 0), b = P(x + CARD_W, CARD_Y0, 0);
+  const bb = P(x + CARD_W, CARD_Y0 + CARD_D, 0), aa = P(x, CARD_Y0 + CARD_D, 0);
+  const a2 = P(x, CARD_Y0, CARD_H), b2 = P(x + CARD_W, CARD_Y0, CARD_H);
+  const bb2 = P(x + CARD_W, CARD_Y0 + CARD_D, CARD_H), aa2 = P(x, CARD_Y0 + CARD_D, CARD_H);
+  return { i, lead: i === 0, top: [a2, b2, bb2, aa2], side: [b2, bb2, bb, b], face: [a2, b2, b, a] };
+});
+---
+
+<div class="arv" aria-hidden="true">
+  <svg viewBox="-92 -68 268 202" role="presentation">
+    <defs>
+      <linearGradient id="arvFace" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#16303a" />
+        <stop offset="100%" stop-color="#10222a" />
+      </linearGradient>
+      <linearGradient id="arvCard" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#d8e2e6" />
+        <stop offset="100%" stop-color="#9fb2ba" />
+      </linearGradient>
+    </defs>
+
+    <!-- Painter order is the whole trick: floor, far walls, cards, then the near walls last so
+         they occlude the bottom of the cards and the cards genuinely sit INSIDE the tray. -->
+    <g class="arv-drawer" style={`--out-x:${outVec[0].toFixed(2)}px; --out-y:${outVec[1].toFixed(2)}px`}>
+      <polygon class="arv-floor" points={pts(f00, f10, f11, f01)} />
+      <polygon class="arv-wall dim" points={pts(f01, f11, w11, w01)} />
+      <polygon class="arv-wall dim" points={pts(f10, f11, w11, w10)} />
+
+      <g class="arv-cards">
+        {
+          cardList.map((cd) => (
+            <g class={"arv-card" + (cd.lead ? " lead" : "")} style={`--i:${cd.i}`}>
+              <polygon class="arv-card-top" points={pts(...cd.top)} />
+              <polygon class="arv-card-side" points={pts(...cd.side)} />
+              <polygon class="arv-card-face" points={pts(...cd.face)} />
+            </g>
+          ))
+        }
+      </g>
+
+      <polygon class="arv-wall" points={pts(f00, f10, w10, w00)} />
+      <polygon class="arv-wall lit" points={pts(f00, f01, w01, w00)} />
+      <!-- the pull, on the near wall -->
+      <polygon class="arv-pull" points={pts(P(W / 2 - 15, -0.6, 2.5), P(W / 2 + 15, -0.6, 2.5), P(W / 2 + 15, -0.6, 6), P(W / 2 - 15, -0.6, 6))} />
+    </g>
+  </svg>
+</div>
+
+<style>
+  .arv { position: relative; width: 100%; max-width: 560px; }
+  .arv svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+  .arv-floor { fill: #0d1d24; stroke: rgba(232, 237, 240, 0.18); stroke-width: 1;
+    stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+  .arv-wall { fill: #16303a; stroke: rgba(232, 237, 240, 0.26); stroke-width: 1;
+    stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+  .arv-wall.lit { fill: #1b3a45; }
+  .arv-wall.dim { fill: #102630; }
+
+  /* The drawer travels along the iso axis, not straight down the screen, so the movement reads
+     as a drawer opening rather than a panel sliding. --p is written by the scroll listener. */
+  .arv-drawer { transform: translate(calc(var(--out-x) * var(--p, 0)), calc(var(--out-y) * var(--p, 0))); }
+  .arv-pull { fill: rgba(232, 132, 90, 0.85); }
+
+  .arv-card-top { fill: #e3ebee; }
+  .arv-card-side { fill: #8ea3ac; }
+  .arv-card-face { fill: url(#arvCard); }
+  /* Cards rise a little as the drawer opens, staggered so the stack fans instead of moving as
+     one slab. The lead card clears the others: it is the newest post. */
+  .arv-card { transform: translateY(calc(var(--p, 0) * (-4px - var(--i) * 0.7px))); }
+  .arv-card.lead { transform: translateY(calc(var(--p, 0) * -16px)); }
+  .arv-card.lead .arv-card-top { fill: #f2f7f8; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .arv-drawer, .arv-card { transform: none; }
+    .arv { --p: 0.62; }
+  }
+</style>
+
+<script is:inline>
+  // Exposed on window and re-callable: the prototype harness clones this markup out of a
+  // <template> after page load, so a one-shot IIFE would bind to an element that did not exist.
+  window.__arvInit = function () {
+    var el = document.querySelector(".arv");
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      el.style.setProperty("--p", "0.62");
+      return;
+    }
+    function update() {
+      var cur = document.querySelector(".arv");
+      if (!cur) return;
+      var r = cur.getBoundingClientRect();
+      var vh = window.innerHeight;
+      // 0 while the object is still low on screen, 1 once it has risen through the viewport
+      var p = (vh - r.top) / (vh * 0.85) - 0.15;
+      p = p < 0 ? 0 : p > 1 ? 1 : p;
+      cur.style.setProperty("--p", p.toFixed(3));
+    }
+    if (!window.__arvBound) {
+      window.__arvBound = true;
+      var ticking = false;
+      window.addEventListener("scroll", function () {
+        if (!ticking) { ticking = true; requestAnimationFrame(function () { ticking = false; update(); }); }
+      }, { passive: true });
+      window.addEventListener("resize", update, { passive: true });
+    }
+    update(); // paint one frame at init, or the object is an empty box until first scroll
+  };
+  window.__arvInit();
+</script>

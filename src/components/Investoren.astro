@@ -1,0 +1,306 @@
+---
+// /investoren — market, product reality, plan, funding.
+//
+// Seven sections, each a different shape (house rule: no layout family twice on a page):
+//   hero      headline + two actions
+//   problem   three large figures in a row, each with its source underneath
+//   markt     measured bars beside prose
+//   heute     plain prose, no figure, one statement
+//   plan      a column chart of the three ARR cases + the cases in words
+//   funding   a horizontal rail with three stops
+//   close     centred
+//
+// CHART DECISIONS (they are deliberate, do not "improve" them into prettier lies):
+//  · The ARR columns are on a LINEAR scale. 9 against 115 renders as a stub, and that is the
+//    honest picture: the ambition case is thirteen times the floor. A log scale would flatter it.
+//  · Only the base case carries the accent colour, because it is the only one we underwrite.
+//    Identity never rests on colour alone here: every column is directly labelled.
+//  · The market section uses TWO mark types on purpose. The TAM is an absolute RANGE (two houses
+//    disagree, so the bar spans their disagreement); the other two are SHARES of a whole, drawn
+//    as proportion bars. Drawing a share as if it were an absolute would be a false comparison.
+//  · No tooltips or toggles anywhere. Static figures, per the site-wide decision that visitors
+//    do not click.
+import { investorenCopy } from "../i18n/investoren";
+import { localePath, CAL_URL, CONTACT_EMAIL, type Locale } from "../i18n/ui";
+import SiteNav from "./SiteNav.astro";
+import SiteFooter from "./SiteFooter.astro";
+
+interface Props { locale?: Locale }
+const { locale = "de" } = Astro.props;
+const c = investorenCopy[locale];
+const p = (path: string) => localePath(locale, path);
+const DECK = "/Synapsio_Pitch.pdf";
+
+// TAM range bar: the axis runs 0 to 60 bn USD so the two houses' figures sit in context.
+const TAM_AXIS = 60, TAM_LO = 40.5, TAM_HI = 51.1;
+const tamLeft = (TAM_LO / TAM_AXIS) * 100;
+const tamWidth = ((TAM_HI - TAM_LO) / TAM_AXIS) * 100;
+const shares = [24.6, 26.2];
+
+const maxCase = Math.max(...c.plan.cases.map((x) => x.v));
+---
+
+<SiteNav locale={locale} path="/investoren" active="investoren" />
+
+<main>
+  <section class="shell in-hero">
+    <span class="chip"><span class="sq"></span>{c.hero.chip}</span>
+    <h1>{c.hero.h1a}<em>{c.hero.h1em}</em>{c.hero.h1b}</h1>
+    <p class="in-sub">{c.hero.sub}</p>
+    <div class="in-actions">
+      <a class="btn lg primary" href={DECK} rel="noopener noreferrer" target="_blank">{c.hero.cta}</a>
+      <a class="in-link" href={CAL_URL}>{c.hero.alt}</a>
+    </div>
+  </section>
+
+  <section class="in-problem">
+    <div class="shell">
+      <h2>{c.problem.h2}</h2>
+      <p class="in-lede">{c.problem.lede}</p>
+      <div class="in-stats">
+        {
+          c.problem.stats.map((s) => (
+            <div class="in-stat">
+              <span class="in-big">{s.v}</span>
+              <p>{s.k}</p>
+              <span class="mono in-src">{s.src}</span>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+    <div class="in-say"><div class="shell"><p>{c.problem.statement}</p></div></div>
+  </section>
+
+  <section class="shell in-markt">
+    <h2>{c.markt.h2}</h2>
+    <div class="in-markt-grid">
+      <div class="in-prose">
+        <p>{c.markt.p1}</p>
+        <p>{c.markt.p2}</p>
+      </div>
+      <figure class="in-bars">
+        {
+          c.markt.rings.map((r, i) => (
+            <div class="in-bar">
+              <div class="in-bar-head">
+                <span class="mono in-bar-k">{r.k}</span>
+                <span class="in-bar-v">{r.v}</span>
+              </div>
+              <div class="in-track">
+                {i === 0 ? (
+                  <span class="in-range" style={`left:${tamLeft}%; width:${tamWidth}%`} />
+                ) : (
+                  <span class="in-fill" style={`width:${shares[i - 1]}%`} />
+                )}
+              </div>
+              {/* the range bar floats inside its scale, so that scale has to be stated or the
+                  segment's position means nothing. The share bars fill from zero and need none. */}
+              {i === 0 && (
+                <div class="in-scale">
+                  <span class="mono">0</span>
+                  <span class="mono">{c.markt.scaleMax}</span>
+                </div>
+              )}
+              <p class="in-bar-d">{r.d}</p>
+              <span class="mono in-src">{r.src}</span>
+            </div>
+          ))
+        }
+      </figure>
+    </div>
+  </section>
+
+  <section class="in-heute">
+    <div class="shell">
+      <h2>{c.heute.h2}</h2>
+      <div class="in-measure">
+        <p>{c.heute.p1}</p>
+        <p>{c.heute.p2}</p>
+      </div>
+    </div>
+    <div class="in-say"><div class="shell"><p>{c.heute.statement}</p></div></div>
+    <div class="shell">
+      <p class="in-measure"><a class="in-link" href={p("/produkt")}>{c.heute.link}</a></p>
+    </div>
+  </section>
+
+  <section class="shell in-plan">
+    <h2>{c.plan.h2}</h2>
+    <p class="in-lede">{c.plan.lede}</p>
+
+    <figure class="in-chart">
+      <span class="mono in-axis">{c.plan.caseAxis}</span>
+      <div class="in-cols">
+        {
+          c.plan.cases.map((x, i) => (
+            <div class="in-col">
+              <div class="in-plot">
+                <span class="in-col-v">{x.label}</span>
+                {/* the magnitude is a custom property, not a height, so the same number can drive a
+                    column on desktop and a horizontal bar in a narrow column */}
+                <span class={"in-col-bar" + (i === 1 ? " on" : "")} style={`--v:${(x.v / maxCase) * 100}%`} />
+              </div>
+              <span class="mono in-col-k">{x.k}</span>
+              <p>{x.d}</p>
+            </div>
+          ))
+        }
+      </div>
+    </figure>
+
+    <div class="in-measure in-honest">
+      <p>{c.plan.honest}</p>
+      <p class="in-peak">{c.plan.peak}</p>
+    </div>
+  </section>
+
+  <section class="in-funding">
+    <div class="shell">
+      <h2>{c.funding.h2}</h2>
+      <div class="in-rail">
+        {
+          c.funding.steps.map((s) => (
+            <div class="in-stop">
+              <span class="in-dot" />
+              <span class="mono in-stop-k">{s.k}</span>
+              <span class="in-stop-v">{s.v}</span>
+              <p>{s.d}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="shell in-close">
+    <h2>{c.close.h2}</h2>
+    <p>{c.close.p}</p>
+    <div class="in-actions in-actions-c">
+      <a class="btn lg primary" href={DECK} rel="noopener noreferrer" target="_blank">{c.close.cta}</a>
+      <a class="in-link" href={CAL_URL}>{c.close.alt}</a>
+      <a class="in-link" href={`mailto:${CONTACT_EMAIL}`}>{c.close.mail}</a>
+    </div>
+  </section>
+
+  <SiteFooter locale={locale} />
+</main>
+
+<style>
+  .in-hero { padding-block:clamp(52px,9vh,104px) clamp(38px,5.5vh,64px); }
+  .in-hero h1 { margin:22px 0 0; max-width:20ch; font-size:clamp(2.1rem,4.6vw,3.5rem); font-weight:600;
+    letter-spacing:-0.032em; line-height:1.06; text-wrap:balance; }
+  .in-hero h1 em { font-style:normal; color:var(--fg-muted); }
+  .in-sub { margin:22px 0 0; max-width:58ch; font-size:1.05rem; color:var(--fg-soft); }
+  .in-actions { margin-top:28px; display:flex; align-items:center; gap:clamp(16px,3vw,28px); flex-wrap:wrap; }
+  .in-actions-c { justify-content:center; }
+
+  h2 { font-size:clamp(1.45rem,2.6vw,2rem); font-weight:600; letter-spacing:-0.02em; }
+  .in-lede { margin:12px 0 0; max-width:54ch; color:var(--fg-muted); font-size:15.5px; }
+  .in-src { display:block; font-size:10px; color:var(--fg-muted); line-height:1.5; }
+  .in-measure { max-width:62ch; }
+  .in-measure p { margin:0 0 17px; color:var(--fg-soft); font-size:16px; line-height:1.7; letter-spacing:0.004em; }
+  .in-measure p:last-child { margin-bottom:0; }
+
+  /* full-bleed statement between hairlines */
+  .in-say { margin:clamp(34px,5vh,58px) 0 0; padding:clamp(24px,3.4vh,38px) 0;
+    border-top:1px solid var(--hairline-strong); border-bottom:1px solid var(--hairline-strong); }
+  .in-say span { display:block; max-width:34ch; font-size:clamp(1.25rem,2.4vw,1.85rem); font-weight:500;
+    letter-spacing:-0.018em; line-height:1.32; color:var(--fg); text-wrap:balance; }
+
+  /* ---- problem: three large figures ---- */
+  .in-problem { padding:clamp(40px,6vh,74px) 0 0; border-top:1px solid var(--hairline); }
+  .in-stats { margin-top:clamp(26px,4vh,44px); display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:clamp(20px,3vw,44px); }
+  @media (max-width:800px){ .in-stats{ grid-template-columns:1fr; gap:26px; } }
+  .in-stat { border-top:1px solid var(--hairline-strong); padding-top:16px; }
+  .in-big { display:block; font-size:clamp(2rem,4vw,2.9rem); font-weight:300; letter-spacing:-0.02em;
+    color:var(--fg); font-variant-numeric:tabular-nums; }
+  .in-stat p { margin:10px 0 12px; color:var(--fg-soft); font-size:14.5px; line-height:1.6; }
+
+  /* ---- market: bars beside prose ---- */
+  .in-markt { padding-block:clamp(44px,6.5vh,80px); }
+  .in-markt-grid { margin-top:clamp(20px,3vh,34px); display:grid;
+    grid-template-columns:minmax(0,40ch) minmax(0,1fr); gap:clamp(26px,4vw,64px); align-items:start; }
+  @media (max-width:900px){ .in-markt-grid{ grid-template-columns:1fr; gap:30px; } }
+  .in-prose p { margin:0 0 16px; color:var(--fg-soft); font-size:15.5px; line-height:1.68; }
+  .in-prose p:last-child { margin-bottom:0; }
+  .in-bars { margin:0; display:flex; flex-direction:column; gap:clamp(20px,3vh,30px); }
+  .in-bar-head { display:flex; align-items:baseline; justify-content:space-between; gap:14px; }
+  .in-bar-k { color:var(--teal-soft); }
+  .in-bar-v { font-size:15.5px; color:var(--fg); font-variant-numeric:tabular-nums; }
+  /* No filled background track. A grey trough with a coloured fill on top is dashboard furniture
+     and reads as a scoring bar; the measure is carried by a hairline baseline plus the mark that
+     sits on it, so only the value has weight. */
+  .in-track { position:relative; height:7px; margin:9px 0 10px; border-bottom:1px solid var(--hairline); }
+  .in-fill, .in-range { position:absolute; bottom:0; height:3px; border-radius:2px;
+    background:var(--teal-soft); }
+  .in-range { background:var(--coral); }
+  .in-scale { display:flex; justify-content:space-between; margin:-4px 0 9px; }
+  .in-bar-d { margin:0 0 6px; color:var(--fg-soft); font-size:13.5px; line-height:1.55; }
+
+  /* ---- what runs today ---- */
+  .in-heute { padding:clamp(40px,6vh,74px) 0 clamp(44px,6.5vh,80px); border-top:1px solid var(--hairline); }
+  .in-heute .in-measure { margin-top:20px; }
+  .in-heute .in-say + .shell { margin-top:clamp(26px,4vh,40px); }
+
+  /* ---- plan: column chart ---- */
+  .in-plan { padding-block:clamp(44px,6.5vh,80px); border-top:1px solid var(--hairline); }
+  /* One figure: bar, name and description live in the same column, so the case is named once
+     instead of twice (an earlier pass had a separate description grid under the chart, which
+     repeated all three labels and did not line up with the bars it referred to). */
+  .in-chart { margin:clamp(28px,4vh,46px) 0 0; }
+  .in-axis { display:block; padding-bottom:10px; border-bottom:1px solid var(--hairline); }
+  .in-cols { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(18px,3.5vw,52px);
+    padding-top:26px; }
+  .in-plot { height:clamp(180px,24vh,250px); display:flex; flex-direction:column; justify-content:flex-end;
+    border-bottom:1px solid var(--hairline-strong); }
+  .in-col-v { font-size:14.5px; color:var(--fg); font-variant-numeric:tabular-nums; white-space:nowrap;
+    padding-bottom:9px; }
+  /* Unaccented cases are near-empty outlines on purpose. They are context for the one case we
+     underwrite; filling all three equally would make the ambition column the loudest object. */
+  /* capped width: at full column width a short bar reads as a filled block rather than a column */
+  .in-col-bar { display:block; width:100%; max-width:172px; height:var(--v); border-radius:4px 4px 0 0;
+    background:rgba(255,255,255,0.045); border:1px solid var(--hairline-strong); border-bottom:none;
+    min-height:3px; }
+  .in-col-bar.on { background:linear-gradient(180deg, var(--teal-soft), rgba(58,128,128,0.32));
+    border-color:transparent; }
+  /* Stacked in one narrow column, three columns each keep a full-height plot and the short cases
+     sit under a tall empty box. Same numbers, laid on their side. */
+  @media (max-width:760px){
+    .in-cols { grid-template-columns:1fr; gap:26px; }
+    .in-plot { height:auto; display:block; border-bottom:none; }
+    .in-col-v { display:block; padding-bottom:7px; }
+    .in-col-bar { width:var(--v); max-width:100%; height:13px; min-height:0; border-radius:0 4px 4px 0;
+      border:1px solid var(--hairline-strong); border-left:none; }
+    .in-col-bar.on { background:linear-gradient(90deg, rgba(58,128,128,0.5), var(--teal-soft)); }
+  }
+  .in-col-k { display:block; padding-top:11px; color:var(--teal-soft); }
+  .in-col p { margin:8px 0 0; color:var(--fg-muted); font-size:14px; line-height:1.6; }
+  .in-honest { margin-top:clamp(34px,5vh,54px); }
+  .in-peak { color:var(--fg) !important; }
+
+  /* ---- funding rail ---- */
+  .in-funding { padding:clamp(44px,6.5vh,80px) 0; border-top:1px solid var(--hairline); }
+  .in-rail { margin-top:clamp(26px,4vh,44px); display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:clamp(20px,3vw,44px); border-top:1px solid var(--hairline-strong); }
+  @media (max-width:800px){ .in-rail{ grid-template-columns:1fr; gap:26px; border-top:none; } }
+  .in-stop { position:relative; padding-top:26px; }
+  @media (max-width:800px){ .in-stop{ border-top:1px solid var(--hairline-strong); } }
+  .in-dot { position:absolute; top:-4.5px; left:0; width:8px; height:8px; border-radius:50%;
+    background:var(--teal-soft); }
+  .in-stop-k { display:block; color:var(--fg-muted); }
+  .in-stop-v { display:block; margin-top:7px; font-size:clamp(1.15rem,2vw,1.5rem); font-weight:300;
+    color:var(--fg); font-variant-numeric:tabular-nums; }
+  .in-stop p { margin:9px 0 0; color:var(--fg-muted); font-size:13.5px; line-height:1.6; }
+
+  /* ---- close ---- */
+  .in-close { padding-block:clamp(50px,7vh,90px) clamp(56px,8vh,100px); border-top:1px solid var(--hairline);
+    text-align:center; }
+  .in-close p { margin:14px auto 0; max-width:52ch; color:var(--fg-soft); font-size:15.5px; }
+
+  .in-link { color:var(--fg); text-decoration:none; font-size:14.5px; font-weight:500;
+    border-bottom:1px solid var(--hairline-strong); padding-bottom:2px;
+    transition:color 160ms ease, border-color 160ms ease; }
+  .in-link:hover { color:var(--coral); border-bottom-color:var(--coral); }
+</style>

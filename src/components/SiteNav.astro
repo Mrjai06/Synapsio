@@ -1,0 +1,44 @@
+---
+// The one nav bar. It used to be pasted into every page, which is how three of its links ended
+// up pointing at "#": there was no single place to fix them.
+//
+// `path` is the CURRENT page without a locale prefix ("/", "/produkt", …). The language switch
+// needs it so DE/EN stay on the same page instead of dropping the visitor on the homepage.
+import { homeCopy } from "../i18n/home";
+import { localePath, CAL_URL, type Locale } from "../i18n/ui";
+
+interface Props {
+  locale: Locale;
+  path: string;
+  /** which nav item to mark as current */
+  active?: "produkt" | "ueber-uns" | "investoren" | "blog" | null;
+}
+const { locale, path, active = null } = Astro.props;
+const c = homeCopy[locale];
+const p = (to: string) => localePath(locale, to);
+
+// Every entry here must resolve to a real page. Three of them used to be href="#", which is how
+// the site taught visitors that its own nav was decorative.
+const links = [
+  { key: "produkt", href: p("/produkt"), label: c.nav.product },
+  { key: "ueber-uns", href: p("/ueber-uns"), label: c.nav.about },
+  { key: "investoren", href: p("/investoren"), label: c.nav.investors },
+  { key: "blog", href: p("/blog"), label: c.nav.blog },
+];
+---
+
+<nav id="nav">
+  <div class="shell nav-in">
+    <a class="brand" href={p("/")}><span class="synapsio-mark"></span><span class="wordmark">Synapsio</span></a>
+    <div class="nav-links">
+      {links.map((l) => <a href={l.href} class={active === l.key ? "on" : undefined}>{l.label}</a>)}
+    </div>
+    <div class="lang">
+      <a href={localePath("de", path)} class={locale === "de" ? "on" : ""}>DE</a><span>/</span><a
+        href={localePath("en", path)}
+        class={locale === "en" ? "on" : ""}>EN</a
+      >
+    </div>
+    <a class="btn primary" href={CAL_URL}>{c.nav.cta}</a>
+  </div>
+</nav>

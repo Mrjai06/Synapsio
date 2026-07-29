@@ -1,0 +1,82 @@
+---
+// /blog — the list. A stack of hairline-divided rows, not a grid of cards: the taste rules ban
+// the uniform card grid, and with two posts a three-up grid would look like a placeholder anyway.
+// Rows also scale to fifty posts without turning into wallpaper.
+import { getCollection } from "astro:content";
+import { blogCopy, formatDate } from "../i18n/blog";
+import { localePath, CAL_URL, type Locale } from "../i18n/ui";
+import SiteNav from "./SiteNav.astro";
+import SiteFooter from "./SiteFooter.astro";
+
+interface Props { locale?: Locale }
+const { locale = "de" } = Astro.props;
+const c = blogCopy[locale];
+const p = (path: string) => localePath(locale, path);
+
+const posts = (await getCollection("blog", (e) => e.data.locale === locale)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+---
+
+<SiteNav locale={locale} path="/blog" active="blog" />
+
+<main>
+  <section class="shell bl-hero">
+    <h1>{c.h1}</h1>
+    <p class="bl-lede">{c.lede}</p>
+  </section>
+
+  <section class="shell bl-list">
+    {posts.length === 0 && <p class="bl-empty">{c.empty}</p>}
+    {
+      posts.map((post) => (
+        <article class="bl-row">
+          <a class="bl-hit" href={p(`/blog/${post.data.slug}`)}>
+            <div class="bl-meta">
+              <span class="mono bl-tag">{post.data.tag}</span>
+              <span class="mono bl-date">{formatDate(post.data.date, locale)}</span>
+            </div>
+            <h2>{post.data.title}</h2>
+            <p>{post.data.description}</p>
+            <span class="mono bl-rt">{c.readingTime(post.data.readingTime)}</span>
+          </a>
+        </article>
+      ))
+    }
+  </section>
+
+  <section class="shell bl-close">
+    <h2>{c.ctaH}</h2>
+    <p>{c.ctaP}</p>
+    <a class="btn lg primary" href={CAL_URL}>{c.cta}</a>
+  </section>
+
+  <SiteFooter locale={locale} />
+</main>
+
+<style>
+  .bl-hero { padding-block:clamp(52px,9vh,104px) clamp(30px,4.5vh,52px); }
+  .bl-hero h1 { max-width:18ch; font-size:clamp(2.1rem,4.6vw,3.5rem); font-weight:600;
+    letter-spacing:-0.032em; line-height:1.06; text-wrap:balance; }
+  .bl-lede { margin:20px 0 0; max-width:56ch; font-size:1.05rem; color:var(--fg-soft); }
+
+  .bl-list { padding-block:0 clamp(30px,5vh,60px); }
+  .bl-empty { color:var(--fg-muted); padding:40px 0; border-top:1px solid var(--hairline); }
+  .bl-row { border-top:1px solid var(--hairline); }
+  .bl-row:last-child { border-bottom:1px solid var(--hairline); }
+  /* the whole row is the target, so the hit area matches what looks clickable */
+  .bl-hit { display:block; padding:clamp(24px,3.4vh,36px) 0; text-decoration:none; color:inherit;
+    transition:opacity 180ms ease; }
+  .bl-hit:hover { opacity:0.72; }
+  .bl-meta { display:flex; gap:16px; align-items:baseline; }
+  .bl-tag { color:var(--teal-soft); }
+  .bl-row h2 { margin:12px 0 0; max-width:26ch; font-size:clamp(1.25rem,2.3vw,1.75rem); font-weight:600;
+    letter-spacing:-0.02em; line-height:1.22; text-wrap:balance; }
+  .bl-hit:hover h2 { color:var(--coral); }
+  .bl-row p { margin:11px 0 0; max-width:62ch; color:var(--fg-soft); font-size:15px; line-height:1.65; }
+  .bl-rt { display:block; margin-top:14px; }
+
+  .bl-close { padding-block:clamp(46px,7vh,86px) clamp(56px,8vh,100px); text-align:center; }
+  .bl-close h2 { font-size:clamp(1.45rem,2.6vw,2rem); font-weight:600; letter-spacing:-0.02em; }
+  .bl-close p { margin:13px auto 24px; max-width:46ch; color:var(--fg-soft); font-size:15.5px; }
+</style>

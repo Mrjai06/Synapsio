@@ -1,0 +1,10 @@
+---
+import Base from "../../layouts/Base.astro";
+import Investoren from "../../components/Investoren.astro";
+import { investorenCopy } from "../../i18n/investoren";
+const c = investorenCopy.en;
+---
+
+<Base locale="en" path="/investoren" title={c.meta.title} description={c.meta.description}>
+  <Investoren locale="en" />
+</Base>

@@ -1,0 +1,15 @@
+---
+import { getCollection } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import BlogPost from "../../components/BlogPost.astro";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog", (e) => e.data.locale === "de");
+  return posts.map((post) => ({ params: { slug: post.data.slug }, props: { post } }));
+}
+const { post } = Astro.props;
+---
+
+<Base locale="de" path={`/blog/${post.data.slug}`} title={`${post.data.title} · Synapsio`} description={post.data.description}>
+  <BlogPost locale="de" post={post} />
+</Base>

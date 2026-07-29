@@ -1,0 +1,43 @@
+---
+// The one footer. Copy still comes from home.ts (`foot`), which was already the single source;
+// only the markup was duplicated. /produkt used to render a three-column variant with the
+// company column missing, so the two pages disagreed about what the site contains.
+import { homeCopy } from "../i18n/home";
+import { localePath, APP_URL, CONTACT_EMAIL, type Locale } from "../i18n/ui";
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const c = homeCopy[locale];
+const p = (to: string) => localePath(locale, to);
+---
+
+<footer class="shell">
+  <div class="foot-in">
+    <div class="foot-col foot-brand">
+      <span class="fb-top"><span class="synapsio-mark"></span><span class="wordmark">Synapsio</span></span>
+      <p class="foot-tag">{c.foot.tag}</p>
+      <span class="mono" style="text-transform:none;letter-spacing:0">{c.foot.entity}</span>
+    </div>
+    <div class="foot-col">
+      <span class="mono">{c.foot.colProduct}</span>
+      <a href={p("/produkt")}>{c.foot.overview}</a>
+      <a href={APP_URL}>{c.foot.app}</a>
+    </div>
+    <div class="foot-col">
+      <span class="mono">{c.foot.colCompany}</span>
+      <a href={p("/ueber-uns")}>{c.foot.about}</a>
+      <a href={p("/investoren")}>{c.nav.investors}</a>
+      <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+    </div>
+    <div class="foot-col">
+      <span class="mono">{c.foot.colLegal}</span>
+      <a href="/Imprint-Synapsio.pdf">{c.foot.imprint}</a>
+      <a href="/privacy-policy-synapsio.pdf">{c.foot.privacy}</a>
+      <a href="/terms-of-service-synapsio.pdf">{c.foot.terms}</a>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <span class="cpy">{c.foot.cpy}</span>
+    <span class="foot-status"><i></i>{c.foot.status}</span>
+  </div>
+</footer>

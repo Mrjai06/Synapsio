@@ -1,0 +1,10 @@
+---
+import Base from "../../layouts/Base.astro";
+import BlogIndex from "../../components/BlogIndex.astro";
+import { blogCopy } from "../../i18n/blog";
+const c = blogCopy.de;
+---
+
+<Base locale="de" path="/blog" title={c.meta.title} description={c.meta.description}>
+  <BlogIndex locale="de" />
+</Base>

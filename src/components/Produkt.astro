@@ -12,6 +12,8 @@ import { produktCopy } from "../i18n/produkt";
 import { localePath, CAL_URL, APP_URL, type Locale } from "../i18n/ui";
 import { homeCopy } from "../i18n/home";
 import Shot from "./Shot.astro";
+import SiteNav from "./SiteNav.astro";
+import SiteFooter from "./SiteFooter.astro";
 
 interface Props { locale?: Locale }
 const { locale = "de" } = Astro.props;
@@ -88,14 +90,7 @@ const L = locale === "de"
       why: "Reason", whyTxt: "Not the cheapest, but the only one before the shortage." };
 ---
 
-<nav id="nav">
-  <div class="shell nav-in">
-    <a class="brand" href={p("/")}><span class="synapsio-mark"></span><span class="wordmark">Synapsio</span></a>
-    <div class="nav-links"><a href={p("/produkt")} class="on">{h.nav.product}</a><a href="#">{h.nav.about}</a><a href="/Synapsio_Pitch.pdf">{h.nav.investors}</a><a href="#">{h.nav.blog}</a></div>
-    <div class="lang"><a href="/produkt" class={locale === "de" ? "on" : ""}>DE</a><span>/</span><a href="/en/produkt" class={locale === "en" ? "on" : ""}>EN</a></div>
-    <a class="btn primary" href={CAL_URL}>{h.nav.cta}</a>
-  </div>
-</nav>
+<SiteNav locale={locale} path="/produkt" active="produkt" />
 
 <main>
   <section class="shell pr-hero">
@@ -228,21 +223,7 @@ const L = locale === "de"
     </div>
   </section>
 
-  <footer class="shell">
-    <div class="foot-in">
-      <div class="foot-col foot-brand">
-        <span class="fb-top"><span class="synapsio-mark"></span><span class="wordmark">Synapsio</span></span>
-        <p class="foot-tag">{h.foot.tag}</p>
-        <span class="mono" style="text-transform:none;letter-spacing:0">{h.foot.entity}</span>
-      </div>
-      <div class="foot-col"><span class="mono">{h.foot.colProduct}</span><a href={p("/produkt")}>{h.foot.overview}</a><a href={APP_URL}>{h.foot.app}</a></div>
-      <div class="foot-col"><span class="mono">{h.foot.colLegal}</span><a href="/Imprint-Synapsio.pdf">{h.foot.imprint}</a><a href="/privacy-policy-synapsio.pdf">{h.foot.privacy}</a><a href="/terms-of-service-synapsio.pdf">{h.foot.terms}</a></div>
-    </div>
-    <div class="foot-bottom">
-      <span class="cpy">{h.foot.cpy}</span>
-      <span class="foot-status"><i></i>{h.foot.status}</span>
-    </div>
-  </footer>
+  <SiteFooter locale={locale} />
 </main>
 
 <script is:inline>document.documentElement.setAttribute("data-js","1");</script>

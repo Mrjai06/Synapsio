@@ -1,0 +1,10 @@
+---
+import Base from "../layouts/Base.astro";
+import UeberUns from "../components/UeberUns.astro";
+import { ueberUnsCopy } from "../i18n/ueber-uns";
+const c = ueberUnsCopy.de;
+---
+
+<Base locale="de" path="/ueber-uns" title={c.meta.title} description={c.meta.description}>
+  <UeberUns locale="de" />
+</Base>
