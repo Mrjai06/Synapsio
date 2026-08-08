@@ -222,6 +222,8 @@ posts.forEach((post, i) => {
       }
       if (best !== window.__ftActive) { window.__ftActive = best; paint(recs[best], best); }
 
+      markHead();
+
       if (moving) requestAnimationFrame(frame);
       else running = false;
     }
@@ -242,7 +244,6 @@ posts.forEach((post, i) => {
       if (head) head.textContent = String(idx + 1).padStart(2, "0");
       var recs2 = document.querySelectorAll(".ft-rec");
       for (var m = 0; m < recs2.length; m++) recs2[m].classList.toggle("on", m === idx);
-      markHead(idx);
     }
 
     // ── the pen trace ──────────────────────────────────────────────────────────────────────
@@ -280,15 +281,40 @@ posts.forEach((post, i) => {
       }
       svg.setAttribute("viewBox", "0 0 " + W + " " + H);
       poly.setAttribute("points", pts.join(" "));
-      markHead(window.__ftActive || 0);
+      markHead();
     }
 
-    function markHead(idx) {
+    // THE PEN SITS AT THE HEAD. Not at the focused record's centre: on a recorder the pen is
+    // fixed and the tape travels under it, so the dot belongs exactly where the trace crosses
+    // the head line — the same line the two registration marks sit on. It therefore slides
+    // continuously along the trace as the tape runs, instead of jumping between records, and the
+    // three coral elements are one mechanism rather than three markers that nearly agree.
+    function markHead() {
       var svg = document.querySelector(".ft-trace");
-      if (!svg || !traceX[idx]) return;
+      if (!svg || traceX.length === 0) return;
       var dot = svg.querySelector("circle");
-      dot.setAttribute("cx", traceX[idx][0]);
-      dot.setAttribute("cy", traceX[idx][1]);
+      var box = svg.getBoundingClientRect();
+      var y = window.innerHeight / 2 - box.top;
+
+      // off the strip: park the pen out of sight rather than pinning it to an end
+      if (y < 0 || y > box.height) { dot.setAttribute("cx", -99); return; }
+
+      // walk the polyline (vertices are in ascending y) and interpolate x at the head line
+      var x = traceX[0][0];
+      if (y <= traceX[0][1]) x = traceX[0][0];
+      else if (y >= traceX[traceX.length - 1][1]) x = traceX[traceX.length - 1][0];
+      else {
+        for (var i = 1; i < traceX.length; i++) {
+          if (y <= traceX[i][1]) {
+            var y0 = traceX[i - 1][1], y1 = traceX[i][1];
+            var t = y1 === y0 ? 0 : (y - y0) / (y1 - y0);
+            x = traceX[i - 1][0] + (traceX[i][0] - traceX[i - 1][0]) * t;
+            break;
+          }
+        }
+      }
+      dot.setAttribute("cx", x.toFixed(2));
+      dot.setAttribute("cy", y.toFixed(2));
     }
 
     function kick() { if (!running) { running = true; requestAnimationFrame(frame); } }

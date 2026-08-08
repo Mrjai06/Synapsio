@@ -64,13 +64,25 @@
    HARD colour stops and a round cell. The first pass used closest-side on a 19x30 cell, which
    makes a soft-edged ELLIPSE — it read as a row of bubbles sitting on the strip rather than as
    holes cut through it. A punch has a crisp edge and is round. */
+/* THE TRANSPORT TRACK (Jakob's pick, 2026-08-08). A bare column of holes is a pattern; a printed
+   track is a mechanism. Five layers, in paint order: the punched holes, a graduation tick halfway
+   between every pair of holes on each side, and a rail down each edge of the track. All teal —
+   this is machinery, and coral is reserved for the head. */
 .ft-perf { position: absolute; top: 13px; bottom: 13px; width: clamp(34px, 3vw, 46px);
   background-image:
     radial-gradient(circle 7.5px at 50% 50%,
       var(--ground) 0 6.4px,
       rgba(90,163,163,0.42) 6.4px 7.2px,
-      transparent 7.2px);
-  background-size: 22px 22px; background-position: center top; background-repeat: repeat-y; }
+      transparent 7.2px),
+    repeating-linear-gradient(180deg,
+      transparent 0 10px, rgba(90,163,163,0.34) 10px 11px, transparent 11px 22px),
+    repeating-linear-gradient(180deg,
+      transparent 0 10px, rgba(90,163,163,0.34) 10px 11px, transparent 11px 22px),
+    linear-gradient(90deg, rgba(90,163,163,0.30) 0 1px, transparent 1px),
+    linear-gradient(270deg, rgba(90,163,163,0.30) 0 1px, transparent 1px);
+  background-size: 22px 22px, 5px 22px, 5px 22px, 100% 100%, 100% 100%;
+  background-position: center top, left top, right top, left top, right top;
+  background-repeat: repeat-y, repeat-y, repeat-y, no-repeat, no-repeat; }
 .ft-perf.left { left: clamp(18px, 1.8vw, 30px); }
 .ft-perf.right { right: clamp(18px, 1.8vw, 30px); }
 /* the material's own edges: a lit rail down each side, inboard of the punch line, so the
@@ -112,7 +124,9 @@
    scale x and y differently and turn the head dot into an ellipse. */
 .ft-trace polyline { fill: none; stroke: rgba(232,132,90,0.42); stroke-width: 1.2;
   stroke-linejoin: round; }
-.ft-trace circle { fill: var(--coral); transition: cx 260ms ease, cy 260ms ease; }
+/* No transition: the pen sits ON the head line and is written every frame. Easing it would let
+   it drift off the line it is supposed to be fixed to. */
+.ft-trace circle { fill: var(--coral); }
 @media (max-width: 900px) { .ft-trace { display: none; } }
 
 .ft-stage { display: flex; flex-direction: column; gap: 0;
