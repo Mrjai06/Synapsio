@@ -132,9 +132,45 @@ const planTicks = Array.from({ length: Math.floor(maxCase / 5) + 1 }, (_, i) => 
       </div>
     </div>
     <div class="in-say"><div class="shell"><p>{c.heute.statement}</p></div></div>
+
+    {/* The register. The section used to be two paragraphs of prose, which reads as a claim; an
+        investor wants the inventory. Two columns, so it is neither the page's three-across grid
+        nor the plan's full-width rows. NO usage numbers: the only ones that exist come from the
+        demo company, and seeded counts published as traction would be invented traction. */}
     <div class="shell">
-      <p class="in-measure"><a class="in-link" href={p("/produkt")}>{c.heute.link}</a></p>
+      <span class="mono in-reg-k">{c.heute.registerK}</span>
+      <div class="in-reg">
+        {
+          c.heute.register.map((r) => (
+            <div class="in-reg-item">
+              <h3>{r.k}</h3>
+              <p>{r.d}</p>
+            </div>
+          ))
+        }
+      </div>
+      <p class="in-measure in-reg-link"><a class="in-link" href={p("/produkt")}>{c.heute.link}</a></p>
     </div>
+  </section>
+
+  {/* Revenue model. It was missing entirely, which on an investor page is a hole, not a choice. */}
+  <section class="shell in-modell">
+    <h2>{c.modell.h2}</h2>
+    <p class="in-lede">{c.modell.lede}</p>
+
+    {
+      c.modell.rows.map((r) => (
+        <div class="in-mod-row">
+          <span class="mono in-mod-k">{r.k}</span>
+          <div class="in-mod-body">
+            <h3>{r.h}</h3>
+            <p>{r.d}</p>
+          </div>
+        </div>
+      ))
+    }
+
+    <p class="in-measure in-mod-note">{c.modell.note}</p>
   </section>
 
   <section class="shell in-plan">
@@ -281,6 +317,32 @@ const planTicks = Array.from({ length: Math.floor(maxCase / 5) + 1 }, (_, i) => 
   .in-heute { padding:clamp(40px,6vh,74px) 0 clamp(44px,6.5vh,80px); border-top:1px solid var(--hairline); }
   .in-heute .in-measure { margin-top:20px; }
   .in-heute .in-say + .shell { margin-top:clamp(26px,4vh,40px); }
+
+  /* ---- the register of what is built ---- */
+  .in-reg-k { display:block; margin-top:clamp(30px,4.5vh,50px); padding-bottom:10px;
+    border-bottom:1px solid var(--hairline); color:var(--teal-soft); }
+  .in-reg { display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+    column-gap:clamp(28px,5vw,74px); }
+  .in-reg-item { padding:18px 0; border-bottom:1px solid var(--hairline); }
+  .in-reg-item h3 { margin:0; font-size:14.5px; font-weight:600; letter-spacing:-0.005em; }
+  .in-reg-item p { margin:7px 0 0; max-width:52ch; color:var(--fg-muted); font-size:13.5px;
+    line-height:1.6; }
+  .in-reg-link { margin-top:22px; }
+  @media (max-width:760px){ .in-reg { grid-template-columns:1fr; } }
+
+  /* ---- revenue model ---- */
+  .in-modell { padding-block:clamp(44px,6.5vh,80px); border-top:1px solid var(--hairline); }
+  .in-mod-row { display:grid; grid-template-columns:170px minmax(0,1fr);
+    gap:clamp(16px,3vw,40px); padding:clamp(20px,3vh,28px) 0;
+    border-top:1px solid var(--hairline); }
+  .in-mod-row:first-of-type { margin-top:clamp(24px,3.5vh,38px); }
+  .in-mod-k { color:var(--teal-soft); padding-top:3px; }
+  .in-mod-body h3 { margin:0; max-width:34ch; font-size:clamp(1.02rem,1.6vw,1.2rem);
+    font-weight:600; letter-spacing:-0.012em; }
+  .in-mod-body p { margin:10px 0 0; max-width:62ch; color:var(--fg-muted); font-size:14px;
+    line-height:1.65; }
+  .in-mod-note { margin-top:clamp(26px,4vh,40px); color:var(--fg-soft) !important; }
+  @media (max-width:700px){ .in-mod-row { grid-template-columns:1fr; gap:10px; } }
 
   /* ---- plan: one scale + the cases as rows ---- */
   .in-plan { padding-block:clamp(44px,6.5vh,80px); border-top:1px solid var(--hairline); }

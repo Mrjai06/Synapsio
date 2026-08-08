@@ -106,6 +106,62 @@ export const investorenCopy = {
       statement:
         "Ein Chatfenster kann Croston nicht gegen Newsvendor abwägen. Dafür braucht es den Bestand, die Historie und die Ausführung im selben System.",
       link: "Die Details stehen auf der Produktseite",
+      // Register of what is actually built. Every line is verifiable in the running system.
+      // ⚠️ NO usage numbers here: the only numbers that exist come from the demo company, and
+      // publishing seeded counts as traction would be inventing traction.
+      registerK: "Gebaut und im Betrieb",
+      register: [
+        {
+          k: "Verfahren pro Artikel",
+          d: "Der Agent wählt je Artikel ein benanntes Nachbestellverfahren — Bestellpunkt (s,Q), Croston für sporadischen Bedarf, Newsvendor für Verderbliches, periodische Prüfung, mehrstufig — und legt Begründung und Konfidenz dazu. Der Mensch kann jede Wahl festsetzen.",
+        },
+        {
+          k: "Nachbewertung",
+          d: "Jede Bestellentscheidung wird mit ihren Signalen gespeichert und später gegen das tatsächliche Ergebnis nachbewertet. Das System weiß, welche seiner Entscheidungen gut waren.",
+        },
+        {
+          k: "Lieferantenmail in beide Richtungen",
+          d: "Bestellung raus, Antwort rein: eingehende Mails werden gelesen, der Bestellstatus wird daraus gesetzt. Der Lieferant muss sich nirgends anmelden und nichts installieren.",
+        },
+        {
+          k: "Mehrere Standorte",
+          d: "Bestände je Lager, eigenes Lager und Logistikdienstleister, Umlagerungen mit Freigabe, und eine Nachbestellung, die den Standort kennt.",
+        },
+        {
+          k: "Stückliste und Fertigung",
+          d: "Verbrauch wird aus echten Fertigungsaufträgen abgeleitet statt geschätzt, inklusive Änderungshistorie an der Stückliste.",
+        },
+        {
+          k: "Freigabe und Protokoll",
+          d: "Betragsschwelle, Freigabe direkt aus der Mail, und jede Aktion des Agenten steht mit Zeitpunkt und Grund im Protokoll.",
+        },
+        {
+          k: "Mandantentrennung",
+          d: "Auf Datenbankebene erzwungen, auf jeder Tabelle. Ein Mandant lässt sich vollständig und nachvollziehbar löschen.",
+        },
+        {
+          k: "Kostendeckel je Kunde",
+          d: "Der Rechenaufwand des Agenten wird pro Unternehmen gemessen und begrenzt. Das ist zugleich die Mechanik, auf der die Abrechnung aufsetzt.",
+        },
+      ],
+    },
+
+    modell: {
+      h2: "Wie Synapsio verdient",
+      lede: "Zwei Ebenen. Die erste trägt heute, die zweite entsteht mit dem Marktplatz.",
+      rows: [
+        {
+          k: "Abonnement",
+          h: "Monatlich, gestaffelt nach Geschäftsvolumen",
+          d: "Vier Stufen vom Einstieg bis Enterprise. Jede Stufe hat ein Monatslimit, das weich ist: Wer darüber liegt, wird benachrichtigt und zahlt einen kleinen Mehrverbrauch, statt mitten im Betrieb abgeschaltet zu werden. Bei Software, die Bestellungen auslöst, ist ein harter Stopp kein vertretbares Verhalten.",
+        },
+        {
+          k: "Transaktion",
+          h: "Anteil an Käufen über den Marktplatz, später",
+          d: "Wenn ein Unternehmen über Synapsio einkauft, fällt eine Gebühr an, die mit steigendem Volumen sinkt und für ausgewählte Branchen ermäßigt ist. Diese Ebene gehört zum Marktplatz und ist noch nicht gebaut. Zahlungsdienstleister-Gebühren sind davon getrennt und keine Einnahme von uns.",
+        },
+      ],
+      note: "Die Preise legen wir zum Launch fest. Was bereits steht, ist die Mechanik darunter: Verbrauch und Budget werden pro Unternehmen gemessen und durchgesetzt. Abrechnung ist damit kein zweites System, sondern dieselbe Grundlage mit einem Preis daran.",
     },
 
     plan: {
@@ -228,6 +284,59 @@ export const investorenCopy = {
       statement:
         "A chat window cannot weigh Croston against newsvendor. That needs the stock, the history and the execution in one system.",
       link: "The detail is on the product page",
+      registerK: "Built and running",
+      register: [
+        {
+          k: "A method per item",
+          d: "The agent picks a named replenishment method for each item — reorder point (s,Q), Croston for intermittent demand, newsvendor for perishables, periodic review, multi-echelon — and records the reason and its confidence. A person can pin any choice.",
+        },
+        {
+          k: "Scored afterwards",
+          d: "Every ordering decision is stored with the signals behind it and later scored against what actually happened. The system knows which of its own decisions were good ones.",
+        },
+        {
+          k: "Supplier mail both ways",
+          d: "Order out, reply in: incoming mail is read and the order status follows from it. The supplier signs up for nothing and installs nothing.",
+        },
+        {
+          k: "Several locations",
+          d: "Stock per site, own warehouse and third-party logistics, transfers with approval, and replenishment that knows where the stock sits.",
+        },
+        {
+          k: "Bills of material",
+          d: "Consumption is derived from real production runs instead of estimated, including the change history on the bill of material.",
+        },
+        {
+          k: "Approval and log",
+          d: "A value threshold, approval straight from the mail, and every action the agent takes recorded with its time and its reason.",
+        },
+        {
+          k: "Tenant separation",
+          d: "Enforced in the database, on every table. A tenant can be deleted completely and verifiably.",
+        },
+        {
+          k: "A cost ceiling per customer",
+          d: "The agent's compute is metered and capped per company. That is also the mechanism billing sits on.",
+        },
+      ],
+    },
+
+    modell: {
+      h2: "How Synapsio earns",
+      lede: "Two layers. The first carries today, the second arrives with the marketplace.",
+      rows: [
+        {
+          k: "Subscription",
+          h: "Monthly, tiered by business volume",
+          d: "Four tiers from entry to enterprise. Each has a monthly limit, and the limit is soft: going past it means a notice and a small overage, not being switched off mid-operation. For software that places orders, a hard stop is not defensible behaviour.",
+        },
+        {
+          k: "Transaction",
+          h: "A share of marketplace purchases, later",
+          d: "When a company buys through Synapsio a fee applies, falling as volume grows and reduced for selected industries. This layer belongs to the marketplace and is not built yet. Payment processor fees are separate and are not our revenue.",
+        },
+      ],
+      note: "Prices are set closer to launch. What already stands is the mechanism underneath: usage and budget are metered and enforced per company. Billing is therefore not a second system, only the same foundation with a price attached.",
     },
 
     plan: {
