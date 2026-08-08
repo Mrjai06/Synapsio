@@ -134,14 +134,12 @@
   stroke-linejoin: round; }
 /* No transition anywhere on the pen: it sits ON the head line and is written every frame.
    Easing it would let it drift off the line it is supposed to be fixed to. */
-/* The carriage: three flat iso faces, no gradients — same treatment as the site's other iso
-   objects, and the taste rules ban a glossy body. */
-.ft-pen .pen-face-t { fill: #f0a07a; }
-.ft-pen .pen-face-l { fill: #c96b45; }
-.ft-pen .pen-face-r { fill: #8f4a2e; }
-.ft-pen .pen-shaft { stroke: rgba(240,160,122,0.9); stroke-width: 1.7; stroke-linecap: round;
-  fill: none; }
-.ft-pen .pen-tip { fill: #f5c0a2; }
+/* The pen: flat faces, no gradients — same treatment as the site's other iso objects, and the
+   taste rules ban a glossy body. Two values per part are enough to read as a solid. */
+.ft-pen .pen-hi { fill: #f0a07a; }
+.ft-pen .pen-lo { fill: #a85736; }
+.ft-pen .pen-collar { fill: #f5c9ae; }
+.ft-pen .pen-tip { fill: #ffe0cc; }
 /* pen off the tape: the whole nib assembly lifts, rather than parking at a coordinate that
    overflow:visible would still show */
 .ft-trace.ft-lifted .ft-pen { opacity: 0; }

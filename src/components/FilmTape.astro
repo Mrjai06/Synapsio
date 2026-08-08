@@ -174,17 +174,19 @@ posts.forEach((post, i) => {
         </linearGradient>
       </defs>
       <polyline points="" />
-      {/* THE PEN CARRIAGE. An arrowhead was too simple (Jakob), and a 6px iso figure would have
-          been a smudge — so the whole assembly got bigger instead: a 23x31px isometric block on
-          a shaft, in the same iso language as HorizonteIso, IsoSilo and ArchivDrawer. Authored
-          once here with its tip at the local origin; the script only translates it, so the
-          geometry can never drift out of proportion. */}
+      {/* THE PEN. An iso cuboid was still just a cuboid — Jakob: "es ist ein Block" — and the
+          house rule is that figures are recognisable OBJECTS, never cubes. So this is drawn as a
+          pen: a conical nib at the tip, a tapered barrel and a collar, each split along its own
+          axis into a lit and a shadowed face so it reads as a solid at 26x37px.
+          The tip is the local origin; the script only translates the group, so the geometry can
+          never drift out of proportion wherever it sits on the trace. */}
       <g class="ft-pen" transform="translate(-999,-999)">
-        <path class="pen-shaft" d="M0,0 L13,-11.5" />
-        <path class="pen-face-l" d="M3,-26 L13,-20.5 L13,-11.5 L3,-17 Z" />
-        <path class="pen-face-r" d="M13,-20.5 L23,-26 L23,-17 L13,-11.5 Z" />
-        <path class="pen-face-t" d="M3,-26 L13,-31.5 L23,-26 L13,-20.5 Z" />
-        <circle class="pen-tip" cx="0" cy="0" r="1.9" />
+        <path class="pen-lo" d="M0,0 L5.94,-9 L2.34,-11.38 Z" />
+        <path class="pen-hi" d="M0,0 L9.54,-6.64 L5.94,-9 Z" />
+        <path class="pen-lo" d="M5.94,-9 L22.44,-34.08 L18.84,-36.48 L2.34,-11.38 Z" />
+        <path class="pen-hi" d="M9.54,-6.64 L26.04,-31.68 L22.44,-34.08 L5.94,-9 Z" />
+        <path class="pen-collar" d="M18.61,-16.48 L21.91,-21.48 L11.09,-28.62 L7.79,-23.6 Z" />
+        <circle class="pen-tip" cx="0" cy="0" r="1.7" />
       </g>
     </svg>
     <span class="ft-ruler bottom"></span>
