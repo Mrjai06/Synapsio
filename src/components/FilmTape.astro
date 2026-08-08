@@ -74,36 +74,9 @@ posts.forEach((post, i) => {
 ---
 
 <div class="ft">
-  <div class="ft-stage">
-    {
-      groups.map((g) => (
-        <>
-          <div class="ft-band"><span>{g.month}</span></div>
-          {g.items.map((p) => (
-            <a
-              class={"ft-rec" + (p.lead ? " lead" : "")}
-              href={p.href}
-              data-n={String(p.n).padStart(2, "0")}
-              data-date={`${p.day}. ${p.month}`}
-              data-tag={p.tag}
-              data-rt={p.rt}
-              data-min={String(parseInt(p.rt, 10) || 0)}
-              data-lede={p.lede}
-            >
-              <span class="ft-main">
-                <h3>{p.title}</h3>
-              </span>
-              {/* Printed ON the material, at the empty right end of the strip. The frame number
-                  is the only thing repeated between strip and instrument column, and it is a
-                  position, not a field: a recorder prints its frame count on the tape as well as
-                  showing it on the counter. Everything else stays in the panel. */}
-              <span class="ft-no" aria-hidden="true">{String(p.n).padStart(2, "0")}</span>
-            </a>
-          ))}
-        </>
-      ))
-    }
-  </div>
+  {/* THE HEAD. Sits outside .ft-strip on purpose: it is the fixed point the tape runs past, so it
+      must not inherit the strip's travel. Sticky, so it only exists while the tape is on screen. */}
+  <span class="ft-headmark" aria-hidden="true"><i></i><b></b><i></i></span>
 
   {/* Instrument column. The ruler is a POSITION indicator, not decoration: one tick per record,
       the one in focus lit and labelled. The panel below it carries that record's detail, so the
@@ -136,6 +109,40 @@ posts.forEach((post, i) => {
     </div>
    </div>
   </aside>
+  {/* Everything that is MATERIAL lives in here and moves as one: records, holes, rails, print and
+      the trace. Never transform a part of it on its own — see note 1 above. */}
+  <div class="ft-strip">
+  <div class="ft-stage">
+    {
+      groups.map((g) => (
+        <>
+          <div class="ft-band"><span>{g.month}</span></div>
+          {g.items.map((p) => (
+            <a
+              class={"ft-rec" + (p.lead ? " lead" : "")}
+              href={p.href}
+              data-n={String(p.n).padStart(2, "0")}
+              data-date={`${p.day}. ${p.month}`}
+              data-tag={p.tag}
+              data-rt={p.rt}
+              data-min={String(parseInt(p.rt, 10) || 0)}
+              data-lede={p.lede}
+            >
+              <span class="ft-main">
+                <h3>{p.title}</h3>
+              </span>
+              {/* Printed ON the material, at the empty right end of the strip. The frame number
+                  is the only thing repeated between strip and instrument column, and it is a
+                  position, not a field: a recorder prints its frame count on the tape as well as
+                  showing it on the counter. Everything else stays in the panel. */}
+              <span class="ft-no" aria-hidden="true">{String(p.n).padStart(2, "0")}</span>
+            </a>
+          ))}
+        </>
+      ))
+    }
+  </div>
+
 
   {/* Static overlay: rulers and perforations, outside the 3D so the punch line stays straight. */}
   <div class="ft-frame" aria-hidden="true">
@@ -152,6 +159,7 @@ posts.forEach((post, i) => {
     {/* The pen line. Empty until the script measures the strip; viewBox is written in pixels. */}
     <svg class="ft-trace"><polyline points="" /><circle cx="-9" cy="-9" r="2.6" /></svg>
     <span class="ft-ruler bottom"></span>
+  </div>
   </div>
 </div>
 
@@ -171,6 +179,19 @@ posts.forEach((post, i) => {
       var recs = document.querySelectorAll(".ft-rec");
       if (!recs.length) { running = false; return; }
       var vh = window.innerHeight, cy = vh / 2, moving = false;
+
+      // THE TRAVEL. One transform on the whole strip, so the tape runs past the head as a single
+      // piece and the holes stay in register with the material. Measured on .ft, which is NOT
+      // transformed — measuring .ft-strip would feed its own transform back into the next frame.
+      var ftEl = document.querySelector(".ft"), strip = document.querySelector(".ft-strip");
+      if (ftEl && strip) {
+        var b = ftEl.getBoundingClientRect();
+        var prog = (cy - b.top) / (b.height + vh);
+        prog = prog < 0 ? 0 : prog > 1 ? 1 : prog;
+        // 46px over the whole pass: enough to read as transport, far too little to fight the
+        // scroll or to move a line of type while someone is reading it.
+        strip.style.setProperty("--run", ((prog - 0.5) * 46).toFixed(2) + "px");
+      }
 
       // Read every rect first, then write. Interleaving getBoundingClientRect() with
       // style writes forces a synchronous layout per record per frame.

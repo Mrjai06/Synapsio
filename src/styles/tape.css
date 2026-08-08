@@ -24,6 +24,32 @@
    past each edge and was silently clipped by body{overflow-x:hidden}. */
 .ft { position: relative; width: 100%; }
 
+/* ---- the strip travels ------------------------------------------------------------------
+   Jakob, 2026-08-08: with the per-record scale gone the tape had no movement left, and a tape
+   that never moves is not a tape. The travel is on the WHOLE strip, so material coherence
+   survives: records, holes, rails, edge print and the trace all shift by the same pixels.
+   Never put a transform on a part of this again. */
+.ft-strip { position: relative; will-change: transform;
+  transform: translate3d(0, var(--run, 0px), 0); }
+
+/* ---- the head ---------------------------------------------------------------------------
+   The fixed point the tape runs past, so it lives OUTSIDE .ft-strip and does not travel with it.
+   Sticky rather than fixed: it exists only while the tape is on screen and never floats over the
+   footer. This is also what makes the travel legible — motion needs something that stays put. */
+.ft-headmark { display: none; }
+@media (min-width: 900px) {
+  .ft-headmark { display: flex; align-items: center; gap: 0;
+    position: sticky; top: 50vh; z-index: 5; height: 0; pointer-events: none;
+    grid-column: 1 / -1; grid-row: 1; align-self: start; }
+  .ft-headmark i { display: block; width: 13px; height: 1px; background: var(--coral); }
+  .ft-headmark b { display: block; flex: 1; height: 1px;
+    background: linear-gradient(90deg,
+      rgba(232,132,90,0.22), rgba(232,132,90,0.05) 22%, rgba(232,132,90,0.05) 78%,
+      rgba(232,132,90,0.22)); }
+}
+/* Left inset clears the instrument column so the head marks the STRIP, not the page. */
+@media (min-width: 1200px) { .ft-headmark { margin-left: 262px; } }
+
 /* --- static overlay: rulers + perforations, outside the 3D --- */
 .ft-frame { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
 .ft-ruler { position: absolute; left: 0; right: 0; height: 13px;
@@ -81,7 +107,7 @@
   pointer-events: none;
   right: clamp(96px, 9vw, 178px); width: clamp(90px, 10.5vw, 176px); overflow: visible;
   background-image:
-    repeating-linear-gradient(90deg, rgba(232,237,240,0.05) 0 1px, transparent 1px 25%); }
+    repeating-linear-gradient(90deg, rgba(90,163,163,0.13) 0 1px, transparent 1px 25%); }
 /* The viewBox is set in PIXELS by the script, never stretched: preserveAspectRatio="none" would
    scale x and y differently and turn the head dot into an ellipse. */
 .ft-trace polyline { fill: none; stroke: rgba(232,132,90,0.42); stroke-width: 1.2;
@@ -147,18 +173,18 @@
   .ft { display: grid; grid-template-columns: 262px minmax(0, 1fr); }
   .ft-inst { display: block; grid-column: 1; grid-row: 1; position: sticky; top: 50vh;
     align-self: start; height: 0; padding-left: clamp(24px, 3vw, 56px); z-index: 4; }
-  .ft-stage { grid-column: 2; grid-row: 1; }
-  /* the overlay belongs to the TAPE, not to the whole grid: without this the left punch
-     line sat under the instrument column and the strip had holes on one edge only */
-  .ft-frame { left: 262px; }
+  /* The strip is the grid item now, not the stage. The overlay is positioned against .ft-strip,
+     so it no longer needs a hand-set 262px offset to clear the instrument column — the wrapper
+     already sits in column 2. */
+  .ft-strip { grid-column: 2; grid-row: 1; }
 }
 /* one transform on the wrapper, so the column is centred on the line as a unit */
 .ft-inst-in { transform: translateY(-50%); }
 /* counter head */
 .ft-head { display: flex; align-items: baseline; justify-content: space-between;
   max-width: 200px; padding-bottom: 9px; margin-bottom: 14px;
-  border-bottom: 1px solid rgba(232,237,240,0.14); font-family: var(--mono); }
-.ft-head-k { font-size: 9.5px; letter-spacing: 0.24em; color: rgba(232,237,240,0.42); }
+  border-bottom: 1px solid rgba(90,163,163,0.28); font-family: var(--mono); }
+.ft-head-k { font-size: 9.5px; letter-spacing: 0.24em; color: var(--teal-soft); }
 .ft-head-c { font-size: 11px; letter-spacing: 0.10em; color: rgba(232,237,240,0.42);
   font-variant-numeric: tabular-nums; }
 .ft-head-n { color: var(--coral); font-weight: 400; }
@@ -169,7 +195,7 @@
   background-image: repeating-linear-gradient(180deg,
     rgba(232,237,240,0.16) 0 1px, transparent 1px 3px); }
 .ft-tick:last-child s { display: none; }
-.ft-tick i { display: block; width: 14px; height: 1px; background: rgba(232,237,240,0.22);
+.ft-tick i { display: block; width: 14px; height: 1px; background: rgba(90,163,163,0.42);
   transition: width 260ms var(--ease-out), background-color 260ms ease; }
 .ft-tick b { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.14em;
   font-weight: 400; color: transparent; transition: color 260ms ease; }
@@ -187,17 +213,22 @@
 .ft-panel-date { display: block; font-family: var(--mono); font-size: 11px;
   letter-spacing: 0.06em; color: #b7c6cd; }
 .ft-panel-tag { display: block; margin-top: 7px; font-family: var(--mono); font-size: 10px;
-  letter-spacing: 0.16em; text-transform: uppercase; color: #7fc0c0; }
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--teal-soft); }
 .ft-panel-lede { margin: 13px 0 0; font-size: 13px; line-height: 1.55; color: #98a7ae; }
 .ft-panel-rt { display: block; margin-top: 11px; font-family: var(--mono); font-size: 9.5px;
   letter-spacing: 0.12em; text-transform: uppercase; color: #7b8b93; }
 
-/* Month band: a marker on the strip, not a record. Restores chunking without a control. */
+/* Month band: a marker on the strip, not a record. Restores chunking without a control.
+   BRAND COLOUR (2026-08-08): the page ran on grey and coral only, while the startpage and
+   /produkt carry coral AND teal. Teal is the site's "structure and state" voice, so it takes the
+   chapter markers, the instrument's own labels and the tag. Coral stays reserved for the ONE
+   thing in focus: the lit record, the head, the trace. Amber is deliberately absent — in the
+   product it means warning, and importing that meaning onto an editorial surface is noise. */
 .ft-band { position: relative; padding: 9px clamp(58px, 5.4vw, 96px);
-  background: linear-gradient(180deg, #121213, #0c0c0d);
-  box-shadow: inset 0 1px 0 rgba(232,237,240,0.09), inset 0 -1px 0 rgba(0,0,0,0.5); }
+  background: linear-gradient(180deg, rgba(58,128,128,0.10), rgba(58,128,128,0.02));
+  box-shadow: inset 0 1px 0 rgba(90,163,163,0.20), inset 0 -1px 0 rgba(0,0,0,0.45); }
 .ft-band span { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.22em;
-  text-transform: uppercase; color: #93a7b0; }
+  text-transform: uppercase; color: var(--teal-soft); }
 
 /* Compact tier: title + metadata only, roughly half the height, so a reader can skim
    titles and the lead is the one that asks for commitment. */
