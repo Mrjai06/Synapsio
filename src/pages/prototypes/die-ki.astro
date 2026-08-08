@@ -1,0 +1,309 @@
+---
+// PROTOTYPE SURFACE — isolated, nothing here is imported by production.
+// Three genuinely different answers to: "how does the Die-KI section prove the AI decides?"
+//   1 Dossier    · axis: document / evidence   · typography only, no diagram
+//   2 Werkstatt  · axis: physical object       · iso machine routing articles to methods
+//   3 Vergleich  · axis: worked argument       · one article, two systems, same week
+// Picker markup/CSS/wiring copied verbatim from .agents/skills/prototype/PICKER.md
+import "../../styles/global.css";
+---
+
+<html lang="de">
+<head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Prototype · Die KI</title></head>
+<body>
+<main class="proto-page"><div class="shell"><div id="stage"></div></div></main>
+
+<nav class="proto-picker" aria-label="Prototype variants">
+  <span class="proto-picker-highlight" aria-hidden="true"></span>
+  <button class="proto-picker-item" data-active aria-current="true">Dossier</button>
+  <button class="proto-picker-item">Werkstatt</button>
+  <button class="proto-picker-item">Vergleich</button>
+  <span class="proto-picker-divider" aria-hidden="true"></span>
+  <button class="proto-picker-item proto-picker-replay" aria-label="Replay animation (R)">↻</button>
+</nav>
+
+<template id="v1">
+  <section class="pv">
+    <p class="pv-num">02 · Die KI</p>
+    <h2 class="pv-h">Jede Bestellung ist eine Akte.</h2>
+    <p class="pv-lede"><b>Der Agent entscheidet nicht im Verborgenen.</b> Zu jeder Bestellung liegt ein Blatt wie dieses: die Zahlen, das gewählte Verfahren, die verworfenen Alternativen und der Grund.</p>
+
+    <article class="dos">
+      <header class="dos-hd">
+        <span>Entscheidung</span><span class="dos-t">2026-07-28 · 06:47</span>
+      </header>
+
+      <div class="dos-art">Gewindeeinsatz M8 <span>G-0442</span></div>
+
+      <div class="dos-grid">
+        <div><dt>Bestand</dt><dd>640 Stück</dd></div>
+        <div><dt>Verbrauch</dt><dd>71 / Tag</dd></div>
+        <div><dt>Reichweite</dt><dd class="warn">9 Tage</dd></div>
+        <div><dt>Lieferzeit</dt><dd>14 Tage</dd></div>
+        <div><dt>Servicegrad</dt><dd>97 %</dd></div>
+        <div><dt>Sicherheitsbestand</dt><dd>310 Stück</dd></div>
+      </div>
+
+      <div class="dos-sec">
+        <span class="dos-lb">Verfahren gewählt</span>
+        <p class="dos-pick">Bestellpunkt (s,Q)</p>
+        <p class="dos-why">Der Verbrauch ist stetig und die Streuung gering. Bei sporadischem Abgang wäre Croston richtig, hier nicht.</p>
+      </div>
+
+      <div class="dos-sec">
+        <span class="dos-lb">Geprüft und verworfen</span>
+        <ul class="dos-alt">
+          <li><s>Croston</s><span>Verbrauch ist nicht sporadisch</span></li>
+          <li><s>Periodische Prüfung (R,S)</s><span>kein fester Bestellrhythmus hinterlegt</span></li>
+          <li><s>Newsvendor</s><span>Artikel ist nicht verderblich</span></li>
+        </ul>
+      </div>
+
+      <footer class="dos-ft">
+        <div><span class="dos-lb">Ausgelöst</span><p>520 Stück bei Nordschraube AG · 3.980 €</p></div>
+        <div class="dos-ok">unter Schwelle · unter Tageslimit</div>
+      </footer>
+    </article>
+  </section>
+</template>
+
+<template id="v2">
+  <section class="pv">
+    <p class="pv-num">02 · Die KI</p>
+    <h2 class="pv-h">Jeder Artikel bekommt sein Verfahren.</h2>
+    <p class="pv-lede"><b>Nicht eine Formel für alles.</b> Die KI schaut sich das Verbrauchsmuster jedes Artikels an und gibt ihm den Rechenweg, der dazu passt.</p>
+    <div class="wk"><svg id="wkSvg" viewBox="250 55 400 200" aria-hidden="true"></svg></div>
+    <div class="wk-legend">
+      <span><i class="d1"></i>Bestellpunkt (s,Q) · stetig</span>
+      <span><i class="d2"></i>Croston · sporadisch</span>
+      <span><i class="d3"></i>Newsvendor · verderblich</span>
+      <span><i class="d4"></i>Periodisch (R,S)</span>
+      <span><i class="d5"></i>Mehrere Standorte</span>
+    </div>
+  </section>
+</template>
+
+<template id="v3">
+  <section class="pv">
+    <p class="pv-num">02 · Die KI</p>
+    <h2 class="pv-h">Derselbe Artikel. Dieselbe Woche.</h2>
+    <p class="pv-lede"><b>Gewindeeinsatz M8, 71 Stück am Tag, 14 Tage Lieferzeit.</b> Links ein fester Mindestbestand, rechts der Agent. Der Unterschied ist nicht die Bestellung, sondern der Zeitpunkt.</p>
+    <div class="cmp">
+      <div class="cmp-col">
+        <span class="cmp-lb">Fester Mindestbestand · 500 Stück</span>
+        <div class="cmp-track">
+          <div class="cmp-fill bad" style="width:64%"></div>
+          <span class="cmp-mark" style="left:64%">Tag 9<br><em>Bestellung ausgelöst</em></span>
+        </div>
+        <p class="cmp-note">Die Regel greift erst, wenn der Bestand 500 unterschreitet. Ab da dauert es 14 Tage. Der Bestand hält aber nur 7.</p>
+        <div class="cmp-out bad">7 Tage Fehlmenge · Linie steht</div>
+      </div>
+      <div class="cmp-col">
+        <span class="cmp-lb">Synapsio · Reichweite gegen Lieferzeit</span>
+        <div class="cmp-track">
+          <div class="cmp-fill good" style="width:32%"></div>
+          <span class="cmp-mark" style="left:32%">Tag 4<br><em>Bestellung ausgelöst</em></span>
+        </div>
+        <p class="cmp-note">Der Agent bestellt, sobald die Reichweite unter die Lieferzeit fällt. Nicht bei einer festen Zahl, sondern bei dem Verbrauch, den der Artikel gerade hat.</p>
+        <div class="cmp-out good">Ware da an Tag 18 · keine Lücke</div>
+      </div>
+    </div>
+    <p class="cmp-foot">Beide Systeme bestellen dieselbe Menge beim selben Lieferanten. Nur eines von beiden rechnet nach, wie lange der Bestand noch reicht.</p>
+  </section>
+</template>
+
+<style is:global>
+  body { background: var(--ground); color: var(--fg); font-family: var(--sans); margin: 0; }
+  .proto-page { padding: clamp(48px, 8vh, 110px) 0 160px; }
+  .pv-num { font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; color: var(--fg-muted); margin: 0 0 12px; }
+  .pv-h { font-size: clamp(1.7rem, 3.2vw, 2.5rem); font-weight: 600; letter-spacing: -0.024em; line-height: 1.08; margin: 0; }
+  .pv-lede { max-width: 62ch; margin: 16px 0 clamp(28px, 4vw, 46px); font-size: 15px; line-height: 1.62; color: var(--fg-muted); }
+  .pv-lede b { color: var(--fg); font-weight: 600; }
+
+  /* ---- 1 Dossier: a record, set in type. No cards, no diagram. ---- */
+  .dos { border-top: 1px solid var(--hairline-strong); max-width: 62rem; }
+  .dos-hd { display: flex; justify-content: space-between; padding: 12px 0; font-family: var(--mono);
+            font-size: 10.5px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--fg-muted); }
+  .dos-art { font-size: clamp(1.3rem, 2.4vw, 1.9rem); font-weight: 300; letter-spacing: -0.02em; padding-bottom: 18px; border-bottom: 1px solid var(--hairline); }
+  .dos-art span { font-family: var(--mono); font-size: 13px; color: var(--fg-muted); margin-left: 12px; }
+  .dos-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--hairline); }
+  @media (max-width: 700px) { .dos-grid { grid-template-columns: repeat(2, 1fr); } }
+  .dos-grid > div { padding: 15px 20px 15px 0; }
+  .dos-grid dt { font-family: var(--mono); font-size: 10px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-muted); }
+  .dos-grid dd { margin: 6px 0 0; font-size: 19px; font-weight: 300; letter-spacing: -0.01em; }
+  .dos-grid dd.warn { color: var(--amber); }
+  .dos-sec { padding: 20px 0; border-bottom: 1px solid var(--hairline); }
+  .dos-lb { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--fg-muted); margin-bottom: 9px; }
+  .dos-pick { margin: 0; font-size: 22px; font-weight: 600; letter-spacing: -0.015em; }
+  .dos-why { margin: 7px 0 0; font-size: 14px; line-height: 1.6; color: var(--fg-muted); max-width: 60ch; }
+  .dos-alt { list-style: none; margin: 0; padding: 0; }
+  .dos-alt li { display: grid; grid-template-columns: 240px 1fr; gap: 16px; padding: 7px 0; font-size: 14px; }
+  @media (max-width: 700px) { .dos-alt li { grid-template-columns: 1fr; gap: 2px; } }
+  .dos-alt s { color: var(--fg-muted); text-decoration-color: rgba(255,255,255,0.25); }
+  .dos-alt span { color: var(--fg-muted); }
+  .dos-ft { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; padding: 20px 0 0; flex-wrap: wrap; }
+  .dos-ft p { margin: 4px 0 0; font-size: 18px; font-weight: 500; }
+  .dos-ok { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; color: var(--teal-soft);
+            border: 1px solid rgba(90,163,163,0.4); border-radius: 6px; padding: 5px 11px; }
+
+  /* ---- 2 Werkstatt: the sorter ---- */
+  .wk { border: 1px solid var(--app-line-2); border-radius: 14px; background: var(--app-card); padding: 10px; }
+  .wk svg { width: 100%; height: auto; display: block; }
+  .wk .f { vector-effect: non-scaling-stroke; }
+  .wk .hop { fill: #12303c; stroke: var(--edge); }
+  .wk .hop-l { fill: #16394a; stroke: var(--edge); }
+  .wk .chute { fill: #0e242e; stroke: var(--edge-soft); }
+  .wk .bin { fill: #102a35; stroke: var(--edge-soft); }
+  .wk .bin-l { fill: #163a48; stroke: var(--edge-soft); }
+  .wk .rail { fill: none; stroke: var(--edge-soft); stroke-dasharray: 4 5; }
+  .wk .lbl { fill: var(--fg-soft); font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; }
+  .wk .cap { fill: var(--fg-muted); font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; }
+  .wk-legend { display: flex; flex-wrap: wrap; gap: 10px 26px; margin-top: 18px; font-size: 12.5px; color: var(--fg-muted); }
+  .wk-legend span { display: inline-flex; align-items: center; gap: 8px; }
+  .wk-legend i { width: 9px; height: 9px; border-radius: 2px; display: block; }
+  .wk-legend .d1 { background: #5aa3a3; } .wk-legend .d2 { background: #e8845a; }
+  .wk-legend .d3 { background: #f0a500; } .wk-legend .d4 { background: #7a9baa; }
+  .wk-legend .d5 { background: #4a6b7a; }
+
+  /* ---- 3 Vergleich: the worked argument ---- */
+  .cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--hairline-strong); border-radius: 13px; overflow: hidden; }
+  @media (max-width: 800px) { .cmp { grid-template-columns: 1fr; } }
+  .cmp-col { padding: 22px 24px 24px; }
+  .cmp-col:first-child { border-right: 1px solid var(--hairline); }
+  @media (max-width: 800px) { .cmp-col:first-child { border-right: 0; border-bottom: 1px solid var(--hairline); } }
+  .cmp-col:last-child { background: rgba(90,163,163,0.04); }
+  .cmp-lb { display: block; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg-muted); margin-bottom: 26px; }
+  .cmp-track { position: relative; height: 6px; border-radius: 3px; background: var(--app-line-2); margin-bottom: 46px; }
+  .cmp-fill { position: absolute; inset: 0 auto 0 0; border-radius: 3px; }
+  .cmp-fill.bad { background: var(--coral); } .cmp-fill.good { background: var(--teal-soft); }
+  .cmp-mark { position: absolute; top: 14px; transform: translateX(-50%); text-align: center; font-family: var(--mono);
+              font-size: 11px; color: var(--fg-soft); white-space: nowrap; }
+  .cmp-mark em { font-style: normal; font-size: 10px; color: var(--fg-muted); }
+  .cmp-mark::before { content: ""; position: absolute; left: 50%; top: -14px; width: 1px; height: 10px; background: var(--fg-muted); }
+  .cmp-note { margin: 0 0 18px; font-size: 13.5px; line-height: 1.6; color: var(--fg-muted); }
+  .cmp-out { font-size: 14px; font-weight: 600; padding: 11px 14px; border-radius: 9px; }
+  .cmp-out.bad { color: var(--coral); background: rgba(232,132,90,0.09); border: 1px solid rgba(232,132,90,0.28); }
+  .cmp-out.good { color: var(--teal-soft); background: rgba(90,163,163,0.09); border: 1px solid rgba(90,163,163,0.3); }
+  .cmp-foot { margin: 18px 0 0; font-size: 13.5px; color: var(--fg-muted); max-width: 70ch; }
+
+  /* ---- picker: verbatim from PICKER.md ---- */
+  .proto-picker { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 2147483647;
+    display: flex; align-items: center; gap: 2px; padding: 4px; border-radius: 999px; background: rgba(10,10,10,0.82);
+    -webkit-backdrop-filter: blur(12px) saturate(1.4); backdrop-filter: blur(12px) saturate(1.4);
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.08) inset, 0 8px 24px rgba(0,0,0,0.24), 0 2px 6px rgba(0,0,0,0.12);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 13px; line-height: 1;
+    -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none; }
+  .proto-picker-highlight { position: absolute; top: 4px; left: 0; height: 28px; border-radius: 999px;
+    background: rgba(255,255,255,0.12); will-change: transform; }
+  .proto-picker[data-ready] .proto-picker-highlight { transition: transform 250ms cubic-bezier(0.23,1,0.32,1), width 250ms cubic-bezier(0.23,1,0.32,1); }
+  @media (prefers-reduced-motion: reduce) { .proto-picker[data-ready] .proto-picker-highlight { transition: none; } }
+  .proto-picker-item { position: relative; display: flex; align-items: center; height: 28px; padding: 0 12px; border: 0;
+    border-radius: 999px; background: transparent; color: rgba(255,255,255,0.55); font: inherit; cursor: pointer;
+    transition: color 150ms ease-out; }
+  .proto-picker-item:hover { color: rgba(255,255,255,0.85); }
+  .proto-picker-item:active { transform: scale(0.97); }
+  .proto-picker-item:focus-visible { outline: 2px solid rgba(255,255,255,0.4); outline-offset: 2px; }
+  .proto-picker-item[data-active] { color: #fff; }
+  .proto-picker-divider { width: 1px; height: 16px; margin: 0 4px; background: rgba(255,255,255,0.12); }
+  .proto-picker-replay { padding: 0 10px; font-size: 14px; }
+</style>
+
+<script is:inline>
+(function(){
+  var stage=document.getElementById('stage');
+  var picker=document.querySelector('.proto-picker');
+  var highlight=picker.querySelector('.proto-picker-highlight');
+  var items=[].slice.call(picker.querySelectorAll('.proto-picker-item:not(.proto-picker-replay)'));
+  var replay=picker.querySelector('.proto-picker-replay');
+  var variants=['v1','v2','v3'].map(function(id){ return function(){ return document.getElementById(id).innerHTML; }; });
+  var current=0;
+
+  function moveHighlight(){ var el=items[current];
+    highlight.style.width=el.offsetWidth+'px';
+    highlight.style.transform='translateX('+el.offsetLeft+'px)'; }
+
+  function mount(i){ stage.innerHTML='';
+    requestAnimationFrame(function(){ stage.innerHTML=variants[i](); if(i===1) drawSorter(); }); }
+
+  function setActive(i){ if(i<0||i>=variants.length) return; current=i;
+    items.forEach(function(el,j){ if(j===i){ el.setAttribute('data-active',''); el.setAttribute('aria-current','true'); }
+      else { el.removeAttribute('data-active'); el.removeAttribute('aria-current'); } });
+    moveHighlight();
+    var url=new URL(location); url.searchParams.set('v',i+1); history.replaceState(null,'',url);
+    mount(i); }
+
+  items.forEach(function(el,i){ el.addEventListener('click',function(){ setActive(i); }); });
+  replay&&replay.addEventListener('click',function(){ mount(current); });
+  window.addEventListener('resize',moveHighlight);
+  document.addEventListener('keydown',function(e){
+    if(/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)||e.target.isContentEditable) return;
+    if(e.metaKey||e.ctrlKey||e.altKey) return;
+    var n=parseInt(e.key,10);
+    if(n>=1&&n<=variants.length) setActive(n-1);
+    else if(e.key==='ArrowRight') setActive((current+1)%variants.length);
+    else if(e.key==='ArrowLeft') setActive((current-1+variants.length)%variants.length);
+    else if(e.key==='r'||e.key==='R') mount(current);
+  });
+
+  /* ---- variant 2: the sorter, drawn in the site's iso dialect ---- */
+  var COS30=Math.cos(Math.PI/6);
+  function drawSorter(){
+    var svg=document.getElementById('wkSvg'); if(!svg) return;
+    var NS='http://www.w3.org/2000/svg', OFF=[450,150];
+    while(svg.firstChild) svg.removeChild(svg.firstChild);
+    function P(p){ return [(p[0]-p[1])*COS30+OFF[0], (p[0]+p[1])*0.5-p[2]+OFF[1]]; }
+    function box(o,u,v,w,cls,litCls){
+      function k(a,b,c){ return [o[0]+a*u[0]+b*v[0]+c*w[0],o[1]+a*u[1]+b*v[1]+c*w[1],o[2]+a*u[2]+b*v[2]+c*w[2]]; }
+      var A=k(0,0,0),B=k(1,0,0),C=k(1,1,0),D=k(0,1,0),E=k(0,0,1),F=k(1,0,1),G=k(1,1,1),H=k(0,1,1);
+      [[[A,B,F,E],cls],[[B,C,G,F],cls],[[E,F,G,H],litCls||cls]].forEach(function(f){ path(f[1],f[0]); });
+    }
+    function path(cls,pts,open){ var d='';
+      pts.forEach(function(p,i){ var s=P(p); d+=(i?'L':'M')+s[0].toFixed(1)+' '+s[1].toFixed(1); });
+      var el=document.createElementNS(NS,'path'); el.setAttribute('class','f '+cls);
+      el.setAttribute('d',d+(open?'':'Z')); svg.appendChild(el); return el; }
+    function text(cls,p,t,anchor,fill){ var s=P(p), el=document.createElementNS(NS,'text');
+      el.setAttribute('class',cls); el.setAttribute('x',s[0]); el.setAttribute('y',s[1]);
+      if(anchor) el.setAttribute('text-anchor',anchor); if(fill) el.setAttribute('fill',fill);
+      el.textContent=t; svg.appendChild(el); return el; }
+
+    // Bins must spread along SCREEN x. screen-x = (x-y)*cos30, so moving +d in x and -d in y
+    // slides a bin sideways without changing its screen height. Fanning by polar angle (what I
+    // did first) collapses them onto the iso diagonal.
+    var COLS=['#5aa3a3','#e8845a','#f0a500','#7a9baa','#4a6b7a'];
+    var NAMES=['s,Q','Croston','Newsv.','R,S','Multi'];
+    // hopper the articles fall into
+    box([-13,-13,62],[26,0,0],[0,26,0],[0,0,16],'hop','hop-l');
+    text('cap',[-13,-13,96],'ARTIKEL','middle');
+    for(var i=0;i<5;i++){
+      var d=(i-2)*30;
+      // chute from the hopper mouth out to the bin
+      path('rail',[[0,0,58],[d*0.55,-d*0.55,34],[d,-d,16]],true);
+      box([d-11,-d-11,0],[22,0,0],[0,22,0],[0,0,13],'bin','bin-l');
+      text('lbl',[d,-d+19,-4],NAMES[i],'middle',COLS[i]);
+    }
+    
+    // one article per chute, dropping and being routed
+    for(var j=0;j<5;j++){
+      var dd=(j-2)*30, s0=P([0,0,132]), s1=P([0,0,70]), s2=P([dd,-dd,20]);
+      var g=document.createElementNS(NS,'g'); svg.appendChild(g);
+      var r=document.createElementNS(NS,'rect');
+      r.setAttribute('width','12'); r.setAttribute('height','12'); r.setAttribute('rx','2');
+      r.setAttribute('x','-6'); r.setAttribute('y','-6');
+      r.setAttribute('fill',COLS[j]); g.appendChild(r);
+      var am=document.createElementNS(NS,'animateMotion');
+      am.setAttribute('dur','4.6s'); am.setAttribute('repeatCount','indefinite');
+      am.setAttribute('begin',(j*0.92).toFixed(2)+'s');
+      am.setAttribute('keyPoints','0;0.46;1'); am.setAttribute('keyTimes','0;0.4;1'); am.setAttribute('calcMode','linear');
+      am.setAttribute('path','M'+s0[0]+' '+s0[1]+' L'+s1[0]+' '+s1[1]+' L'+s2[0]+' '+s2[1]);
+      g.appendChild(am);
+    }
+  }
+
+  setActive((parseInt(new URLSearchParams(location.search).get('v'),10)||1)-1);
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ picker.setAttribute('data-ready',''); }); });
+})();
+</script>
+</body>
+</html>

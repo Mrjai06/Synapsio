@@ -34,5 +34,6 @@ skills-lock.json
 .render-*.png
 !.render-harness.mjs
 
-# Prototype surfaces: real routes that would publish if committed
-src/pages/prototypes/
+# Prototype surfaces used to be ignored here. They are TRACKED now: blog-index.astro holds the
+# entire data-tape CSS and an untracked file is one `git clean` away from gone. They stay out of
+# the sitemap (astro.config.mjs filter), carry `noindex` and are linked from nowhere.

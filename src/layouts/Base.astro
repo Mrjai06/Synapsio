@@ -11,8 +11,10 @@ interface Props {
   path: string;
   /** set false for pages that exist in only one language */
   hasAlternate?: boolean;
+  /** prototype surfaces: tracked and built, but must never be indexed */
+  noindex?: boolean;
 }
-const { locale, title, description, path, hasAlternate = true } = Astro.props;
+const { locale, title, description, path, hasAlternate = true, noindex = false } = Astro.props;
 
 const site = "https://synapsio.solutions";
 const canonical = site + localePath(locale, path);
@@ -27,6 +29,7 @@ const altEn = site + localePath("en", path);
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonical} />
     {hasAlternate && <link rel="alternate" hreflang="de" href={altDe} />}
     {hasAlternate && <link rel="alternate" hreflang="en" href={altEn} />}
