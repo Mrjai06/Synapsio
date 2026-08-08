@@ -296,8 +296,20 @@ posts.forEach((post, i) => {
       var box = svg.getBoundingClientRect();
       var y = window.innerHeight / 2 - box.top;
 
-      // off the strip: park the pen out of sight rather than pinning it to an end
-      if (y < 0 || y > box.height) { dot.setAttribute("cx", -99); return; }
+      // Off the strip, the pen is not on the tape. It must be HIDDEN, not moved: the svg is
+      // overflow:visible so a parked coordinate stays on screen, and the last one showed up as a
+      // loose dot floating beside the band once the tape had run past the head.
+      // The registration marks go with it. They are sticky inside .ft, whose layout box ends up
+      // to the travel distance BELOW the strip's visual edge, so without this they hang in empty
+      // space for the last ~23px after the tape has run out.
+      var ftEl2 = document.querySelector(".ft");
+      if (y < 0 || y > box.height) {
+        dot.style.opacity = "0";
+        if (ftEl2) ftEl2.classList.add("ft-past");
+        return;
+      }
+      dot.style.opacity = "";
+      if (ftEl2) ftEl2.classList.remove("ft-past");
 
       // walk the polyline (vertices are in ascending y) and interpolate x at the head line
       var x = traceX[0][0];

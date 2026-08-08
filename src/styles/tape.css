@@ -44,8 +44,11 @@
   .ft-headmark { display: flex; align-items: center; justify-content: space-between;
     position: sticky; top: 50vh; z-index: 5; height: 0; pointer-events: none;
     grid-column: 1 / -1; grid-row: 1; align-self: start; }
-  .ft-headmark i { display: block; width: 22px; height: 2px; background: var(--coral); }
+  .ft-headmark i { display: block; width: 22px; height: 2px; background: var(--coral);
+    transition: opacity 160ms ease; }
   .ft-headmark b { display: none; }
+  /* the head only exists while there is tape under it */
+  .ft.ft-past .ft-headmark i { opacity: 0; }
 }
 /* Left inset clears the instrument column so the head marks the STRIP, not the page. */
 @media (min-width: 1200px) { .ft-headmark { margin-left: 262px; } }
