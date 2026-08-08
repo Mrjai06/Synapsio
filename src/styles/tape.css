@@ -67,6 +67,28 @@
    The strip keeps its holes and rails there; the fine print is a wide-screen luxury. */
 @media (max-width: 900px) { .ft-code { display: none; } }
 
+/* ---- the pen trace ----------------------------------------------------------------------
+   ONE polyline for the whole strip, living in the static overlay next to the perforations.
+   The first attempt drew a segment inside each record; records scaled independently, so the
+   segments stopped meeting at their shared boundary the moment one came into focus. Now that
+   nothing deforms, the vertices can be measured once (FilmTape.astro, layoutTrace) and the line
+   is continuous by construction, at any number of records and any record height.
+   Deflection is the reading time. The dot marks the piece currently at the head. */
+/* height by calc, NOT top+bottom: an <svg> is a replaced element with an intrinsic 300x150, so
+   it ignores a top/bottom pair and stays 150px tall. The script then measured H=150 on a strip
+   hundreds of pixels high and the line's tail ran back up the band. */
+.ft-trace { position: absolute; top: 13px; height: calc(100% - 26px); z-index: 4;
+  pointer-events: none;
+  right: clamp(96px, 9vw, 178px); width: clamp(90px, 10.5vw, 176px); overflow: visible;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(232,237,240,0.05) 0 1px, transparent 1px 25%); }
+/* The viewBox is set in PIXELS by the script, never stretched: preserveAspectRatio="none" would
+   scale x and y differently and turn the head dot into an ellipse. */
+.ft-trace polyline { fill: none; stroke: rgba(232,132,90,0.42); stroke-width: 1.2;
+  stroke-linejoin: round; }
+.ft-trace circle { fill: var(--coral); transition: cx 260ms ease, cy 260ms ease; }
+@media (max-width: 900px) { .ft-trace { display: none; } }
+
 .ft-stage { display: flex; flex-direction: column; gap: 0;
   padding-block: 13px; }
 
@@ -89,18 +111,21 @@
     repeating-linear-gradient(90deg, rgba(232,237,240,0.016) 0 1px, transparent 1px 5px),
     linear-gradient(180deg, rgba(232,237,240,0.034) 0%, rgba(232,237,240,0.016) 100%);
   box-shadow: inset 0 1px 0 rgba(232, 237, 240, 0.075);
-  /* FOCUS AT THE CENTRE LINE. The record crossing the middle of the viewport is at full
-     size and full strength; the rest step back. Scale reads immediately even on a short
-     index, which a rotation could not: the drum needed more vertical travel than a
-     five-post blog has, so three of five records sat pinned at maximum tilt and never moved.
-     Scale also gives the reader a real "you are here" without a scrollbar or a control. */
-  transform: scale(calc(1 - var(--ad, 0) * 0.075));
-  transform-origin: 50% 50%;
-  /* floored at 0.70 so the stepped-back records stay above AA, not just visible */
-  opacity: calc(1 - var(--ad, 0) * 0.30);
-  will-change: transform, opacity;
+  /* FOCUS AT THE CENTRE LINE — BY LIGHT, NOT BY SCALE (changed 2026-08-08).
+     Records used to scale individually. That is what forced the perforations into a static
+     overlay: a scaled record's holes are smaller and sit at a different pitch than its
+     neighbour's, so the punch line stepped by 12px at every boundary. Jakob's objection was that
+     the holes then do not travel with the material, and he is right — a tape is ONE physical
+     object, so either all of it deforms or none of it does. None of it does now.
+     The focus is carried the way a real transport carries it: the piece passing the head is lit,
+     the rest falls off. That also lets the pen trace run as a single unbroken line, because
+     record geometry no longer changes while scrolling. */
+  opacity: calc(1 - var(--ad, 0) * 0.34);
+  will-change: opacity;
   transition: filter 200ms ease;
 }
+/* the lit piece: a touch more surface and a full-strength title */
+.ft-rec.on { filter: brightness(1.05); }
 .ft-rec:hover, .ft-rec:focus-visible { filter: brightness(1.14); }
 .ft-rec:active { filter: brightness(0.97); }
 

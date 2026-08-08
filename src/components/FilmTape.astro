@@ -10,8 +10,14 @@
 //    records. When each record carried its own, every record's transform moved its holes: the
 //    punch line wobbled 12px between a centred record and the ends, and the strip resolved as
 //    separate slabs rather than one tape. A straight sprocket line IS the read of "continuous".
-//    The overlay paints ground-coloured discs on top, which is visually identical to a hole and
-//    geometrically immune to whatever the records do underneath.
+//    ── 2026-08-08, and this is now the load-bearing decision ──
+//    Jakob: "diese Punkte sind über das Tape overlayed und nicht mit dem Scrollen animiert, wenn
+//    ein Tapeteil hochgeht sollte die Perforierung auch hochgehen." Correct, and it cannot be
+//    fixed by moving the holes back into the records: a scaled record's holes are smaller and at
+//    a different pitch than its neighbour's, which is the wobble above. A tape is ONE physical
+//    object — either all of it deforms or none of it does. So the PER-RECORD SCALE IS GONE.
+//    Nothing deforms, the overlay is in permanent register with the material, and the whole strip
+//    travels together. Do not reintroduce a per-record transform without also solving this.
 // 2. NO translateZ. Under perspective it shrinks the record horizontally as well, which is the
 //    same wedge that removing scale() was supposed to fix. rotateX alone keeps width constant.
 // 3. The opacity ramp is floored. It used to reach 0.38, where the lede measured 2.27:1 against
@@ -43,14 +49,16 @@ const { posts } = Astro.props;
 //
 // This costs no interaction, which matters: the site's rule is that visitors do not click things.
 //
-// ── REMOVED 2026-08-08: the pen trace ──
-// A polyline per record, deflection = reading time. It could not work where it sat. Records SCALE
-// independently as they cross the centre line, so two neighbouring segments stop meeting at their
-// shared boundary the moment one of them is in focus — the line visibly broke while scrolling.
-// That is the same reason the perforations live in the static overlay (note 1 above). Rebuilding
-// it there would mean measuring every record's position in JS each frame, and Jakob's first
-// question about it was "was soll die darstellen?" — a figure that needs its legend read is not
-// paying for that. The tape carries its density in print and graduation instead.
+// ── THE PEN TRACE, second attempt (2026-08-08) ──
+// v1 drew a segment inside each record. Records scaled independently, so neighbouring segments
+// stopped meeting at their shared boundary as soon as one came into focus, and the line broke
+// while scrolling. It was removed, and Jakob asked for it back on the condition it be done
+// properly ("das Prinzip der Spur gut, aber es muss besser umgesetzt werden").
+// v2 is ONE polyline in the static overlay, with a vertex per record measured in layoutTrace().
+// It is only correct because the scale is gone: record geometry no longer changes while
+// scrolling, so the line can be measured once per layout instead of per frame. Deflection is the
+// reading time — real, and the head dot on it marks the piece currently at the centre line, which
+// is what ties the figure to what you are reading rather than leaving it to be decoded.
 
 // Repeated so the strip is printed edge to edge at any length. Long enough for a tall tape;
 // overflow is clipped by .ft-code, so an extra repeat costs nothing.
@@ -79,6 +87,7 @@ posts.forEach((post, i) => {
               data-date={`${p.day}. ${p.month}`}
               data-tag={p.tag}
               data-rt={p.rt}
+              data-min={String(parseInt(p.rt, 10) || 0)}
               data-lede={p.lede}
             >
               <span class="ft-main">
@@ -140,6 +149,8 @@ posts.forEach((post, i) => {
         who made the tape. Material, not data: nothing here is a measurement. */}
     <span class="ft-code left">{EDGE_CODE}</span>
     <span class="ft-code right">{EDGE_CODE}</span>
+    {/* The pen line. Empty until the script measures the strip; viewBox is written in pixels. */}
+    <svg class="ft-trace"><polyline points="" /><circle cx="-9" cy="-9" r="2.6" /></svg>
     <span class="ft-ruler bottom"></span>
   </div>
 </div>
@@ -148,7 +159,7 @@ posts.forEach((post, i) => {
   // Re-callable: the harness mounts this after load.
   window.__ftInit = function () {
     if (!document.querySelector(".ft-stage")) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     // Each record eases toward its target every frame rather than snapping per scroll event.
     // The loop parks once everything is within half a thousandth of target (verified: 0 rAF
@@ -210,9 +221,66 @@ posts.forEach((post, i) => {
       if (head) head.textContent = String(idx + 1).padStart(2, "0");
       var recs2 = document.querySelectorAll(".ft-rec");
       for (var m = 0; m < recs2.length; m++) recs2[m].classList.toggle("on", m === idx);
+      markHead(idx);
+    }
+
+    // ── the pen trace ──────────────────────────────────────────────────────────────────────
+    // Measured once per layout, not per frame: nothing about the strip's geometry changes while
+    // scrolling any more. Coordinates go into the viewBox in PIXELS so the line is not stretched
+    // and the head dot stays round.
+    var traceX = [];
+    function layoutTrace() {
+      var svg = document.querySelector(".ft-trace");
+      var recs = document.querySelectorAll(".ft-rec");
+      if (!svg || !recs.length) return;
+      var poly = svg.querySelector("polyline");
+      var box = svg.getBoundingClientRect();
+      var W = box.width, H = box.height;
+      if (!W || !H) return;
+
+      var max = 1;
+      for (var i = 0; i < recs.length; i++) {
+        var m = +recs[i].getAttribute("data-min") || 0;
+        if (m > max) max = m;
+      }
+      // 18..82 % of the band, so the line never runs into either of its own edges
+      var pts = [];
+      traceX = [];
+      for (var j = 0; j < recs.length; j++) {
+        var v = +recs[j].getAttribute("data-min") || 0;
+        var x = (0.18 + (v / max) * 0.64) * W;
+        var r = recs[j].getBoundingClientRect();
+        var y = r.top + r.height / 2 - box.top;
+        traceX.push([x, y]);
+        // run the line out to both ends of the strip instead of starting at the first record
+        if (j === 0) pts.push(x + ",0");
+        pts.push(x + "," + y);
+        if (j === recs.length - 1) pts.push(x + "," + H);
+      }
+      svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+      poly.setAttribute("points", pts.join(" "));
+      markHead(window.__ftActive || 0);
+    }
+
+    function markHead(idx) {
+      var svg = document.querySelector(".ft-trace");
+      if (!svg || !traceX[idx]) return;
+      var dot = svg.querySelector("circle");
+      dot.setAttribute("cx", traceX[idx][0]);
+      dot.setAttribute("cy", traceX[idx][1]);
     }
 
     function kick() { if (!running) { running = true; requestAnimationFrame(frame); } }
+
+    // The trace is a FIGURE, not motion: it is drawn even under reduced motion, where only the
+    // focus ramp and the head dot stop moving.
+    layoutTrace();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(layoutTrace);
+    if (!window.__ftTraceBound) {
+      window.__ftTraceBound = true;
+      window.addEventListener("resize", layoutTrace, { passive: true });
+    }
+    if (still) return;
 
     if (!window.__ftBound) {
       window.__ftBound = true;
