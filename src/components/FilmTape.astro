@@ -64,12 +64,9 @@ const { posts } = Astro.props;
 // overflow is clipped by .ft-code, so an extra repeat costs nothing.
 const EDGE_CODE = "SYNAPSIO · NOTIZEN AUS DEM EINKAUF · ".repeat(24);
 
-// The printed axis at the head of the band. Same mapping the script uses for the vertices:
-// 18..82 % of the band width. Even minutes only, so a five-post index prints three numbers and
-// not a ruler. Whisper-quiet on purpose — the quantity is reading time, not revenue.
-const rtMax = Math.max(...posts.map((p) => parseInt(p.rt, 10) || 0), 1);
-const axisTicks: { v: number; x: number }[] = [];
-for (let v = 2; v <= rtMax; v += 2) axisTicks.push({ v, x: 18 + (v / rtMax) * 64 });
+// REMOVED 2026-08-08: the printed minute axis. Jakob: "die Skala macht keinen Sinn, bzw. hat
+// keinen Sinn." He is right — labelling an axis for reading time dresses a small figure as an
+// important measurement. The deflection is legible as a shape; it does not need numbers.
 
 const groups: { month: string; items: (Post & { lead: boolean; n: number })[] }[] = [];
 posts.forEach((post, i) => {
@@ -163,30 +160,32 @@ posts.forEach((post, i) => {
         who made the tape. Material, not data: nothing here is a measurement. */}
     <span class="ft-code left">{EDGE_CODE}</span>
     <span class="ft-code right">{EDGE_CODE}</span>
-    {/* Printed once, at the head of the band, on the paper itself — so it travels with the tape
-        the way a printed chart header does, instead of hovering as a permanent axis. */}
-    <span class="ft-axis" aria-hidden="true">
-      <em>MIN.</em>
-      {axisTicks.map((t) => (
-        <b style={`left:${t.x}%`}>{t.v}</b>
-      ))}
-    </span>
     {/* The pen line. Empty until the script measures the strip; viewBox is written in pixels. */}
     <svg class="ft-trace">
       <defs>
         {/* FRESH INK: the stroke brightens around the pen and dries off with distance. The stops
             are userSpaceOnUse so the script can slide the window with the pen every frame. */}
         <linearGradient id="ft-ink" gradientUnits="userSpaceOnUse" x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0" stop-color="#e8845a" stop-opacity="0.30" />
-          <stop offset="0.5" stop-color="#e8845a" stop-opacity="1" />
-          <stop offset="1" stop-color="#e8845a" stop-opacity="0.30" />
+          <stop offset="0" stop-color="#e8845a" stop-opacity="0.16" />
+          <stop offset="0.42" stop-color="#e8845a" stop-opacity="0.42" />
+          <stop offset="0.5" stop-color="#f0a07a" stop-opacity="1" />
+          <stop offset="0.58" stop-color="#e8845a" stop-opacity="0.42" />
+          <stop offset="1" stop-color="#e8845a" stop-opacity="0.16" />
         </linearGradient>
       </defs>
       <polyline points="" />
-      {/* the nib: a short arm and a tip, which reads as a pen at 10px where an iso figure would
-          only read as a smudge */}
-      <line class="ft-arm" x1="0" y1="0" x2="0" y2="0" />
-      <path class="ft-nib" d="" />
+      {/* THE PEN CARRIAGE. An arrowhead was too simple (Jakob), and a 6px iso figure would have
+          been a smudge — so the whole assembly got bigger instead: a 23x31px isometric block on
+          a shaft, in the same iso language as HorizonteIso, IsoSilo and ArchivDrawer. Authored
+          once here with its tip at the local origin; the script only translates it, so the
+          geometry can never drift out of proportion. */}
+      <g class="ft-pen" transform="translate(-999,-999)">
+        <path class="pen-shaft" d="M0,0 L13,-11.5" />
+        <path class="pen-face-l" d="M3,-26 L13,-20.5 L13,-11.5 L3,-17 Z" />
+        <path class="pen-face-r" d="M13,-20.5 L23,-26 L23,-17 L13,-11.5 Z" />
+        <path class="pen-face-t" d="M3,-26 L13,-31.5 L23,-26 L13,-20.5 Z" />
+        <circle class="pen-tip" cx="0" cy="0" r="1.9" />
+      </g>
     </svg>
     <span class="ft-ruler bottom"></span>
   </div>
@@ -354,23 +353,14 @@ posts.forEach((post, i) => {
           }
         }
       }
-      // the nib: a short arm to the right of the tip, and a triangle pointing at the line
-      var arm = svg.querySelector(".ft-arm"), nib = svg.querySelector(".ft-nib");
-      if (arm) {
-        arm.setAttribute("x1", (x + 5).toFixed(2)); arm.setAttribute("y1", y.toFixed(2));
-        arm.setAttribute("x2", (x + 19).toFixed(2)); arm.setAttribute("y2", y.toFixed(2));
-      }
-      if (nib) {
-        nib.setAttribute("d",
-          "M" + (x + 1.6).toFixed(2) + "," + y.toFixed(2) +
-          " L" + (x + 6.4).toFixed(2) + "," + (y - 3.1).toFixed(2) +
-          " L" + (x + 6.4).toFixed(2) + "," + (y + 3.1).toFixed(2) + " Z");
-      }
+      // one translate for the whole carriage: its tip is the local origin
+      var pen = svg.querySelector(".ft-pen");
+      if (pen) pen.setAttribute("transform", "translate(" + x.toFixed(2) + "," + y.toFixed(2) + ")");
 
-      // fresh ink: slide the gradient window with the pen so the stroke is brightest where it is
-      // being written and dries off within ~150px in both directions
+      // fresh ink: a tighter, higher-contrast window than the first attempt, which was too wide
+      // and too shallow to notice (0.30 to 1 over 300px read as an evenly coloured line)
       var g = svg.querySelector("#ft-ink");
-      if (g) { g.setAttribute("y1", (y - 150).toFixed(1)); g.setAttribute("y2", (y + 150).toFixed(1)); }
+      if (g) { g.setAttribute("y1", (y - 95).toFixed(1)); g.setAttribute("y2", (y + 95).toFixed(1)); }
     }
 
     function kick() { if (!running) { running = true; requestAnimationFrame(frame); } }
