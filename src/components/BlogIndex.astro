@@ -57,7 +57,7 @@ const records = posts.map((post) => ({
         <div class="shell bl-empty-wrap"><p class="bl-empty">{c.empty}</p></div>
       ) : (
         <div class="fm-tape">
-          <FilmTape posts={records} legend={c.traceLegend} />
+          <FilmTape posts={records} />
         </div>
       )
     }

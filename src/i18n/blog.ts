@@ -11,9 +11,6 @@ export const blogCopy = {
     // composition the tape was designed under.
     kicker: "Notizen",
     mast: "Aus dem Einkauf",
-    // What the pen line on the tape plots. It must name a real quantity, or the trace is
-    // decoration dressed as a measurement.
-    traceLegend: "AUSSCHLAG · LESEZEIT",
     lede: "Was wir beim Bauen über Bestandsführung, Lieferanten und Beschaffung im Mittelstand lernen. Ohne Vertriebsbroschüre.",
     readingTime: (m: number) => `${m} Min. Lesezeit`,
     back: "Alle Beiträge",
@@ -31,7 +28,6 @@ export const blogCopy = {
     h1: "Notes from procurement",
     kicker: "Notes",
     mast: "From procurement",
-    traceLegend: "DEFLECTION · READING TIME",
     lede: "What we learn while building, about inventory, suppliers and procurement in mid-sized companies. Not a sales brochure.",
     readingTime: (m: number) => `${m} min read`,
     back: "All posts",

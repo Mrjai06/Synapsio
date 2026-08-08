@@ -33,12 +33,18 @@
   background-size: 100% 9px, 100% 5px; background-repeat: repeat-x; }
 .ft-ruler.top { top: 0; border-bottom: 1px solid rgba(232,237,240,0.16); background-position: left bottom; }
 .ft-ruler.bottom { bottom: 0; border-top: 1px solid rgba(232,237,240,0.16); background-position: left top; }
-/* Ground-coloured discs painted OVER the records: identical to a hole, and dead straight
-   regardless of what the records do underneath. */
+/* Ground-coloured holes painted OVER the records: identical to a punch, and dead straight
+   regardless of what the records do underneath.
+   HARD colour stops and a round cell. The first pass used closest-side on a 19x30 cell, which
+   makes a soft-edged ELLIPSE — it read as a row of bubbles sitting on the strip rather than as
+   holes cut through it. A punch has a crisp edge and is round. */
 .ft-perf { position: absolute; top: 13px; bottom: 13px; width: clamp(34px, 3vw, 46px);
   background-image:
-    radial-gradient(closest-side, var(--ground) 0 86%, rgba(232,237,240,0.22) 89%, transparent 92%);
-  background-size: 19px 30px; background-position: center top; background-repeat: repeat-y; }
+    radial-gradient(circle 7.5px at 50% 50%,
+      var(--ground) 0 6.4px,
+      rgba(232,237,240,0.20) 6.4px 7.2px,
+      transparent 7.2px);
+  background-size: 22px 22px; background-position: center top; background-repeat: repeat-y; }
 .ft-perf.left { left: clamp(18px, 1.8vw, 30px); }
 .ft-perf.right { right: clamp(18px, 1.8vw, 30px); }
 /* the material's own edges: a lit rail down each side, inboard of the punch line, so the
@@ -71,14 +77,18 @@
   grid-template-columns: minmax(0, 1fr);
   padding: clamp(22px, 2.8vh, 32px) clamp(58px, 5.4vw, 96px);
   text-decoration: none; color: inherit;
+  /* SURFACE MATCHED TO THE INSTRUMENT COLUMN (Jakob, 2026-08-08: "der Index passt texturlich
+     nicht rein, vielleicht kann man das Tape an den Index anpassen"). The strip used to be a
+     graphite slab — a three-layer gradient from #232426 to #141516, an inset white top edge and
+     a drop shadow so records sat ON each other. Beside a column made of ground colour, hairlines
+     and mono type, that was a different material from a different site.
+     Now: the same ground, lifted just enough to stay ABOVE the page, hairline separation, and
+     the striations kept. The lift is not optional — the perforations are painted in the ground
+     colour, so if the strip stops being lighter than the page the holes stop reading as holes. */
   background:
-    repeating-linear-gradient(90deg, rgba(232,237,240,0.022) 0 1px, transparent 1px 4px),
-    linear-gradient(90deg, rgba(0,0,0,0.45) 0, transparent 8%, transparent 92%, rgba(0,0,0,0.45) 100%),
-    linear-gradient(180deg, #232426 0%, #1b1c1e 55%, #141516 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(232, 237, 240, 0.17),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
-    0 12px 26px -16px rgba(0, 0, 0, 0.9);
+    repeating-linear-gradient(90deg, rgba(232,237,240,0.016) 0 1px, transparent 1px 5px),
+    linear-gradient(180deg, rgba(232,237,240,0.034) 0%, rgba(232,237,240,0.016) 100%);
+  box-shadow: inset 0 1px 0 rgba(232, 237, 240, 0.075);
   /* FOCUS AT THE CENTRE LINE. The record crossing the middle of the viewport is at full
      size and full strength; the rest step back. Scale reads immediately even on a short
      index, which a rotation could not: the drum needed more vertical travel than a
@@ -96,7 +106,7 @@
 
 .ft-rec::before {
   content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
-  background-image: linear-gradient(180deg, rgba(232,237,240,calc(0.035 + var(--f,0) * 0.055)) 0, transparent 46%);
+  background-image: linear-gradient(180deg, rgba(232,237,240,calc(0.014 + var(--f,0) * 0.030)) 0, transparent 46%);
 }
 .ft-rec::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px;
   background: linear-gradient(90deg, transparent, rgba(232,132,90,calc(var(--f,0) * 0.55)), transparent);
@@ -127,8 +137,6 @@
 .ft-head-c { font-size: 11px; letter-spacing: 0.10em; color: rgba(232,237,240,0.42);
   font-variant-numeric: tabular-nums; }
 .ft-head-n { color: var(--coral); font-weight: 400; }
-.ft-legend { display: block; margin-top: -6px; margin-bottom: 15px; font-family: var(--mono);
-  font-size: 8.5px; letter-spacing: 0.20em; color: rgba(232,237,240,0.34); }
 .ft-scale { display: flex; flex-direction: column; gap: 9px; }
 .ft-tick { position: relative; display: flex; align-items: center; gap: 10px; }
 /* three minor graduations in the gap under each tick, so the scale reads as travel */
@@ -181,21 +189,6 @@
 .ft-tag { font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase;
   color: #7fc0c0; margin-top: 4px; }
 .ft-rt { font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #93a7b0; }
-
-/* The pen trace. Runs the full length of the tape through the empty right third, which is
-   also what stops each record from being a title floating in a void. */
-.ft-trace { position: absolute; top: 0; bottom: 0; z-index: 0;
-  right: clamp(96px, 9vw, 168px); width: clamp(96px, 11vw, 190px); height: 100%;
-  overflow: visible; }
-.ft-trace polyline { fill: none; vector-effect: non-scaling-stroke;
-  stroke: rgba(232,132,90,0.34); stroke-width: 1.25;
-  transition: stroke 220ms ease, stroke-width 220ms ease; }
-.ft-rec.on .ft-trace polyline { stroke: rgba(232,132,90,0.85); stroke-width: 1.6; }
-/* The trace's own graduation. A deflection against nothing is a squiggle; against a ruled
-   band it is a reading. Four faint verticals, painted under the line. */
-.ft-trace { background-image:
-  repeating-linear-gradient(90deg, rgba(232,237,240,0.055) 0 1px, transparent 1px 25%); }
-@media (max-width: 900px) { .ft-trace { display: none; } }
 
 /* Frame number printed on the material, at the empty right end of the record. */
 .ft-no { position: absolute; right: clamp(58px, 5.4vw, 96px); top: 50%; z-index: 1;

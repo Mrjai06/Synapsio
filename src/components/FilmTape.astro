@@ -29,8 +29,8 @@
 interface Post {
   day: string; month: string; tag: string; rt: string; title: string; lede: string; href: string;
 }
-interface Props { posts: Post[]; legend?: string }
-const { posts, legend = "AUSSCHLAG · LESEZEIT" } = Astro.props;
+interface Props { posts: Post[] }
+const { posts } = Astro.props;
 
 // Group by month, and split lead from the rest.
 //
@@ -42,32 +42,23 @@ const { posts, legend = "AUSSCHLAG · LESEZEIT" } = Astro.props;
 // Archiv had and the tape lost.
 //
 // This costs no interaction, which matters: the site's rule is that visitors do not click things.
+//
+// ── REMOVED 2026-08-08: the pen trace ──
+// A polyline per record, deflection = reading time. It could not work where it sat. Records SCALE
+// independently as they cross the centre line, so two neighbouring segments stop meeting at their
+// shared boundary the moment one of them is in focus — the line visibly broke while scrolling.
+// That is the same reason the perforations live in the static overlay (note 1 above). Rebuilding
+// it there would mean measuring every record's position in JS each frame, and Jakob's first
+// question about it was "was soll die darstellen?" — a figure that needs its legend read is not
+// paying for that. The tape carries its density in print and graduation instead.
+
 // Repeated so the strip is printed edge to edge at any length. Long enough for a tall tape;
 // overflow is clipped by .ft-code, so an extra repeat costs nothing.
 const EDGE_CODE = "SYNAPSIO · NOTIZEN AUS DEM EINKAUF · ".repeat(24);
 
-// ── THE TRACE ──────────────────────────────────────────────────────────────────────────────
-// A chart recorder without a pen line is just a perforated band. The deflection is REAL and
-// labelled in the instrument head: it is the reading time of each piece. Nothing here is an
-// invented measurement, which is the rule this file has followed from the first pass.
-//
-// Continuity across records is built, not faked: each record draws its own segment, but enters
-// at the midpoint between itself and the record above and leaves at the midpoint to the one
-// below. Neighbouring segments therefore meet exactly on the record boundary at any height,
-// which a single tall SVG could not guarantee (the lead record is twice the height of the rest,
-// so a stretched viewBox would drift out of register with the strip).
-const mins = (s: string) => parseInt(s, 10) || 0;
-const rtMax = Math.max(...posts.map((p) => mins(p.rt)), 1);
-// 18..82 % of the trace band, so the line never runs into either of its own edges
-const defl = (v: number) => 18 + (v / rtMax) * 64;
-
-const groups: { month: string; items: (Post & { lead: boolean; n: number; trace: string })[] }[] = [];
+const groups: { month: string; items: (Post & { lead: boolean; n: number })[] }[] = [];
 posts.forEach((post, i) => {
-  const cur = defl(mins(post.rt));
-  const prev = i > 0 ? defl(mins(posts[i - 1].rt)) : cur;
-  const next = i < posts.length - 1 ? defl(mins(posts[i + 1].rt)) : cur;
-  const trace = `${(prev + cur) / 2},0 ${cur},50 ${(cur + next) / 2},100`;
-  const item = { ...post, lead: i === 0, n: i + 1, trace };
+  const item = { ...post, lead: i === 0, n: i + 1 };
   const last = groups[groups.length - 1];
   if (last && last.month === post.month) last.items.push(item);
   else groups.push({ month: post.month, items: [item] });
@@ -98,11 +89,6 @@ posts.forEach((post, i) => {
                   position, not a field: a recorder prints its frame count on the tape as well as
                   showing it on the counter. Everything else stays in the panel. */}
               <span class="ft-no" aria-hidden="true">{String(p.n).padStart(2, "0")}</span>
-              {/* preserveAspectRatio none: the band is a fixed width but every record is a
-                  different height, and the segment must fill whatever height it gets. */}
-              <svg class="ft-trace" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-                <polyline points={p.trace} />
-              </svg>
             </a>
           ))}
         </>
@@ -123,8 +109,6 @@ posts.forEach((post, i) => {
       <span class="ft-head-k">INDEX</span>
       <span class="ft-head-c"><b class="ft-head-n">01</b>/{String(posts.length).padStart(2, "0")}</span>
     </div>
-    {/* The trace has to say what it plots, or it is decoration pretending to be a measurement. */}
-    <span class="ft-legend">{legend}</span>
     <div class="ft-scale">
       {posts.map((p, i) => (
         <span class="ft-tick" data-tick={i}>
