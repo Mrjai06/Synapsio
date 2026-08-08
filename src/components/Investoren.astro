@@ -6,15 +6,19 @@
 //   problem   three large figures in a row, each with its source underneath
 //   markt     measured bars beside prose
 //   heute     plain prose, no figure, one statement
-//   plan      a column chart of the three ARR cases + the cases in words
+//   plan      one proportional scale carrying the three ARR cases + the cases as a stacked list
 //   funding   a horizontal rail with three stops
 //   close     centred
 //
 // CHART DECISIONS (they are deliberate, do not "improve" them into prettier lies):
-//  · The ARR columns are on a LINEAR scale. 9 against 115 renders as a stub, and that is the
-//    honest picture: the ambition case is thirteen times the floor. A log scale would flatter it.
-//  · Only the base case carries the accent colour, because it is the only one we underwrite.
-//    Identity never rests on colour alone here: every column is directly labelled.
+//  · The three ARR cases sit on ONE linear scale, not in three columns. As columns the floor case
+//    rendered as a 20px stub beside an empty ambition box, which read as two placeholders and one
+//    number. On a shared axis the same linear truth (ambition is thirteen times the floor) is the
+//    distance between two marks, and the section stops being the page's third three-column grid.
+//    A log scale would flatter the floor case; it stays linear.
+//  · Only the base case carries the accent, because it is the only one we underwrite. Identity
+//    never rests on colour alone: every mark is directly labelled, and the case names repeat in
+//    the list underneath. No filled track — a hairline axis with marks, per the taste pass.
 //  · The market section uses TWO mark types on purpose. The TAM is an absolute RANGE (two houses
 //    disagree, so the bar spans their disagreement); the other two are SHARES of a whole, drawn
 //    as proportion bars. Drawing a share as if it were an absolute would be a false comparison.
@@ -38,6 +42,14 @@ const tamWidth = ((TAM_HI - TAM_LO) / TAM_AXIS) * 100;
 const shares = [24.6, 26.2];
 
 const maxCase = Math.max(...c.plan.cases.map((x) => x.v));
+
+// Graduation for the ARR rail. Without it the axis is a bare line with 60 % of its length empty
+// between the base and the ambition case, and the distance stops being readable as a quantity.
+// Minor every 5 Mio., labelled major every 25.
+const planTicks = Array.from({ length: Math.floor(maxCase / 5) + 1 }, (_, i) => {
+  const v = i * 5;
+  return { v, x: (v / maxCase) * 100, major: v % 25 === 0 };
+});
 ---
 
 <SiteNav locale={locale} path="/investoren" active="investoren" />
@@ -131,22 +143,48 @@ const maxCase = Math.max(...c.plan.cases.map((x) => x.v));
 
     <figure class="in-chart">
       <span class="mono in-axis">{c.plan.caseAxis}</span>
-      <div class="in-cols">
+      {/* The scale itself: position IS the number. Edge marks are pinned inside the rail rather
+          than centred on their tick, so nothing overhangs the measure at any width. */}
+      <div class="in-scale">
         {
           c.plan.cases.map((x, i) => (
-            <div class="in-col">
-              <div class="in-plot">
-                <span class="in-col-v">{x.label}</span>
-                {/* the magnitude is a custom property, not a height, so the same number can drive a
-                    column on desktop and a horizontal bar in a narrow column */}
-                <span class={"in-col-bar" + (i === 1 ? " on" : "")} style={`--v:${(x.v / maxCase) * 100}%`} />
-              </div>
-              <span class="mono in-col-k">{x.k}</span>
-              <p>{x.d}</p>
-            </div>
+            <span
+              class={"in-mark" + (i === 1 ? " on" : "")}
+              style={`--x:${(x.v / maxCase) * 100}%`}
+              data-edge={i === 0 ? "start" : i === c.plan.cases.length - 1 ? "end" : undefined}
+            >
+              <span class="in-mark-v">{x.label}</span>
+              <span class="in-mark-t" />
+            </span>
           ))
         }
       </div>
+
+      {/* The graduation hangs BELOW the baseline so it can never collide with the case marks. */}
+      <div class="in-grad" aria-hidden="true">
+        {
+          planTicks.map((t) => (
+            <span class={"in-tick" + (t.major ? " maj" : "")} style={`--x:${t.x}%`}>
+              {t.major && <i class="mono">{t.v}</i>}
+            </span>
+          ))
+        }
+      </div>
+
+      {/* Rows, not columns: the page already spends two sections on three-across grids. */}
+      <dl class="in-cases">
+        {
+          c.plan.cases.map((x, i) => (
+            <div class={"in-case" + (i === 1 ? " on" : "")}>
+              <dt class="mono">
+                {x.k}
+                <span class="in-case-v">{x.label}</span>
+              </dt>
+              <dd>{x.d}</dd>
+            </div>
+          ))
+        }
+      </dl>
     </figure>
 
     <div class="in-measure in-honest">
@@ -244,39 +282,50 @@ const maxCase = Math.max(...c.plan.cases.map((x) => x.v));
   .in-heute .in-measure { margin-top:20px; }
   .in-heute .in-say + .shell { margin-top:clamp(26px,4vh,40px); }
 
-  /* ---- plan: column chart ---- */
+  /* ---- plan: one scale + the cases as rows ---- */
   .in-plan { padding-block:clamp(44px,6.5vh,80px); border-top:1px solid var(--hairline); }
-  /* One figure: bar, name and description live in the same column, so the case is named once
-     instead of twice (an earlier pass had a separate description grid under the chart, which
-     repeated all three labels and did not line up with the bars it referred to). */
   .in-chart { margin:clamp(28px,4vh,46px) 0 0; }
-  .in-axis { display:block; padding-bottom:10px; border-bottom:1px solid var(--hairline); }
-  .in-cols { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(18px,3.5vw,52px);
-    padding-top:26px; }
-  .in-plot { height:clamp(180px,24vh,250px); display:flex; flex-direction:column; justify-content:flex-end;
-    border-bottom:1px solid var(--hairline-strong); }
-  .in-col-v { font-size:14.5px; color:var(--fg); font-variant-numeric:tabular-nums; white-space:nowrap;
-    padding-bottom:9px; }
-  /* Unaccented cases are near-empty outlines on purpose. They are context for the one case we
-     underwrite; filling all three equally would make the ambition column the loudest object. */
-  /* capped width: at full column width a short bar reads as a filled block rather than a column */
-  .in-col-bar { display:block; width:100%; max-width:172px; height:var(--v); border-radius:4px 4px 0 0;
-    background:rgba(255,255,255,0.045); border:1px solid var(--hairline-strong); border-bottom:none;
-    min-height:3px; }
-  .in-col-bar.on { background:linear-gradient(180deg, var(--teal-soft), rgba(58,128,128,0.32));
-    border-color:transparent; }
-  /* Stacked in one narrow column, three columns each keep a full-height plot and the short cases
-     sit under a tall empty box. Same numbers, laid on their side. */
-  @media (max-width:760px){
-    .in-cols { grid-template-columns:1fr; gap:26px; }
-    .in-plot { height:auto; display:block; border-bottom:none; }
-    .in-col-v { display:block; padding-bottom:7px; }
-    .in-col-bar { width:var(--v); max-width:100%; height:13px; min-height:0; border-radius:0 4px 4px 0;
-      border:1px solid var(--hairline-strong); border-left:none; }
-    .in-col-bar.on { background:linear-gradient(90deg, rgba(58,128,128,0.5), var(--teal-soft)); }
+  .in-axis { display:block; padding-bottom:10px; }
+
+  /* The rail is the section's only figure. Its baseline is the axis; marks hang above it. */
+  .in-scale { position:relative; height:74px; border-bottom:1px solid var(--hairline-strong); }
+  .in-mark { position:absolute; bottom:0; left:var(--x); display:flex; flex-direction:column;
+    align-items:center; transform:translateX(-50%); }
+  /* 0 % and 100 % would hang half their label outside the measure. */
+  .in-mark[data-edge="start"] { transform:none; align-items:flex-start; }
+  .in-mark[data-edge="end"] { transform:translateX(-100%); align-items:flex-end; }
+  .in-mark-v { font-size:14.5px; color:var(--fg-soft); font-variant-numeric:tabular-nums;
+    white-space:nowrap; padding-bottom:10px; }
+  .in-mark-t { display:block; width:1px; height:20px; background:var(--hairline-strong); }
+  /* The one case we underwrite is the only mark that reaches down the full rail. */
+  .in-mark.on .in-mark-v { color:var(--fg); }
+  .in-mark.on .in-mark-t { width:2px; height:38px; background:var(--teal-soft); }
+
+  .in-grad { position:relative; height:22px; }
+  .in-tick { position:absolute; top:0; left:var(--x); width:1px; height:4px;
+    background:rgba(255,255,255,0.16); }
+  .in-tick.maj { height:8px; background:var(--hairline-strong); }
+  .in-tick i { position:absolute; top:11px; left:0; transform:translateX(-50%); font-style:normal;
+    font-size:10.5px; letter-spacing:0.06em; color:var(--fg-muted); }
+  .in-tick.maj:first-of-type i { transform:none; }
+  .in-tick:last-of-type i { transform:translateX(-100%); }
+
+  .in-cases { margin:clamp(24px,3.5vh,38px) 0 0; }
+  .in-case { display:grid; grid-template-columns:150px minmax(0,1fr); gap:clamp(14px,3vw,34px);
+    padding:15px 0; border-top:1px solid var(--hairline); }
+  .in-case dt { color:var(--fg-muted); }
+  .in-case.on dt { color:var(--teal-soft); }
+  .in-case dd { margin:0; max-width:64ch; color:var(--fg-muted); font-size:14px; line-height:1.6; }
+  /* The value lives on the rail on wide screens; the rail drops its labels when they would
+     collide, and the rows pick them up instead. */
+  .in-case-v { display:none; }
+  @media (max-width:700px){
+    .in-scale { height:34px; }
+    .in-mark-v { display:none; }
+    .in-mark.on .in-mark-t { height:26px; }
+    .in-case { grid-template-columns:1fr; gap:7px; }
+    .in-case-v { display:inline; padding-left:10px; color:var(--fg); font-variant-numeric:tabular-nums; }
   }
-  .in-col-k { display:block; padding-top:11px; color:var(--teal-soft); }
-  .in-col p { margin:8px 0 0; color:var(--fg-muted); font-size:14px; line-height:1.6; }
   .in-honest { margin-top:clamp(34px,5vh,54px); }
   .in-peak { color:var(--fg) !important; }
 
