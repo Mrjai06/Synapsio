@@ -134,12 +134,18 @@
   stroke-linejoin: round; }
 /* No transition anywhere on the pen: it sits ON the head line and is written every frame.
    Easing it would let it drift off the line it is supposed to be fixed to. */
-/* The pen: flat faces, no gradients — same treatment as the site's other iso objects, and the
-   taste rules ban a glossy body. Two values per part are enough to read as a solid. */
-.ft-pen .pen-hi { fill: #f0a07a; }
-.ft-pen .pen-lo { fill: #a85736; }
-.ft-pen .pen-collar { fill: #f5c9ae; }
-.ft-pen .pen-tip { fill: #ffe0cc; }
+/* MATERIAL OF THE THREE STARTPAGE FIGURES (Jakob, 2026-08-08). Those are not flat shapes: every
+   face is a fill PLUS a light hairline outline (global.css `.face` / `.face.lit`), and the
+   security dome mixes materials — its copper parts are #5c3a22 with a #d0925f edge. The pen was
+   drawn as a coral sticker with no outline, which is a different vocabulary. Same values now, so
+   it belongs to the same world: copper barrel, a steel collar in the figures' own face colour,
+   and the non-scaling stroke they all use so the line weight never changes with the viewBox. */
+.ft-pen path { stroke-width: 1; stroke-linejoin: round; vector-effect: non-scaling-stroke;
+  shape-rendering: geometricPrecision; }
+.ft-pen .pen-hi { fill: #7a512f; stroke: #d0925f; }
+.ft-pen .pen-lo { fill: #5c3a22; stroke: #d0925f; }
+.ft-pen .pen-collar { fill: var(--face-hi); stroke: var(--edge); }
+.ft-pen .pen-tip { fill: #f2b98f; }
 /* pen off the tape: the whole nib assembly lifts, rather than parking at a coordinate that
    overflow:visible would still show */
 .ft-trace.ft-lifted .ft-pen { opacity: 0; }
