@@ -38,14 +38,14 @@
    footer. This is also what makes the travel legible — motion needs something that stays put. */
 .ft-headmark { display: none; }
 @media (min-width: 900px) {
-  .ft-headmark { display: flex; align-items: center; gap: 0;
+  /* Two marks, NO rule between them. A full-width hairline across the strip read as a random
+     divider between two records rather than as a head — it crossed the material and looked like
+     part of it. Registration marks at the two edges belong to the machine, not to the tape. */
+  .ft-headmark { display: flex; align-items: center; justify-content: space-between;
     position: sticky; top: 50vh; z-index: 5; height: 0; pointer-events: none;
     grid-column: 1 / -1; grid-row: 1; align-self: start; }
-  .ft-headmark i { display: block; width: 13px; height: 1px; background: var(--coral); }
-  .ft-headmark b { display: block; flex: 1; height: 1px;
-    background: linear-gradient(90deg,
-      rgba(232,132,90,0.22), rgba(232,132,90,0.05) 22%, rgba(232,132,90,0.05) 78%,
-      rgba(232,132,90,0.22)); }
+  .ft-headmark i { display: block; width: 22px; height: 2px; background: var(--coral); }
+  .ft-headmark b { display: none; }
 }
 /* Left inset clears the instrument column so the head marks the STRIP, not the page. */
 @media (min-width: 1200px) { .ft-headmark { margin-left: 262px; } }
@@ -54,11 +54,11 @@
 .ft-frame { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
 .ft-ruler { position: absolute; left: 0; right: 0; height: 13px;
   background-image:
-    repeating-linear-gradient(90deg, rgba(232,237,240,0.42) 0 1px, transparent 1px 45px),
-    repeating-linear-gradient(90deg, rgba(232,237,240,0.18) 0 1px, transparent 1px 9px);
+    repeating-linear-gradient(90deg, rgba(122,196,196,0.62) 0 1px, transparent 1px 45px),
+    repeating-linear-gradient(90deg, rgba(122,196,196,0.26) 0 1px, transparent 1px 9px);
   background-size: 100% 9px, 100% 5px; background-repeat: repeat-x; }
-.ft-ruler.top { top: 0; border-bottom: 1px solid rgba(232,237,240,0.16); background-position: left bottom; }
-.ft-ruler.bottom { bottom: 0; border-top: 1px solid rgba(232,237,240,0.16); background-position: left top; }
+.ft-ruler.top { top: 0; border-bottom: 1px solid rgba(90,163,163,0.34); background-position: left bottom; }
+.ft-ruler.bottom { bottom: 0; border-top: 1px solid rgba(90,163,163,0.34); background-position: left top; }
 /* Ground-coloured holes painted OVER the records: identical to a punch, and dead straight
    regardless of what the records do underneath.
    HARD colour stops and a round cell. The first pass used closest-side on a 19x30 cell, which
@@ -68,7 +68,7 @@
   background-image:
     radial-gradient(circle 7.5px at 50% 50%,
       var(--ground) 0 6.4px,
-      rgba(232,237,240,0.20) 6.4px 7.2px,
+      rgba(90,163,163,0.42) 6.4px 7.2px,
       transparent 7.2px);
   background-size: 22px 22px; background-position: center top; background-repeat: repeat-y; }
 .ft-perf.left { left: clamp(18px, 1.8vw, 30px); }
@@ -76,7 +76,7 @@
 /* the material's own edges: a lit rail down each side, inboard of the punch line, so the
    strip reads as a physical band rather than as full-width rows */
 .ft-edge { position: absolute; top: 13px; bottom: 13px; width: 1px;
-  background: linear-gradient(180deg, transparent, rgba(232,237,240,0.22) 8%, rgba(232,237,240,0.22) 92%, transparent); }
+  background: linear-gradient(180deg, transparent, rgba(90,163,163,0.40) 8%, rgba(90,163,163,0.40) 92%, transparent); }
 .ft-edge.left { left: clamp(66px, 5.4vw, 88px); }
 .ft-edge.right { right: clamp(66px, 5.4vw, 88px); }
 /* Edge print: continuous fine text down the strip between the punch line and the edge rail.
@@ -86,7 +86,7 @@
 .ft-code { position: absolute; top: 13px; bottom: 13px; width: 13px; overflow: hidden;
   writing-mode: vertical-rl; white-space: nowrap;
   font-family: var(--mono); font-size: 8px; letter-spacing: 0.30em;
-  line-height: 13px; color: rgba(232,237,240,0.16); user-select: none; }
+  line-height: 13px; color: rgba(122,196,196,0.24); user-select: none; }
 .ft-code.left { left: clamp(52px, 4.3vw, 74px); }
 .ft-code.right { right: clamp(52px, 4.3vw, 74px); transform: rotate(180deg); }
 /* Below 900px the record's own padding shrinks past the print column and the title runs into it.
@@ -136,7 +136,7 @@
   background:
     repeating-linear-gradient(90deg, rgba(232,237,240,0.016) 0 1px, transparent 1px 5px),
     linear-gradient(180deg, rgba(232,237,240,0.034) 0%, rgba(232,237,240,0.016) 100%);
-  box-shadow: inset 0 1px 0 rgba(232, 237, 240, 0.075);
+  box-shadow: inset 0 1px 0 rgba(90, 163, 163, 0.20);
   /* FOCUS AT THE CENTRE LINE — BY LIGHT, NOT BY SCALE (changed 2026-08-08).
      Records used to scale individually. That is what forced the perforations into a static
      overlay: a scaled record's holes are smaller and sit at a different pitch than its
@@ -193,9 +193,9 @@
 /* three minor graduations in the gap under each tick, so the scale reads as travel */
 .ft-tick s { position: absolute; left: 0; top: 100%; width: 7px; height: 9px;
   background-image: repeating-linear-gradient(180deg,
-    rgba(232,237,240,0.16) 0 1px, transparent 1px 3px); }
+    rgba(90,163,163,0.34) 0 1px, transparent 1px 3px); }
 .ft-tick:last-child s { display: none; }
-.ft-tick i { display: block; width: 14px; height: 1px; background: rgba(90,163,163,0.42);
+.ft-tick i { display: block; width: 14px; height: 1px; background: rgba(90,163,163,0.62);
   transition: width 260ms var(--ease-out), background-color 260ms ease; }
 .ft-tick b { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.14em;
   font-weight: 400; color: transparent; transition: color 260ms ease; }
@@ -225,10 +225,10 @@
    thing in focus: the lit record, the head, the trace. Amber is deliberately absent — in the
    product it means warning, and importing that meaning onto an editorial surface is noise. */
 .ft-band { position: relative; padding: 9px clamp(58px, 5.4vw, 96px);
-  background: linear-gradient(180deg, rgba(58,128,128,0.10), rgba(58,128,128,0.02));
-  box-shadow: inset 0 1px 0 rgba(90,163,163,0.20), inset 0 -1px 0 rgba(0,0,0,0.45); }
+  background: linear-gradient(180deg, rgba(58,128,128,0.22), rgba(58,128,128,0.06));
+  box-shadow: inset 0 1px 0 rgba(90,163,163,0.48), inset 0 -1px 0 rgba(0,0,0,0.45); }
 .ft-band span { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.22em;
-  text-transform: uppercase; color: var(--teal-soft); }
+  text-transform: uppercase; color: #8fd0d0; }
 
 /* Compact tier: title + metadata only, roughly half the height, so a reader can skim
    titles and the lead is the one that asks for commitment. */
