@@ -1,0 +1,234 @@
+/* The data tape: the /blog index surface.
+ *
+ * Lives in its own stylesheet because two pages mount it — the real /blog and the prototype
+ * harness that its variants were judged in. It used to sit in the harness page's global block,
+ * which meant the only copy of the design was in a file that was not even tracked by git.
+ *
+ * Markup, motion and the reasoning behind the structural decisions are in FilmTape.astro.
+ * The mast (.fm-*) is part of the composition: a centred serif masthead is what the tape was
+ * designed under, and a left-aligned sans hero over a full-bleed strip does not hold.
+ */
+
+.fm-page { position: relative; }
+.fm-mast { padding-block: clamp(44px, 7vh, 88px) clamp(26px, 4vh, 44px); text-align: center; }
+.fm-kicker { font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--fg-muted); }
+.fm-mast h1 { margin: 14px 0 0; font-family: "Newsreader Variable", Georgia, serif;
+  font-weight: 400; font-size: clamp(2.4rem, 5.4vw, 4rem); line-height: 1.03;
+  letter-spacing: -0.02em; }
+.fm-mast p { margin: 18px auto 0; max-width: 46ch; font-size: 1.02rem; color: var(--fg-soft); }
+.fm-tape { padding-block: 0 clamp(60px, 10vh, 120px); }
+
+/* ===== 5 · FILM: full-bleed data tape (markup + rationale in FilmTape.astro) ===== */
+/* width:100%, never 100vw: 100vw includes the classic scrollbar, so the tape hung 7.5px
+   past each edge and was silently clipped by body{overflow-x:hidden}. */
+.ft { position: relative; width: 100%; }
+
+/* --- static overlay: rulers + perforations, outside the 3D --- */
+.ft-frame { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.ft-ruler { position: absolute; left: 0; right: 0; height: 13px;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(232,237,240,0.42) 0 1px, transparent 1px 45px),
+    repeating-linear-gradient(90deg, rgba(232,237,240,0.18) 0 1px, transparent 1px 9px);
+  background-size: 100% 9px, 100% 5px; background-repeat: repeat-x; }
+.ft-ruler.top { top: 0; border-bottom: 1px solid rgba(232,237,240,0.16); background-position: left bottom; }
+.ft-ruler.bottom { bottom: 0; border-top: 1px solid rgba(232,237,240,0.16); background-position: left top; }
+/* Ground-coloured discs painted OVER the records: identical to a hole, and dead straight
+   regardless of what the records do underneath. */
+.ft-perf { position: absolute; top: 13px; bottom: 13px; width: clamp(34px, 3vw, 46px);
+  background-image:
+    radial-gradient(closest-side, var(--ground) 0 86%, rgba(232,237,240,0.22) 89%, transparent 92%);
+  background-size: 19px 30px; background-position: center top; background-repeat: repeat-y; }
+.ft-perf.left { left: clamp(18px, 1.8vw, 30px); }
+.ft-perf.right { right: clamp(18px, 1.8vw, 30px); }
+/* the material's own edges: a lit rail down each side, inboard of the punch line, so the
+   strip reads as a physical band rather than as full-width rows */
+.ft-edge { position: absolute; top: 13px; bottom: 13px; width: 1px;
+  background: linear-gradient(180deg, transparent, rgba(232,237,240,0.22) 8%, rgba(232,237,240,0.22) 92%, transparent); }
+.ft-edge.left { left: clamp(66px, 5.4vw, 88px); }
+.ft-edge.right { right: clamp(66px, 5.4vw, 88px); }
+/* Edge print: continuous fine text down the strip between the punch line and the edge rail.
+   This is the density the tape was missing against the rest of the site — the startpage
+   carries a field of small live elements, the tape carried one title per 90px of nothing.
+   Vertical writing mode, clipped at both ends, never wraps. */
+.ft-code { position: absolute; top: 13px; bottom: 13px; width: 13px; overflow: hidden;
+  writing-mode: vertical-rl; white-space: nowrap;
+  font-family: var(--mono); font-size: 8px; letter-spacing: 0.30em;
+  line-height: 13px; color: rgba(232,237,240,0.16); user-select: none; }
+.ft-code.left { left: clamp(52px, 4.3vw, 74px); }
+.ft-code.right { right: clamp(52px, 4.3vw, 74px); transform: rotate(180deg); }
+/* Below 900px the record's own padding shrinks past the print column and the title runs into it.
+   The strip keeps its holes and rails there; the fine print is a wide-screen luxury. */
+@media (max-width: 900px) { .ft-code { display: none; } }
+
+.ft-stage { display: flex; flex-direction: column; gap: 0;
+  padding-block: 13px; }
+
+.ft-rec {
+  position: relative; display: grid;
+  /* Title only. Date, tag, reading time and lede all live in the instrument panel now:
+     printing them here as well repeated every field three times on screen at once. */
+  grid-template-columns: minmax(0, 1fr);
+  padding: clamp(22px, 2.8vh, 32px) clamp(58px, 5.4vw, 96px);
+  text-decoration: none; color: inherit;
+  background:
+    repeating-linear-gradient(90deg, rgba(232,237,240,0.022) 0 1px, transparent 1px 4px),
+    linear-gradient(90deg, rgba(0,0,0,0.45) 0, transparent 8%, transparent 92%, rgba(0,0,0,0.45) 100%),
+    linear-gradient(180deg, #232426 0%, #1b1c1e 55%, #141516 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(232, 237, 240, 0.17),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.55),
+    0 12px 26px -16px rgba(0, 0, 0, 0.9);
+  /* FOCUS AT THE CENTRE LINE. The record crossing the middle of the viewport is at full
+     size and full strength; the rest step back. Scale reads immediately even on a short
+     index, which a rotation could not: the drum needed more vertical travel than a
+     five-post blog has, so three of five records sat pinned at maximum tilt and never moved.
+     Scale also gives the reader a real "you are here" without a scrollbar or a control. */
+  transform: scale(calc(1 - var(--ad, 0) * 0.075));
+  transform-origin: 50% 50%;
+  /* floored at 0.70 so the stepped-back records stay above AA, not just visible */
+  opacity: calc(1 - var(--ad, 0) * 0.30);
+  will-change: transform, opacity;
+  transition: filter 200ms ease;
+}
+.ft-rec:hover, .ft-rec:focus-visible { filter: brightness(1.14); }
+.ft-rec:active { filter: brightness(0.97); }
+
+.ft-rec::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background-image: linear-gradient(180deg, rgba(232,237,240,calc(0.035 + var(--f,0) * 0.055)) 0, transparent 46%);
+}
+.ft-rec::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(232,132,90,calc(var(--f,0) * 0.55)), transparent);
+  pointer-events: none; }
+.ft-rec > * { position: relative; z-index: 1; }
+
+/* ===== instrument column: live ruler + context panel ===== */
+/* Sticky, not fixed: it belongs to the tape, so it must not float over the footer. */
+.ft-inst { display: none; }
+/* Grid, not float: sticky + float does not hold, and the aside sits after the stage in DOM
+   order so it floated to the bottom. Explicit grid placement puts it in column 1 regardless. */
+@media (min-width: 1200px) {
+  .ft { display: grid; grid-template-columns: 262px minmax(0, 1fr); }
+  .ft-inst { display: block; grid-column: 1; grid-row: 1; position: sticky; top: 50vh;
+    align-self: start; height: 0; padding-left: clamp(24px, 3vw, 56px); z-index: 4; }
+  .ft-stage { grid-column: 2; grid-row: 1; }
+  /* the overlay belongs to the TAPE, not to the whole grid: without this the left punch
+     line sat under the instrument column and the strip had holes on one edge only */
+  .ft-frame { left: 262px; }
+}
+/* one transform on the wrapper, so the column is centred on the line as a unit */
+.ft-inst-in { transform: translateY(-50%); }
+/* counter head */
+.ft-head { display: flex; align-items: baseline; justify-content: space-between;
+  max-width: 200px; padding-bottom: 9px; margin-bottom: 14px;
+  border-bottom: 1px solid rgba(232,237,240,0.14); font-family: var(--mono); }
+.ft-head-k { font-size: 9.5px; letter-spacing: 0.24em; color: rgba(232,237,240,0.42); }
+.ft-head-c { font-size: 11px; letter-spacing: 0.10em; color: rgba(232,237,240,0.42);
+  font-variant-numeric: tabular-nums; }
+.ft-head-n { color: var(--coral); font-weight: 400; }
+.ft-legend { display: block; margin-top: -6px; margin-bottom: 15px; font-family: var(--mono);
+  font-size: 8.5px; letter-spacing: 0.20em; color: rgba(232,237,240,0.34); }
+.ft-scale { display: flex; flex-direction: column; gap: 9px; }
+.ft-tick { position: relative; display: flex; align-items: center; gap: 10px; }
+/* three minor graduations in the gap under each tick, so the scale reads as travel */
+.ft-tick s { position: absolute; left: 0; top: 100%; width: 7px; height: 9px;
+  background-image: repeating-linear-gradient(180deg,
+    rgba(232,237,240,0.16) 0 1px, transparent 1px 3px); }
+.ft-tick:last-child s { display: none; }
+.ft-tick i { display: block; width: 14px; height: 1px; background: rgba(232,237,240,0.22);
+  transition: width 260ms var(--ease-out), background-color 260ms ease; }
+.ft-tick b { font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.14em;
+  font-weight: 400; color: transparent; transition: color 260ms ease; }
+.ft-tick.on i { width: 30px; background: var(--coral); }
+.ft-tick.on b { color: var(--coral); }
+
+/* No coloured left rail here: that is the side-tab pattern the taste pass already removed
+   from the blog post once. A corner registration mark does the same job — it says "this
+   readout belongs to the mark that is lit" — and belongs to the instrument language. */
+.ft-panel { position: relative; margin-top: 20px; max-width: 200px; padding-top: 13px; }
+.ft-panel::before { content: ""; position: absolute; left: 0; top: 0; width: 9px; height: 9px;
+  border-top: 1px solid rgba(232,132,90,0.55); border-left: 1px solid rgba(232,132,90,0.55); }
+.ft-panel::after { content: ""; position: absolute; left: 14px; right: 0; top: 0; height: 1px;
+  background: rgba(232,237,240,0.12); }
+.ft-panel-date { display: block; font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.06em; color: #b7c6cd; }
+.ft-panel-tag { display: block; margin-top: 7px; font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.16em; text-transform: uppercase; color: #7fc0c0; }
+.ft-panel-lede { margin: 13px 0 0; font-size: 13px; line-height: 1.55; color: #98a7ae; }
+.ft-panel-rt { display: block; margin-top: 11px; font-family: var(--mono); font-size: 9.5px;
+  letter-spacing: 0.12em; text-transform: uppercase; color: #7b8b93; }
+
+/* Month band: a marker on the strip, not a record. Restores chunking without a control. */
+.ft-band { position: relative; padding: 9px clamp(58px, 5.4vw, 96px);
+  background: linear-gradient(180deg, #121213, #0c0c0d);
+  box-shadow: inset 0 1px 0 rgba(232,237,240,0.09), inset 0 -1px 0 rgba(0,0,0,0.5); }
+.ft-band span { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.22em;
+  text-transform: uppercase; color: #93a7b0; }
+
+/* Compact tier: title + metadata only, roughly half the height, so a reader can skim
+   titles and the lead is the one that asks for commitment. */
+.ft-rec:not(.lead) { padding-block: clamp(24px, 3vh, 34px); }
+.ft-rec:not(.lead) .ft-main h3 { font-size: clamp(1.15rem, 1.7vw, 1.44rem); }
+.ft-rec.lead .ft-main h3 { font-size: clamp(1.45rem, 2.5vw, 2.15rem); }
+
+.ft-idx { display: flex; flex-direction: column; gap: 6px; font-family: var(--mono);
+  font-variant-numeric: tabular-nums; padding-top: 5px; }
+/* demoted: the ordinal used to render larger than the headline in full coral, and it is
+   position-in-list, so it renumbers on every publish. The date is the stable anchor. */
+.ft-no { font-size: 12px; letter-spacing: 0.16em; color: rgba(232,132,90,0.75); }
+.ft-date { font-size: 12px; letter-spacing: 0.05em; color: #b7c6cd; }
+.ft-tag { font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: #7fc0c0; margin-top: 4px; }
+.ft-rt { font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #93a7b0; }
+
+/* The pen trace. Runs the full length of the tape through the empty right third, which is
+   also what stops each record from being a title floating in a void. */
+.ft-trace { position: absolute; top: 0; bottom: 0; z-index: 0;
+  right: clamp(96px, 9vw, 168px); width: clamp(96px, 11vw, 190px); height: 100%;
+  overflow: visible; }
+.ft-trace polyline { fill: none; vector-effect: non-scaling-stroke;
+  stroke: rgba(232,132,90,0.34); stroke-width: 1.25;
+  transition: stroke 220ms ease, stroke-width 220ms ease; }
+.ft-rec.on .ft-trace polyline { stroke: rgba(232,132,90,0.85); stroke-width: 1.6; }
+/* The trace's own graduation. A deflection against nothing is a squiggle; against a ruled
+   band it is a reading. Four faint verticals, painted under the line. */
+.ft-trace { background-image:
+  repeating-linear-gradient(90deg, rgba(232,237,240,0.055) 0 1px, transparent 1px 25%); }
+@media (max-width: 900px) { .ft-trace { display: none; } }
+
+/* Frame number printed on the material, at the empty right end of the record. */
+.ft-no { position: absolute; right: clamp(58px, 5.4vw, 96px); top: 50%; z-index: 1;
+  transform: translateY(-50%); font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.16em; font-variant-numeric: tabular-nums;
+  color: rgba(232,237,240,0.20); transition: color 220ms ease; }
+.ft-rec.on .ft-no { color: rgba(232,132,90,0.78); }
+@media (max-width: 900px) { .ft-no { display: none; } }
+
+.ft-main h3 { margin: 0; max-width: 34ch; font-family: "Newsreader Variable", Georgia, serif;
+  font-weight: 400; font-size: clamp(1.35rem, 2.3vw, 2rem); line-height: 1.18;
+  letter-spacing: -0.012em; transition: color 180ms ease;
+  /* overflow-wrap only, NOT hyphens: auto. Automatic hyphenation in a serif display line
+     breaks words mid-headline ("der teu-erste Kompromiss") and reads as a rendering fault. */
+  overflow-wrap: break-word; }
+.ft-rec:hover h3 { color: var(--coral); }
+/* lifted from --fg-muted, which measured 3.82:1 and failed AA before the curve even ran */
+.ft-main p { margin: 11px 0 0; max-width: 78ch; font-size: 14.5px; line-height: 1.62;
+  color: #aab7bd; }
+
+@media (max-width: 900px) {
+  .ft-rec { grid-template-columns: minmax(0, 1fr); gap: 12px;
+    padding-inline: clamp(46px, 12vw, 68px); }
+  .ft-idx { flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 12px; padding-top: 0; }
+  .ft-tag, .ft-rt { margin-top: 0; }
+}
+@media (max-width: 620px) {
+  .ft-perf { width: 16px; }
+  .ft-perf.left { left: 7px; }
+  .ft-perf.right { right: 7px; }
+  .ft-rec { padding-inline: 34px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ft-rec { transform: none; opacity: 1; }
+}

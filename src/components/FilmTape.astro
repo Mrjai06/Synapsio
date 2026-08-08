@@ -24,11 +24,13 @@
 // inside the prototype harness its scoped sheet was not reaching the document.
 //
 // NO INVENTED DATA: index, date, tag and reading time are all real. No fake record ids.
+// `rt` arrives fully written ("6 Min. Lesezeit" / "6 min read"): the component must not compose
+// German around a number, it is mounted on both language versions of /blog.
 interface Post {
   day: string; month: string; tag: string; rt: string; title: string; lede: string; href: string;
 }
-interface Props { posts: Post[] }
-const { posts } = Astro.props;
+interface Props { posts: Post[]; legend?: string }
+const { posts, legend = "AUSSCHLAG · LESEZEIT" } = Astro.props;
 
 // Group by month, and split lead from the rest.
 //
@@ -40,9 +42,32 @@ const { posts } = Astro.props;
 // Archiv had and the tape lost.
 //
 // This costs no interaction, which matters: the site's rule is that visitors do not click things.
-const groups: { month: string; items: (Post & { lead: boolean; n: number })[] }[] = [];
+// Repeated so the strip is printed edge to edge at any length. Long enough for a tall tape;
+// overflow is clipped by .ft-code, so an extra repeat costs nothing.
+const EDGE_CODE = "SYNAPSIO · NOTIZEN AUS DEM EINKAUF · ".repeat(24);
+
+// ── THE TRACE ──────────────────────────────────────────────────────────────────────────────
+// A chart recorder without a pen line is just a perforated band. The deflection is REAL and
+// labelled in the instrument head: it is the reading time of each piece. Nothing here is an
+// invented measurement, which is the rule this file has followed from the first pass.
+//
+// Continuity across records is built, not faked: each record draws its own segment, but enters
+// at the midpoint between itself and the record above and leaves at the midpoint to the one
+// below. Neighbouring segments therefore meet exactly on the record boundary at any height,
+// which a single tall SVG could not guarantee (the lead record is twice the height of the rest,
+// so a stretched viewBox would drift out of register with the strip).
+const mins = (s: string) => parseInt(s, 10) || 0;
+const rtMax = Math.max(...posts.map((p) => mins(p.rt)), 1);
+// 18..82 % of the trace band, so the line never runs into either of its own edges
+const defl = (v: number) => 18 + (v / rtMax) * 64;
+
+const groups: { month: string; items: (Post & { lead: boolean; n: number; trace: string })[] }[] = [];
 posts.forEach((post, i) => {
-  const item = { ...post, lead: i === 0, n: i + 1 };
+  const cur = defl(mins(post.rt));
+  const prev = i > 0 ? defl(mins(posts[i - 1].rt)) : cur;
+  const next = i < posts.length - 1 ? defl(mins(posts[i + 1].rt)) : cur;
+  const trace = `${(prev + cur) / 2},0 ${cur},50 ${(cur + next) / 2},100`;
+  const item = { ...post, lead: i === 0, n: i + 1, trace };
   const last = groups[groups.length - 1];
   if (last && last.month === post.month) last.items.push(item);
   else groups.push({ month: post.month, items: [item] });
@@ -62,12 +87,22 @@ posts.forEach((post, i) => {
               data-n={String(p.n).padStart(2, "0")}
               data-date={`${p.day}. ${p.month}`}
               data-tag={p.tag}
-              data-rt={`${p.rt} Lesezeit`}
+              data-rt={p.rt}
               data-lede={p.lede}
             >
               <span class="ft-main">
                 <h3>{p.title}</h3>
               </span>
+              {/* Printed ON the material, at the empty right end of the strip. The frame number
+                  is the only thing repeated between strip and instrument column, and it is a
+                  position, not a field: a recorder prints its frame count on the tape as well as
+                  showing it on the counter. Everything else stays in the panel. */}
+              <span class="ft-no" aria-hidden="true">{String(p.n).padStart(2, "0")}</span>
+              {/* preserveAspectRatio none: the band is a fixed width but every record is a
+                  different height, and the segment must fill whatever height it gets. */}
+              <svg class="ft-trace" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                <polyline points={p.trace} />
+              </svg>
             </a>
           ))}
         </>
@@ -81,9 +116,23 @@ posts.forEach((post, i) => {
       Both are driven by the --f value the tape already computes. Hidden below 1200px. */}
   <aside class="ft-inst" aria-hidden="true">
    <div class="ft-inst-in">
+    {/* Counter head. The column was five dashes and a numeral in a lot of empty space, which read
+        as unfinished next to the rest of the site. A real instrument states what it is measuring
+        and how far the scale runs before it points at anything. */}
+    <div class="ft-head">
+      <span class="ft-head-k">INDEX</span>
+      <span class="ft-head-c"><b class="ft-head-n">01</b>/{String(posts.length).padStart(2, "0")}</span>
+    </div>
+    {/* The trace has to say what it plots, or it is decoration pretending to be a measurement. */}
+    <span class="ft-legend">{legend}</span>
     <div class="ft-scale">
       {posts.map((p, i) => (
-        <span class="ft-tick" data-tick={i}><i></i><b>{String(i + 1).padStart(2, "0")}</b></span>
+        <span class="ft-tick" data-tick={i}>
+          <i></i><b>{String(i + 1).padStart(2, "0")}</b>
+          {/* three minor graduations between records: the scale reads as continuous travel
+              rather than five unrelated stops */}
+          <s aria-hidden="true"></s>
+        </span>
       ))}
     </div>
     <div class="ft-panel">
@@ -102,6 +151,11 @@ posts.forEach((post, i) => {
     <span class="ft-perf right"></span>
     <span class="ft-edge left"></span>
     <span class="ft-edge right"></span>
+    {/* Edge print. Film carries a manufacturer marking down the strip between the sprocket holes
+        and the frame area; it is what makes stock read as stock and not as a grey band. Ours says
+        who made the tape. Material, not data: nothing here is a measurement. */}
+    <span class="ft-code left">{EDGE_CODE}</span>
+    <span class="ft-code right">{EDGE_CODE}</span>
     <span class="ft-ruler bottom"></span>
   </div>
 </div>
@@ -168,6 +222,10 @@ posts.forEach((post, i) => {
       if (r) r.textContent = rec.getAttribute("data-rt") || "";
       var ticks = document.querySelectorAll(".ft-tick");
       for (var i = 0; i < ticks.length; i++) ticks[i].classList.toggle("on", i === idx);
+      var head = q(".ft-head-n");
+      if (head) head.textContent = String(idx + 1).padStart(2, "0");
+      var recs2 = document.querySelectorAll(".ft-rec");
+      for (var m = 0; m < recs2.length; m++) recs2[m].classList.toggle("on", m === idx);
     }
 
     function kick() { if (!running) { running = true; requestAnimationFrame(frame); } }
