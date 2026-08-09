@@ -23,6 +23,18 @@ export interface Person {
   linkedin?: string;
 }
 
+export interface Partner {
+  name: string;
+  note: string;
+  /**
+   * false = written, deliberately not shown. Naming a partner publicly is a claim about a third
+   * party, so it waits for the signature, not for the intent. The whole section disappears when
+   * nothing in it is published (see UeberUns.astro), so flipping this to true is the only edit
+   * needed once the agreement exists.
+   */
+  published: boolean;
+}
+
 export const ueberUnsCopy = {
   de: {
     meta: {
@@ -70,6 +82,17 @@ export const ueberUnsCopy = {
           photo: "",
         },
       ] as Person[],
+    },
+    partners: {
+      h2: "Partner",
+      lede: "Wer neben dem Team an Synapsio beteiligt ist.",
+      items: [
+        {
+          name: "28DIGITAL",
+          note: "Venture-Studio in Berlin. Beteiligt am Unternehmen, bringt Netzwerk und operative Begleitung ein.",
+          published: false,
+        },
+      ] as Partner[],
     },
     principles: {
       h2: "Wie wir arbeiten",
@@ -152,6 +175,17 @@ export const ueberUnsCopy = {
           photo: "",
         },
       ] as Person[],
+    },
+    partners: {
+      h2: "Partners",
+      lede: "Who else has a stake in Synapsio besides the team.",
+      items: [
+        {
+          name: "28DIGITAL",
+          note: "Venture studio in Berlin. Holds a stake in the company and contributes network and hands-on support.",
+          published: false,
+        },
+      ] as Partner[],
     },
     principles: {
       h2: "How we work",

@@ -29,6 +29,17 @@ if (pending.length) {
       pending.map((x) => x.name).join(", "),
   );
 }
+
+// Same rule one level up: naming a partner is a public claim about a third party, so it waits for
+// the signature. Nothing published means the section does not exist rather than standing empty.
+const partners = c.partners.items.filter((x) => x.published);
+const withheld = c.partners.items.filter((x) => !x.published);
+if (withheld.length) {
+  console.warn(
+    `[ueber-uns:${locale}] ${withheld.length} partner(s) withheld until signed: ` +
+      withheld.map((x) => x.name).join(", "),
+  );
+}
 ---
 
 <SiteNav locale={locale} path="/ueber-uns" active="ueber-uns" />
@@ -80,6 +91,23 @@ if (pending.length) {
       }
     </div>
   </section>
+
+  {
+    partners.length > 0 && (
+      <section class="shell ab-partners">
+        <h2>{c.partners.h2}</h2>
+        <p class="ab-lede">{c.partners.lede}</p>
+        <div class="ab-partner-list">
+          {partners.map((x) => (
+            <article class="ab-partner">
+              <h3>{x.name}</h3>
+              <p>{x.note}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+    )
+  }
 
   <section class="ab-principles">
     <div class="shell">
@@ -167,6 +195,16 @@ if (pending.length) {
   .ab-person .ab-link { display:inline-block; margin-top:11px; }
 
   /* ---- principles: numbered rows, full width ---- */
+  /* Deliberately the quietest section on the page and a shape none of the others use: a short
+     bordered block, name at heading size with the note as prose under it. Not the facts register
+     (mono key / value) and not the portrait grid. Renders only once a partner is signed. */
+  .ab-partners { padding-block:clamp(40px,5.5vh,68px); border-top:1px solid var(--hairline); }
+  .ab-partner-list { margin-top:clamp(22px,3.4vh,36px); display:flex; flex-wrap:wrap; gap:18px; }
+  .ab-partner { flex:1 1 300px; max-width:520px; border:1px solid var(--hairline); border-radius:9px;
+    padding:20px 22px; }
+  .ab-partner h3 { margin:0; font-size:17px; font-weight:600; letter-spacing:-0.01em; }
+  .ab-partner p { margin:8px 0 0; color:var(--fg-soft); font-size:14.5px; }
+
   .ab-principles { padding:clamp(44px,6.5vh,80px) 0; border-top:1px solid var(--hairline); }
   .ab-rows { margin-top:clamp(20px,3vh,34px); border-top:1px solid var(--hairline); }
   .ab-row { display:grid; grid-template-columns:minmax(0,22ch) minmax(0,1fr);
