@@ -46,6 +46,10 @@ const altEn = site + localePath("en", path);
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={`${site}/og-image.png`} />
+    {/* Marks the document as scripted BEFORE first paint, so rules that hide something until JS
+        can act on it (scroll reveals, the mobile menu button) never flash. It used to live at the
+        end of /produkt only, which is both too late and too narrow. */}
+    <script is:inline>document.documentElement.setAttribute("data-js", "1");</script>
   </head>
   <body>
     <slot />

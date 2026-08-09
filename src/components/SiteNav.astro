@@ -12,8 +12,17 @@ interface Props {
   path: string;
   /** which nav item to mark as current */
   active?: "produkt" | "ueber-uns" | "investoren" | "blog" | null;
+  /**
+   * Suffix for this instance's element ids. Only the 404 page needs it: GitHub Pages serves one
+   * 404.html for the whole site, so that page renders BOTH locales and hides one, which means two
+   * navs in one document. `aria-controls` needs a real id, and two `id="nav-panel"` would leave
+   * the second button pointing at the first panel.
+   */
+  uid?: string;
 }
-const { locale, path, active = null } = Astro.props;
+const { locale, path, active = null, uid = "" } = Astro.props;
+const toggleId = `nav-toggle${uid}`;
+const panelId = `nav-panel${uid}`;
 const c = homeCopy[locale];
 const p = (to: string) => localePath(locale, to);
 
@@ -27,7 +36,7 @@ const links = [
 ];
 ---
 
-<nav id="nav">
+<nav id={`nav${uid}`} data-sitenav>
   <div class="shell nav-in">
     <a class="brand" href={p("/")}><span class="synapsio-mark"></span><span class="wordmark">Synapsio</span></a>
     <div class="nav-links">
@@ -40,5 +49,91 @@ const links = [
       >
     </div>
     <a class="btn primary" href={CAL_URL}>{c.nav.cta}</a>
+    {/* Only rendered as a control when JS is on (see the html[data-js] rules in global.css):
+        without a script the panel could never open, and a button that does nothing is worse
+        than no button. Without JS the footer carries every destination. */}
+    <button
+      id={toggleId}
+      class="nav-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls={panelId}
+      aria-label={c.nav.menu}
+      data-close-label={c.nav.menuClose}
+    >
+      <span class="nt-bars" aria-hidden="true"><i></i><i></i></span>
+    </button>
+  </div>
+
+  {/* The panel animates 0fr → 1fr on grid-template-rows, not max-height: a max-height transition
+      is a known tell (it also has to guess a height). The inner .np-in is required — a grid item
+      is what collapses, and a bare text node would become an anonymous one that cannot. */}
+  <div id={panelId} class="nav-panel">
+    <div class="np-in">
+      <div class="shell np-body">
+        {links.map((l) => (
+          <a class={`np-link${active === l.key ? " on" : ""}`} href={l.href}>{l.label}</a>
+        ))}
+        <div class="np-foot">
+          <div class="lang np-lang" aria-label={c.nav.language}>
+            <a href={localePath("de", path)} class={locale === "de" ? "on" : ""}>DE</a><span>/</span><a
+              href={localePath("en", path)}
+              class={locale === "en" ? "on" : ""}>EN</a
+            >
+          </div>
+          <a class="btn primary np-cta" href={CAL_URL}>{c.nav.cta}</a>
+        </div>
+      </div>
+    </div>
   </div>
 </nav>
+
+{/* One script whatever the instance count: it walks [data-sitenav] and scopes every query to the
+    nav it is wiring, so the 404's second (hidden) nav gets its own working button. Astro
+    de-duplicates an identical is:inline script, so rendering the component twice does not run
+    this twice. */}
+<script is:inline>
+  (function () {
+    var wide = window.matchMedia("(min-width: 941px)");
+
+    document.querySelectorAll("[data-sitenav]").forEach(function (nav) {
+      var btn = nav.querySelector(".nav-toggle");
+      if (!btn) return;
+      var openLabel = btn.getAttribute("aria-label") || "";
+      var closeLabel = btn.getAttribute("data-close-label") || openLabel;
+
+      function set(open) {
+        nav.classList.toggle("menu-open", open);
+        btn.setAttribute("aria-expanded", open ? "true" : "false");
+        btn.setAttribute("aria-label", open ? closeLabel : openLabel);
+      }
+
+      btn.addEventListener("click", function () {
+        set(btn.getAttribute("aria-expanded") !== "true");
+      });
+
+      // A link inside the panel navigates, but same-page anchors and the language switch to the
+      // page you are already on would leave the panel hanging open.
+      nav.querySelectorAll(".nav-panel a").forEach(function (a) {
+        a.addEventListener("click", function () {
+          set(false);
+        });
+      });
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && nav.classList.contains("menu-open")) {
+          set(false);
+          btn.focus();
+        }
+      });
+
+      // Rotating a phone past the breakpoint hides the button; without this the panel would stay
+      // open and push the page down with nothing left to close it.
+      var onWide = function (e) {
+        if (e.matches) set(false);
+      };
+      if (wide.addEventListener) wide.addEventListener("change", onWide);
+      else wide.addListener(onWide);
+    });
+  })();
+</script>

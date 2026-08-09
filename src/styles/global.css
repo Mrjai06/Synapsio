@@ -75,6 +75,88 @@
     .wordmark { font-size:12.5px; letter-spacing:0.16em; }
   }
 
+  /* ===== mobile menu =====
+     Below 940px .nav-links is display:none (see above) and for months that was the whole story:
+     four real destinations existed and a phone could reach none of them. This is that fix.
+     Everything here sits AFTER the rules it overrides — .nav-links / .lang / .btn.primary all
+     have equal specificity, and this stylesheet has already lost that race twice. */
+
+  /* No JS, no button: the panel cannot open, so the control must not appear. All three rules in
+     this group carry the same html[data-js] prefix on purpose — mixing prefixed and bare
+     selectors here is exactly how [data-shot] silently stayed invisible. */
+  .nav-toggle { display:none; }
+  html[data-js] .nav-toggle { display:none; }
+  @media (max-width:940px){
+    html[data-js] .nav-toggle { display:inline-flex; }
+  }
+  .nav-toggle {
+    align-items:center; justify-content:center; flex:none;
+    width:38px; height:34px; padding:0; margin-right:-8px;
+    background:none; border:1px solid transparent; border-radius:7px;
+    color:var(--fg); cursor:pointer;
+    transition:border-color 160ms ease;
+  }
+  .nav-toggle:hover { border-color:var(--hairline-strong); }
+  .nav-toggle:focus-visible { outline:1px solid var(--teal-soft); outline-offset:2px; }
+  /* Two rules, not three: an X is two strokes, so a third bar only has to be hidden again.
+     They cross at the centre, which is why both are absolutely placed off it. */
+  .nt-bars { position:relative; display:block; width:19px; height:11px; }
+  .nt-bars i {
+    position:absolute; left:0; width:100%; height:1px; background:currentColor;
+    transition:transform 220ms var(--ease-out), opacity 160ms ease;
+  }
+  .nt-bars i:first-child { top:0; }
+  .nt-bars i:last-child { bottom:0; }
+  nav.menu-open .nt-bars i:first-child { transform:translateY(5px) rotate(45deg); }
+  nav.menu-open .nt-bars i:last-child { transform:translateY(-5px) rotate(-45deg); }
+
+  /* 0fr → 1fr rather than max-height: no guessed height, and transitioning max-height is a
+     recognisable tell. .np-in is the grid item that actually collapses. */
+  .nav-panel { display:none; }
+  @media (max-width:940px){
+    html[data-js] .nav-panel {
+      display:grid; grid-template-rows:0fr;
+      transition:grid-template-rows 260ms var(--ease-out);
+      border-top:1px solid transparent;
+    }
+    html[data-js] nav.menu-open .nav-panel { grid-template-rows:1fr; border-top-color:var(--hairline); }
+  }
+  .np-in { overflow:hidden; min-height:0; }
+  .np-body { display:flex; flex-direction:column; padding-block:6px 20px; }
+  .np-link {
+    display:block; padding:13px 0; font-size:17px; color:var(--fg-soft); text-decoration:none;
+    border-bottom:1px solid var(--hairline);
+    transition:color 160ms ease;
+  }
+  .np-link:hover, .np-link.on { color:var(--fg); }
+  .np-link.on { color:var(--coral); }
+  .np-foot { display:flex; align-items:center; justify-content:space-between; gap:16px; padding-top:20px; }
+  .np-lang { font-size:13px; }
+  .np-lang a { padding-inline:2px; }
+  /* The panel opening is a state change the user asked for, so it may move. The links inside it
+     must not stagger in afterwards: that is decoration on a navigation surface. */
+  @media (prefers-reduced-motion:reduce){
+    html[data-js] .nav-panel { transition:none; }
+    .nt-bars i { transition:none; }
+  }
+
+  /* The bar has to give up room for the button. The language switch goes first (it is duplicated
+     in the panel), then the CTA below 560px — where brand + CTA + button no longer fit and the
+     CTA is better served full width inside the panel anyway. */
+  @media (max-width:940px){
+    nav .nav-in > .lang { display:none; }
+  }
+  /* The panel's CTA is a stand-in for the bar's, not a second one: between 560 and 940px the bar
+     still shows it and printing it twice on one screen is just untidy. */
+  .np-cta { display:none; }
+  @media (max-width:560px){
+    nav .nav-in > .btn.primary { display:none; }
+    .np-cta { display:inline-flex; }
+  }
+  /* It stays a button rather than stretching full width: a coral slab across a 390px phone is the
+     loudest thing on the screen, and it fits beside the language switch down to 320px
+     (measured: 46 + 16 + 140 against 284 of gutter-less width). */
+
   /* A zero-size anchor at the document's top-right corner. The sphere offsets itself by half
      its own width and height from here, so its centre lands exactly on the corner and only the
      lower-left quarter is on screen. main{overflow-x:clip} below does the clipping. */

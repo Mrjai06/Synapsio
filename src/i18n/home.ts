@@ -9,7 +9,7 @@
 
 export const homeCopy = {
   de: {
-    nav: { product: "Produkt", about: "Über uns", investors: "Investoren", blog: "Blog", cta: "Pilot-Gespräch" },
+    nav: { product: "Produkt", about: "Über uns", investors: "Investoren", blog: "Blog", cta: "Pilot-Gespräch", menu: "Menü", menuClose: "Menü schließen", language: "Sprache" },
 
     hero: {
       chip: "KI-Agent für den Einkauf",
@@ -281,7 +281,7 @@ export const homeCopy = {
   },
 
   en: {
-    nav: { product: "Product", about: "About", investors: "Investors", blog: "Blog", cta: "Book a call" },
+    nav: { product: "Product", about: "About", investors: "Investors", blog: "Blog", cta: "Book a call", menu: "Menu", menuClose: "Close menu", language: "Language" },
 
     hero: {
       chip: "AI agent for purchasing",
