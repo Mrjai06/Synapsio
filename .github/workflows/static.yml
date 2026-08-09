@@ -31,8 +31,13 @@ jobs:
         run: bun install
       - name: Build
         run: bun run build
-      - name: Copy index.html to 404.html for SPA routing
-        run: cp dist/index.html dist/404.html
+      # There used to be a "Copy index.html to 404.html for SPA routing" step here. It was correct
+      # for the old React SPA, which resolved unknown paths client-side. Astro pre-renders every
+      # route, so the copy only meant that any wrong URL served the German homepage under a 404
+      # status. src/pages/404.astro replaces it and Astro emits dist/404.html itself; this step
+      # guards against that file quietly disappearing.
+      - name: Verify the 404 page was built
+        run: test -s dist/404.html
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact

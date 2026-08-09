@@ -1,0 +1,163 @@
+---
+// The site had no 404 page at all. The Pages workflow copied dist/index.html over dist/404.html
+// (a leftover from the React SPA, which routed client-side), so every unknown URL served the
+// GERMAN HOMEPAGE under a 404 status: no error shown, an English visitor dropped into German,
+// and search engines fed a duplicate of the homepage at unlimited addresses. That copy step is
+// gone from .github/workflows/static.yml; this file is what replaces it.
+//
+// GitHub Pages serves ONE 404.html for the whole site, so this page cannot be built per locale.
+// Both languages are in the markup, German is what CSS shows, and the inline script below swaps
+// to English when the missing URL was under /en/. Without JS an English visitor gets German —
+// acceptable on an error page, and better than the reverse.
+import Base from "../layouts/Base.astro";
+import SiteNav from "../components/SiteNav.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import { notFoundCopy } from "../i18n/notfound";
+import { homeCopy } from "../i18n/home";
+import { localePath, CONTACT_EMAIL, type Locale } from "../i18n/ui";
+
+const locales: Locale[] = ["de", "en"];
+---
+
+<Base
+  locale="de"
+  path="/404"
+  title={`${notFoundCopy.de.h1} · Synapsio`}
+  description={notFoundCopy.de.p}
+  hasAlternate={false}
+  noindex={true}
+>
+  <script is:inline>
+    // Parser-blocking and first in the body, so the German block is never painted for a visitor
+    // whose missing URL was under /en/.
+    (function () {
+      if (!/^\/en(\/|$)/.test(location.pathname)) return;
+      document.documentElement.lang = "en";
+      document.documentElement.setAttribute("data-nf", "en");
+    })();
+  </script>
+  {/* Both navs are rendered so the chrome speaks the same language as the message. The EN one
+      carries uid="-en", which keeps its toggle/panel ids unique and gives the CSS below a handle
+      (a wrapper element is not an option: nav is position:sticky and would then stick inside a
+      62px-tall box and scroll away). */}
+  {locales.map((l) => <SiteNav locale={l} path="/" uid={l === "de" ? "" : "-en"} />)}
+  <main>
+    <section class="shell nf">
+      {
+        locales.map((l) => {
+          const c = notFoundCopy[l];
+          const nav = homeCopy[l].nav;
+          const p = (to: string) => localePath(l, to);
+          return (
+            <div class="nf-body" lang={l} data-nf-locale={l}>
+              <p class="mono nf-code">{c.code}</p>
+              <h1 class="nf-h1">{c.h1}</h1>
+              <p class="nf-p">{c.p}</p>
+              <div class="nf-links">
+                <a class="btn" href={p("/")}>
+                  {c.home}
+                </a>
+                <a class="nf-alt" href={p("/produkt")}>
+                  {nav.product}
+                </a>
+                <a class="nf-alt" href={p("/ueber-uns")}>
+                  {nav.about}
+                </a>
+                <a class="nf-alt" href={p("/investoren")}>
+                  {nav.investors}
+                </a>
+                <a class="nf-alt" href={p("/blog")}>
+                  {nav.blog}
+                </a>
+              </div>
+              <p class="nf-contact">
+                {c.contact} <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+              </p>
+            </div>
+          );
+        })
+      }
+    </section>
+  </main>
+  {
+    locales.map((l) => (
+      <div data-nf-locale={l}>
+        <SiteFooter locale={l} />
+      </div>
+    ))
+  }
+</Base>
+
+<style>
+  .nf {
+    padding-block: clamp(70px, 14vh, 150px) clamp(80px, 16vh, 170px);
+  }
+  /* One language is shown, never both. The attribute sits on <html> so the swap is a single write
+     before paint rather than a walk over two subtrees. */
+  [data-nf-locale="en"] {
+    display: none;
+  }
+  :global(html[data-nf="en"]) [data-nf-locale="en"] {
+    display: block;
+  }
+  :global(html[data-nf="en"]) [data-nf-locale="de"] {
+    display: none;
+  }
+  /* The navs are addressed by id because they cannot be wrapped (see the note at the markup).
+     :global on both sides: SiteNav is a different component, so its <nav> carries a different
+     scope hash and a scoped selector would never match it. */
+  :global(nav#nav-en) {
+    display: none;
+  }
+  :global(html[data-nf="en"] nav#nav-en) {
+    display: block;
+  }
+  :global(html[data-nf="en"] nav#nav) {
+    display: none;
+  }
+
+  .nf-code {
+    margin: 0;
+    color: var(--coral);
+  }
+  .nf-h1 {
+    margin: 18px 0 0;
+    max-width: 16ch;
+    font-size: clamp(2rem, 4.4vw, 3.1rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.06;
+  }
+  .nf-p {
+    margin: 20px 0 0;
+    max-width: 46ch;
+    color: var(--fg-soft);
+  }
+  .nf-links {
+    margin-top: 34px;
+    display: flex;
+    align-items: center;
+    gap: 14px 26px;
+    flex-wrap: wrap;
+  }
+  .nf-alt {
+    color: var(--fg-muted);
+    text-decoration: none;
+    font-size: 14.5px;
+    transition: color 160ms ease;
+  }
+  .nf-alt:hover {
+    color: var(--fg);
+  }
+  .nf-contact {
+    margin: 40px 0 0;
+    padding-top: 22px;
+    border-top: 1px solid var(--hairline);
+    max-width: 46ch;
+    font-size: 14.5px;
+    color: var(--fg-muted);
+  }
+  .nf-contact a {
+    color: var(--fg-soft);
+  }
+</style>
