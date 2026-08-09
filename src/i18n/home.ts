@@ -93,7 +93,7 @@ export const homeCopy = {
       },
     },
 
-    band: ["Daten in der EU (Frankfurt)", "Lückenloser Audit-Trail", "Entwickelt in Berlin", "Live unter app.synapsio.solutions"],
+    band: ["Datenbank in Frankfurt (EU)", "Lückenloser Audit-Trail", "Entwickelt in Berlin", "Live unter app.synapsio.solutions"],
 
     figs: {
       chip: "So arbeitet der KI-Agent",
@@ -192,10 +192,10 @@ export const homeCopy = {
         { lbl: "Mandantentrennung", h: "Jede Firma abgeschottet", p: "Ihre Zahlen liegen in einer eigenen, isolierten Umgebung. Auf Datenbankebene kann keine Firma die Daten einer anderen sehen." },
         { lbl: "Rollen & Rechte", h: "Sie vergeben die Rechte", p: "Wer freigeben, bestellen oder nur ansehen darf, bestimmen Sie: pro Person, jederzeit änderbar." },
         { lbl: "Zugangsdaten", h: "Geheimnisse bleiben geheim", p: "Lieferanten-Zugänge und Schlüssel sieht niemand im Klartext, auch nicht in der Oberfläche." },
-        { lbl: "Recht auf Löschung", h: "Ihre Daten, Ihre Wahl", p: "Auf Wunsch entfernen wir alle Daten Ihrer Firma vollständig und endgültig, DSGVO-konform." },
+        { lbl: "Recht auf Löschung", h: "Ihre Daten, Ihre Wahl", p: "Auf Wunsch entfernen wir alle Daten Ihrer Firma vollständig und endgültig, Konto und Inhalte." },
       ],
       stripLbl: "Infrastruktur", stripH: "Auf geprüfter Infrastruktur gebaut.",
-      strip: ["TLS-verschlüsselte Verbindungen", "Verschlüsselung im Ruhezustand", "Automatische Sicherungen", "Lückenloser Audit-Trail", "Server in der EU · Frankfurt"],
+      strip: ["TLS-verschlüsselte Verbindungen", "Verschlüsselung im Ruhezustand", "Automatische Sicherungen", "Lückenloser Audit-Trail", "Datenbank in Frankfurt · EU"],
     },
 
     hz: {
@@ -365,7 +365,7 @@ export const homeCopy = {
       },
     },
 
-    band: ["Data in the EU (Frankfurt)", "Complete audit trail", "Built in Berlin", "Live at app.synapsio.solutions"],
+    band: ["Database in Frankfurt (EU)", "Complete audit trail", "Built in Berlin", "Live at app.synapsio.solutions"],
 
     figs: {
       chip: "How the AI works",
@@ -464,10 +464,10 @@ export const homeCopy = {
         { lbl: "Tenant isolation", h: "Every company sealed off", p: "Your figures sit in their own isolated environment. At database level, no company can see another company's data." },
         { lbl: "Roles & rights", h: "You assign the rights", p: "Who may approve, order or only view is up to you: per person, changeable at any time." },
         { lbl: "Credentials", h: "Secrets stay secret", p: "Supplier logins and keys are never shown in plain text, not even in the interface." },
-        { lbl: "Right to erasure", h: "Your data, your call", p: "On request we remove all of your company's data completely and permanently, in line with the GDPR." },
+        { lbl: "Right to erasure", h: "Your data, your call", p: "On request we remove all of your company's data completely and permanently, account and contents." },
       ],
       stripLbl: "Infrastructure", stripH: "Built on audited infrastructure.",
-      strip: ["TLS-encrypted connections", "Encryption at rest", "Automatic backups", "Complete audit trail", "Servers in the EU · Frankfurt"],
+      strip: ["TLS-encrypted connections", "Encryption at rest", "Automatic backups", "Complete audit trail", "Database in Frankfurt · EU"],
     },
 
     hz: {
