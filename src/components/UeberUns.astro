@@ -170,7 +170,9 @@ if (withheld.length) {
      elements once already. */
   .ab-hero-in { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,42%); gap:clamp(28px,5vw,72px);
     align-items:center; }
-  .ab-hero-obj { min-width:0; }
+  /* The pendant's cord is drawn to the very top of its own frame, so pulling the figure up by the
+     hero's top padding lets it read as hanging from the page header rather than from thin air. */
+  .ab-hero-obj { min-width:0; margin-top:calc(-1 * clamp(52px,9vh,104px) + 22px); }
   @media (max-width:900px){
     .ab-hero-in { grid-template-columns:1fr; gap:clamp(26px,5vh,44px); }
     /* On a phone the object follows the sentence it illustrates rather than leading it, and it

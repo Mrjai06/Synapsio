@@ -165,30 +165,41 @@ bx(0, 0, LEGH, DW, DD, TOPT, "face wk-topslab", 1);
 
 // ---- two monitors, behind the laptop ------------------------------------------------------------
 const MPT = 3.5, MRISE = 15;
-/** One monitor: a flat base plate, a thick column, a panel with real thickness. Taken from the
- *  reference desk rather than invented: a portrait screen beside a landscape one is what the
- *  setup actually looks like, and the two shapes together stop the pair reading as wallpaper. */
-function monitor(mx: number, my: number, w: number, h: number, rows: number, accentRow: number) {
+/** One monitor, at any angle on the desk.
+ *  Everything on this object was axis aligned, which is exactly why it read as flat: an isometric
+ *  drawing gets its depth from surfaces that DISAGREE about their direction. So the whole monitor
+ *  is built through one local-to-world map and can simply be turned. Local x runs across the
+ *  panel, local y through its thickness with the screen on the +y side, z is up. */
+function monitor(mx: number, my: number, w: number, h: number, rows: number, accentRow: number, rot: number) {
+  const cx = mx + w / 2, cy = my + MPT / 2;
+  const ca = Math.cos(rot), sa = Math.sin(rot);
+  const T = (lx: number, ly: number, lz: number): V3 =>
+    [cx + lx * ca - ly * sa, cy + lx * sa + ly * ca, lz];
+  const along = (n: number): V3 => [n * ca, n * sa, 0];
+  const deep = (n: number): V3 => [-n * sa, n * ca, 0];
   const bwid = Math.min(w - 8, 34);
-  /* ⚠️ The stand has to sit BEHIND the panel, and behind is SMALLER y: the screen is drawn on the
-     panel's y + MPT face, so the viewer is on the large-y side. Placed at my + 6.5 the column
-     stood in front of the screen it was meant to hold, touching nothing, and both monitors
-     floated above their own feet. The plate reaches fore and aft, the way a monitor foot does,
-     and the column overruns the panel's lower edge so the two visibly meet. */
-  bx(mx + w / 2 - bwid / 2, my - 13, Z, bwid, 22, 2.2, "face");  // base plate
-  bx(mx + w / 2 - 5, my - 9, Z + 2.2, 10, 10, MRISE + 8);        // column, behind the panel
-  bx(mx, my, Z + MRISE, w, MPT, h);                              // panel
-  const y = my + MPT, z0 = Z + MRISE;
-  panelY(mx + 3, mx + w - 3, z0 + 3, z0 + h - 3, y, "wk-screen", 0.5);
+  // The stand sits BEHIND the panel, and behind is smaller local y: the screen is on the +y face.
+  prism(T(-bwid / 2, -13, Z), along(bwid), deep(22), [0, 0, 2.2], "face", 2);        // base plate
+  prism(T(-5, -9, Z + 2.2), along(10), deep(10), [0, 0, MRISE + 8], "face", 2);      // column
+  prism(T(-w / 2, -MPT / 2, Z + MRISE), along(w), deep(MPT), [0, 0, h], "face", 2);  // panel
+
+  // Decals on the +y face. Winding is (x0,z0) -> (x0,z1) -> (x1,z1) -> (x1,z0) as ever; rotating
+  // the map rotates the normal with it, so the cull still sees a face pointing at the viewer.
+  const yf = MPT / 2, z0 = Z + MRISE;
+  const face = (x0: number, x1: number, za: number, zb: number, cls: string, bias: number) =>
+    push({ p: [T(x0, yf, za), T(x0, yf, zb), T(x1, yf, zb), T(x1, yf, za)], cls, bias });
+  face(-w / 2 + 3, w / 2 - 3, z0 + 3, z0 + h - 3, "wk-screen", 0.5);
   const widths = [0.74, 0.42, 0.62, 0.3, 0.55, 0.36, 0.66];
   for (let i = 0; i < rows; i++) {
     const zz = z0 + h - 9 - (i / rows) * (h - 18);
-    panelY(mx + 8, mx + 8 + (w - 16) * widths[i % widths.length], zz, zz + 2.6, y,
+    face(-w / 2 + 8, -w / 2 + 8 + (w - 16) * widths[i % widths.length], zz, zz + 2.6,
       i === accentRow ? "wk-row hot" : "wk-row", 0.9);
   }
 }
-monitor(34, 10, 44, 68, 7, 1);        // portrait
-monitor(88, 10, 78, 46, 4, 2);        // landscape
+// Turned slightly toward the chair, the way a two-screen desk actually stands. Opposite signs, so
+// the pair reads as a shallow V rather than as one long wall.
+monitor(30, 12, 44, 68, 7, 1, -0.17);        // portrait
+monitor(88, 8, 78, 46, 4, 2, 0.2);           // landscape
 
 // ---- laptop -------------------------------------------------------------------------------------
 const LX = 86, LY = 50, LW = 62, LD = 42, LBASE = 4;
@@ -230,7 +241,9 @@ const PX = 108, PY = 46;                       // the pendant hangs over the lap
 // ⚠️ Hung at Z+74 with a 26 radius the shade filled the middle of the picture and covered the
 // laptop it was meant to light. A pendant reads from its SILHOUETTE, so it can be small; what it
 // cannot be is in the way.
-const PZTOP = Z + 186, PZSH = Z + 104;         // cord anchor, and where the shade begins
+// The cord runs far above the desk so it can leave the illustration's frame entirely and read as
+// hanging from the page header. The viewBox takes no top margin for the same reason.
+const PZTOP = Z + 320, PZSH = Z + 104;         // cord anchor, and where the shade begins
 bx(PX - 1, PY - 1, PZSH + 10, 2, 2, PZTOP - PZSH - 10, "face wk-cord", 4);
 bx(PX - 4, PY - 4, PZSH + 7, 8, 8, 4, "face", 4);          // the fitting at the top of the shade
 
@@ -310,7 +323,18 @@ pen(-4, -2, 18, "face");
 [0, 1].forEach((i) => {
   tray(16 + i * 32, 74, Z, 28, 28, 11, i === 1 ? "wk-fill hot" : "wk-fill");
 });
-const CX = 152, CY = 76, CW = 42, CD = 30;
+/* A desk with four things on it reads as a diagram. These are the objects that make it a desk
+   someone works at, and each one is placed clear of the others: check both boxes after moving
+   anything, since the laptop already grew out of a tray once. */
+// phone, face up at the front edge
+bx(60, 100, Z, 13, 26, 1.6);
+pad(61.2, 101.4, Z + 1.7, 10.6, 23.2, "wk-screen", 0.5);
+// mouse, to the right of the laptop
+cyl(163, 63, Z, 5.6, 3.6);
+// two books stacked, front right
+bx(196, 66, Z, 22, 26, 3.2);
+bx(198.5, 68.5, Z + 3.2, 21, 25, 2.8);
+const CX = 152, CY = 78, CW = 40, CD = 28;
 pad(CX, CY, Z + 0.5, CW, CD, "wk-board");
 bx(CX + CW / 2 - 7, CY + 2, Z + 0.5, 14, 6, 2.5);
 const rules = [0.42, 0.58, 0.74].map((k) =>
@@ -336,12 +360,18 @@ const PIV = P2([PX, PY, PZTOP]);
 const line = (p: V3[]) => p.map((v) => P2(v).map((n) => n.toFixed(1)).join(",")).join(" ");
 
 // viewBox from real projected extents, so the object never sits in a corner of its own frame.
-const every: V3[] = [...S.flatMap((f) => f.p), ...throwPoly, [LX, LY + LIDL * Math.cos(LIDOPEN), ZB + LIDL * Math.sin(LIDOPEN)], [LX + LW, LY, ZB + LIDL]];
+/* ⚠️ The CORD is excluded from the frame. Measured in, its 215 units above the shade dominated
+   the box and the desk shrank to a corner of its own picture. The svg is overflow:visible, so the
+   cord simply runs out of the top and up the page, and the sticky nav paints over it: that is
+   what makes it read as hanging FROM the header rather than from the top of a drawing. */
+const every: V3[] = [...S.filter((f) => !f.cls.includes("wk-cord")).flatMap((f) => f.p), ...throwPoly, [LX, LY + LIDL * Math.cos(LIDOPEN), ZB + LIDL * Math.sin(LIDOPEN)], [LX + LW, LY, ZB + LIDL]];
 const pj = every.map(P2);
 const xs = pj.map((p) => p[0]), ys = pj.map((p) => p[1]);
 const M = 12;
-const vb = [Math.min(...xs) - M, Math.min(...ys) - M,
-  Math.max(...xs) - Math.min(...xs) + M * 2, Math.max(...ys) - Math.min(...ys) + M * 2];
+// No margin at the TOP: the cord is meant to run out of the frame, not to sit inside it with
+// air above. Left, right and bottom keep theirs.
+const vb = [Math.min(...xs) - M, Math.min(...ys),
+  Math.max(...xs) - Math.min(...xs) + M * 2, Math.max(...ys) - Math.min(...ys) + M];
 
 const lidCfg = JSON.stringify({ RX, RY, LX, LY, LW, ZB, LIDL, LIDOPEN });
 ---
