@@ -159,7 +159,11 @@ const hz = homeCopy[locale].hz;
   // Reduced lorry for distant use (the ring road). At that size ribs, hubs and slats are
   // sub-pixel — they cost frame time and add noise without adding a single readable detail.
   function lorrySimple(cabCls){
-    var f=[], W=2.4, TL=8.2, cy=TL+0.9, tot=cy+2.2;
+    // ⚠️ cy is the gap between trailer and tractor. It was TL+0.9, and the chassis that bridges
+    // it is darker than the tarmac, so at any size above thumbnail the gap read as a HOLE with
+    // road showing through and the two boxes looked like separate objects, especially where the
+    // cab carries a colour. TL+0.42 keeps the articulation legible without the hole.
+    var f=[], W=2.4, TL=8.2, cy=TL+0.42, tot=cy+2.2;
     // WHEELS FIRST. Without them the thing is two boxes hovering over the tarmac, which is
     // exactly why the ring traffic read as floating blocks — at this size the tyres are only a
     // couple of pixels, but they are what plants the vehicle on the road.
@@ -428,16 +432,57 @@ const hz = homeCopy[locale].hz;
     var RC=[0,0,0.09];
     [3.0,-3.0].forEach(function(off){
       for(i=0;i<N;i++){
-        var a=ringXY(i/N*Math.PI*2,off), b=ringXY((i+1)/N*Math.PI*2,off);
+        var th0=i/N*Math.PI*2, th1=(i+1)/N*Math.PI*2;
+        if(inJunction((th0+th1)/2)) continue;
+        var a=ringXY(th0,off), b=ringXY(th1,off);
         f.push({pts:[[a[0],a[1],0.1],[b[0],b[1],0.1]],nrm:null,cls:"rmk",open:true,ref:RC});
       }
     });
     var M=26;
     for(i=0;i<M;i++){
-      var c=ringXY(i/M*Math.PI*2,0), d=ringXY((i+0.5)/M*Math.PI*2,0);
+      var t0=i/M*Math.PI*2, t1=(i+0.5)/M*Math.PI*2;
+      if(inJunction((t0+t1)/2)) continue;
+      var c=ringXY(t0,0), d=ringXY(t1,0);
       f.push({pts:[[c[0],c[1],0.1],[d[0],d[1],0.1]],nrm:null,cls:"rmkd",open:true,ref:RC});
     }
     return f;
+  }
+  /* The four arm junctions, in the ellipse's parameter space. The arms run along the model axes,
+     so they meet the ring at th = 0, pi/2, pi, 3pi/2.
+     A kerb line or a centre dash painted straight THROUGH an intersection is the loudest artefact
+     in the whole scene at any zoom: it reads as a line lying across the road. The streets already
+     hold their markings clear of their junctions (see street(), m0 = t0 + 5); the ring never did,
+     so all four crossings had the ring's two kerbs and its centre dashes running over them.
+     The window is the street's half width converted to parameter space, which is why it is
+     recomputed per junction: an ellipse's arc-length scale is B at th=0 and A at th=pi/2, so a
+     fixed angle would be almost twice as wide at one crossing as at the next. */
+  function junctionWindows(){
+    // ⚠️ Do NOT assume 0 / pi/2 / pi / 3pi/2. ringXY maps its ellipse through a skew into model
+    // space, so an arm along a model axis does NOT meet the ring at that axis's parameter value.
+    // Masking those four angles masked four places where no junction is. The angle is SEARCHED
+    // per arm, and the window is the street's half width converted to local arc length, measured
+    // from the curve itself rather than from a closed form that the skew would invalidate.
+    return [[1,0],[-1,0],[0,-1],[0,1]].map(function(d){
+      var bt=-1,bd=1e9,bth=0,i,th,q,t,dd;
+      for(i=0;i<720;i++){
+        th=i/720*Math.PI*2; q=ringXY(th,0); t=q[0]*d[0]+q[1]*d[1];
+        if(t<=0) continue;
+        dd=Math.hypot(q[0]-d[0]*t,q[1]-d[1]*t);
+        if(dd<bd){ bd=dd; bt=t; bth=th; }
+      }
+      var e=0.004, a=ringXY(bth-e,0), b=ringXY(bth+e,0);
+      var L=Math.hypot(b[0]-a[0],b[1]-a[1])/(2*e);          // |d(ring)/dth| here
+      return {th:bth,w:(SW+1.2)/L};
+    });
+  }
+  var JUNCT=null;
+  function inJunction(th){
+    if(!JUNCT) JUNCT=junctionWindows();
+    for(var i=0;i<JUNCT.length;i++){
+      var d=Math.abs(((th-JUNCT[i].th+Math.PI)%(Math.PI*2)+Math.PI*2)%(Math.PI*2)-Math.PI);
+      if(d<JUNCT[i].w) return true;
+    }
+    return false;
   }
   // lamps standing just outside the ring, lighting the carriageway. Four, at the quarter points,
   // so none of them lands in a street junction (those sit at roughly 46°/134°/226°/314°).
@@ -510,10 +555,55 @@ const hz = homeCopy[locale].hz;
     }
     return bt;
   }
+  /* Which of the two band contours is the INNER one, decided by measurement rather than by
+     guessing the sign of the offset: ringXY's normal runs through the same skew as everything
+     else here. */
+  var INNER_S=(function(){
+    function meanR(off){ var m=0; for(var i=0;i<72;i++){ var q=ringXY(i/72*Math.PI*2,off); m+=Math.hypot(q[0],q[1]); } return m/72; }
+    return meanR(3.4)<meanR(-3.4)?3.4:-3.4;
+  })();
+  /* The t at which the line (p0 + d*t + n*o) first crosses the band contour at offset `off`.
+     Segment intersection against the sampled contour, not a nearest-point search: the near edge
+     of a street has to sit ON the curve, and "closest sample" is up to half a segment out. */
+  function edgeCross(p0,d,n,o,off){
+    var best=null, q0=ringXY(0,off), q1,i,ax,ay,bx,by,cx,cy,det,t,u;
+    var ox=p0[0]+n[0]*o, oy=p0[1]+n[1]*o;
+    for(i=1;i<=360;i++){
+      q1=ringXY(i/360*Math.PI*2,off);
+      ax=d[0]; ay=d[1]; bx=q0[0]-q1[0]; by=q0[1]-q1[1];
+      cx=q0[0]-ox; cy=q0[1]-oy;
+      det=ax*by-ay*bx;
+      if(Math.abs(det)>1e-9){
+        t=(cx*by-cy*bx)/det; u=(ax*cy-ay*cx)/det;
+        if(u>=-1e-9&&u<=1+1e-9&&t>0&&(best===null||t<best)) best=t;
+      }
+      q0=q1;
+    }
+    return best;
+  }
   function street(p0,d,t0,t1,taper){
     var n=[-d[1],d[0]];
     function P(t,o,z){ return [p0[0]+d[0]*t+n[0]*o, p0[1]+d[1]*t+n[1]*o, z==null?0.088:z]; }
-    var f=[{pts:[P(t0,-SW),P(t1,-SW),P(t1,SW),P(t0,SW)],nrm:[0,0,1],lit:true,cls:"ring"}];
+    /* t0 === "ring" means this street BEGINS at the ring, and then its near end must be a CURVE.
+       A rectangle can never meet a curved kerb: pull it back far enough for its two corners to
+       land on the band and the centre of the road pokes a tongue of tarmac into the dark middle;
+       stop where the centre is right and the corners fall short and the background shows through
+       as a notch. Both were shipped, in that order. The near edge is now built from the band's
+       own inner contour, sampled across the full width, so the join is exact at every offset and
+       there is nothing left to tune. */
+    var near=[], i, o, tc;
+    if(t0==="ring"){
+      var K=14;
+      for(i=K;i>=0;i--){
+        o=-SW+(2*SW)*i/K;
+        tc=edgeCross(p0,d,n,o,INNER_S);
+        near.push(P(tc==null?0:tc-0.35,o));
+      }
+      t0=edgeCross(p0,d,n,0,INNER_S)-0.35;
+    } else {
+      near=[P(t0,SW),P(t0,-SW)];
+    }
+    var f=[{pts:[P(t1,-SW),P(t1,SW)].concat(near),nrm:[0,0,1],lit:true,cls:"ring"}];
     // An open road dissolves at its far end instead of stopping at a hard diagonal cut, which
     // reads as unfinished scaffolding rather than a road carrying on out of frame. A street that
     // TERMINATES in a junction gets no taper — it simply ends against the other carriageway.
@@ -543,18 +633,24 @@ const hz = homeCopy[locale].hz;
     return f;
   }
   // static geometry — built once, then only faded.
-  // The four arms start 0.6 INSIDE the ring band, where street and ring share a fill and the
+  // The four arms start 2.6 INSIDE the ring band, where street and ring share a fill and the
+  // ⚠️ 0.6 was NOT enough. A street is a RECTANGLE and the ring's inner edge is a CURVE, so the
+  // street's two far CORNERS fall short of the ring even when its centreline reaches it, and the
+  // background showed through as a notch at all four crossings. The overlap has to clear the
+  // sagitta across the street's full width, which at the ellipse's tight ends is ~0.6 by itself.
+  // The extra depth is free: the ring sits at z 0.09 against the street's 0.088, so it paints
+  // over whatever runs under it.
   // junction has no seam; the two branches start inside the arm they T off, for the same reason.
   var LANES=(function(){
     function far(ax,dir,c){ var m=0; [OWN].concat(PEERS).forEach(function(p){
       if(p.ax===ax&&p.dir===dir&&p.c===c) m=Math.max(m,p.far); }); return m; }
     var B=bandCross;
     return [
-      {p:[0,0],d:[ 1,0],t0:B([ 1,0])-0.6,t1:far(0, 1,0)+2.5,taper:1},   // east arm — ours
-      {p:[0,0],d:[-1,0],t0:B([-1,0])-0.6,t1:far(0,-1,0)+2.5,taper:1},   // west arm
+      {p:[0,0],d:[ 1,0],t0:"ring",t1:far(0, 1,0)+2.5,taper:1},   // east arm — ours
+      {p:[0,0],d:[-1,0],t0:"ring",t1:far(0,-1,0)+2.5,taper:1},   // west arm
       // the north arm runs past its plot and on out; the south arm ENDS in the branch junction
-      {p:[0,0],d:[0,-1],t0:B([0,-1])-0.6,t1:Math.max(far(1,-1,0)+2.5,BR1+SW+0.5),taper:1},
-      {p:[0,0],d:[0, 1],t0:B([0, 1])-0.6,t1:BR2+SW,taper:0},
+      {p:[0,0],d:[0,-1],t0:"ring",t1:Math.max(far(1,-1,0)+2.5,BR1+SW+0.5),taper:1},
+      {p:[0,0],d:[0, 1],t0:"ring",t1:BR2+SW,taper:0},
       {p:[0,-BR1],d:[ 1,0],t0:-SW,t1:far(0, 1,-BR1)+2.5,taper:1},       // north branch
       {p:[0, BR2],d:[-1,0],t0:-SW,t1:far(0,-1, BR2)+2.5,taper:1}        // south branch
     ];
