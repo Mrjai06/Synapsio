@@ -1,18 +1,20 @@
 ---
-// /ueber-uns's own object: a workbench.
+// /ueber-uns's own object: the workbench the company actually works at.
 //
 // WHY A BENCH, AND WHY NOT THE SPHERE. NeuralSphere anchors the startpage hero, the security
 // section owns the dome, the blog owns the tape and its pen. A device appears ONCE on this site,
 // and that rule is the only reason the five pages do not read as variants of one template.
-// A bench also says what the page says: a small team that knows the operational side first hand.
 //
-// MOTION CONTRACT (the site's rule): the OBJECT may animate on scroll, the prose never does.
-// One reveal, ease-out, once, and reduced motion shows it finished. No render loop: this is
-// static SVG, so it costs one paint.
+// It is a DESK, not a woodworking bench: laptop, monitor, lamp. The parts bins stay, because the
+// company's subject is stock, and the clipboard stays, because paper is what the product replaces.
 //
-// ISO ENGINE: the same basis as ArchivDrawer and HorizonteIso. x runs down-right, y down-left,
-// z up. Faces carry `.face` / `.face.lit` so the bench uses the same material as the startpage
-// figures, which is what stops a new drawing reading as a decal laid on the design.
+// MOTION CONTRACT (the site's rule): the OBJECT may animate, the prose never does. Two things
+// move, both once and both on reveal: the laptop lid opens, and the lamp strikes with a short
+// flicker before settling. Reduced motion shows the finished state and nothing moves.
+//
+// ISO ENGINE: x runs down-right, y down-left, z up. Corners of the bench top project as
+//   (0,0)=top   (BW,0)=right   (0,BD)=left   (BW,BD)=bottom
+// so SMALL y is the back of the desk and LARGE y is the front edge nearest the viewer.
 
 const RX = [0.866, 0.5];
 const RY = [-0.866, 0.5];
@@ -23,89 +25,151 @@ const P = (x: number, y: number, z: number): [number, number] => [
 const poly = (...p: [number, number][]) =>
   p.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
 
-/** Three visible faces of an axis-aligned box: top (lit), the -y flank, the +x flank.
- *  Returned back-to-front so a caller can concat boxes in draw order and be done. */
+/** The three faces of an axis-aligned box that this camera can actually see.
+ *  ⚠️ The two vertical ones are at x+w and y+d. An earlier version drew the face at y instead,
+ *  which is the face pointing AWAY from the viewer, so every box was missing one silhouette
+ *  edge and the object looked half-drawn. Normal +x projects down-right and normal +y projects
+ *  down-left; those two are the visible pair. */
 function box(x: number, y: number, z: number, w: number, d: number, h: number) {
   return {
     top: poly(P(x, y, z + h), P(x + w, y, z + h), P(x + w, y + d, z + h), P(x, y + d, z + h)),
-    front: poly(P(x, y, z), P(x + w, y, z), P(x + w, y, z + h), P(x, y, z + h)),
+    front: poly(P(x, y + d, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x, y + d, z + h)),
     side: poly(P(x + w, y, z), P(x + w, y + d, z), P(x + w, y + d, z + h), P(x + w, y, z + h)),
   };
 }
+/** A flat panel lying on the desk at height z. */
+const slab = (x: number, y: number, z: number, w: number, d: number) =>
+  poly(P(x, y, z), P(x + w, y, z), P(x + w, y + d, z), P(x, y + d, z));
 
 // ---- the bench ------------------------------------------------------------------------------
-const BW = 210, BD = 104, TOPT = 9;      // bench: width along x, depth along y, top thickness
-const LEGH = 62, LEG = 11;
+const BW = 214, BD = 112, TOPT = 8;
+const LEGH = 60, LEG = 10;
 const TOPZ = LEGH;
+const Z = TOPZ + TOPT;                      // working surface
 
 const top = box(0, 0, TOPZ, BW, BD, TOPT);
-const shelf = box(6, 6, 20, BW - 12, BD - 12, 5);
-// Legs are drawn before the top so the top occludes them, and the two far ones before the near.
+const shelf = box(7, 7, 18, BW - 14, BD - 14, 4);
 const legs = [
-  box(BW - LEG - 4, BD - LEG - 4, 0, LEG, LEG, LEGH),   // far right
-  box(4, BD - LEG - 4, 0, LEG, LEG, LEGH),              // far left
-  box(BW - LEG - 4, 4, 0, LEG, LEG, LEGH),              // near right
-  box(4, 4, 0, LEG, LEG, LEGH),                         // near left
+  box(BW - LEG - 4, 4, 0, LEG, LEG, LEGH),
+  box(4, 4, 0, LEG, LEG, LEGH),
+  box(BW - LEG - 4, BD - LEG - 4, 0, LEG, LEG, LEGH),
+  box(4, BD - LEG - 4, 0, LEG, LEG, LEGH),
 ];
 
-// ---- what is ON the bench -------------------------------------------------------------------
-const Z = TOPZ + TOPT;
+// ---- monitor: back of the desk, on a foot ---------------------------------------------------
+const MX = 104, MY = 12, MW = 74, MPT = 4, MH = 46, MRISE = 12;
+const mFoot = box(MX + MW / 2 - 15, MY + 1, Z, 30, 16, 3);
+const mStem = box(MX + MW / 2 - 4, MY + 6, Z + 3, 8, 5, MRISE);
+const mPanel = box(MX, MY, Z + MRISE, MW, MPT, MH);
+// the screen itself is the panel's front face, inset, and it is the brightest thing here
+const mScreen = poly(
+  P(MX + 3, MY + MPT, Z + MRISE + 3), P(MX + MW - 3, MY + MPT, Z + MRISE + 3),
+  P(MX + MW - 3, MY + MPT, Z + MRISE + MH - 3), P(MX + 3, MY + MPT, Z + MRISE + MH - 3),
+);
+// three rows of "content" on the monitor, drawn as bars rather than as fake text
+const mRows = [0.24, 0.44, 0.62, 0.78].map((k, i) => {
+  const w = [0.72, 0.5, 0.62, 0.34][i];
+  return poly(
+    P(MX + 8, MY + MPT + 0.1, Z + MRISE + MH - 6 - k * (MH - 12)),
+    P(MX + 8 + (MW - 16) * w, MY + MPT + 0.1, Z + MRISE + MH - 6 - k * (MH - 12)),
+    P(MX + 8 + (MW - 16) * w, MY + MPT + 0.1, Z + MRISE + MH - 3.4 - k * (MH - 12)),
+    P(MX + 8, MY + MPT + 0.1, Z + MRISE + MH - 3.4 - k * (MH - 12)),
+  );
+});
 
-// Three open parts bins in a row. An open bin reads instantly; a closed box is just a cube, and
-// a cube is the one shape this site's figure rule bans.
-const BINW = 34, BIND = 40, BINH = 15, BINGAP = 8;
-const bins = [0, 1, 2].map((i) => {
-  const x = 18 + i * (BINW + BINGAP);
-  const y = BD - BIND - 14;
+// ---- laptop: the animated piece --------------------------------------------------------------
+// The lid is hinged on its BACK edge (small y) and swings up and back. Closed is theta = 0, where
+// it lies flat over the base; open is a little past vertical, the way a laptop actually sits.
+const LX = 22, LY = 44, LW = 62, LD = 44, LBASE = 4;
+const LIDL = 42;                             // lid length, i.e. screen height when upright
+const LIDOPEN = 1.92;                        // radians, ~110 degrees
+const lapBase = box(LX, LY, Z, LW, LD, LBASE);
+const ZB = Z + LBASE;
+// keyboard: a darker inset panel plus a trackpad, so the base is not a blank slab
+const lapKeys = slab(LX + 5, LY + 6, ZB + 0.1, LW - 10, LD - 20);
+const lapPad = slab(LX + LW / 2 - 10, LY + LD - 13, ZB + 0.1, 20, 9);
+
+/* Anything drawn ON the lid is given in the LID'S OWN coordinates: x0/x1 across it, k0/k1 along
+   it from the hinge (k=0) to the free edge (k=1). One interpolation then serves both the build
+   and the runtime, so the screen's content cannot drift off the panel it sits on. */
+const LID_INSETS = [
+  { cls: "wk-screen wk-lidscreen", x0: 4, x1: LW - 4, k0: 0.1, k1: 0.92 },
+  { cls: "wk-row hot wk-lidrow", x0: 9, x1: LW - 22, k0: 0.79, k1: 0.845 },
+  { cls: "wk-row wk-lidrow", x0: 9, x1: LW - 14, k0: 0.68, k1: 0.735 },
+  { cls: "wk-row wk-lidrow", x0: 9, x1: LW - 30, k0: 0.57, k1: 0.625 },
+];
+function lidAt(t: number) {
+  const dy = LIDL * Math.cos(t), dz = LIDL * Math.sin(t);
+  const q = (x: number, k: number) => P(LX + x, LY + dy * k, ZB + dz * k);
+  return {
+    lid: poly(P(LX, LY, ZB), P(LX + LW, LY, ZB), q(LW, 1), q(0, 1)),
+    insets: LID_INSETS.map((i) => poly(q(i.x0, i.k0), q(i.x1, i.k0), q(i.x1, i.k1), q(i.x0, i.k1))),
+  };
+}
+const lid0 = lidAt(LIDOPEN);
+
+// ---- desk lamp: post, arm, angled shade, and the light it throws -----------------------------
+const PX = 8, PY = BD - 22, PH = 54;
+const lampPost = box(PX, PY, Z, 5, 5, PH);
+const lampArm = box(PX + 2, PY - 46, Z + PH - 4, 5, 48, 5);       // reaches back over the laptop
+const shadeX = PX + 1, shadeY = PY - 50, shadeZ = Z + PH - 16;
+const lampShade = box(shadeX, shadeY, shadeZ, 20, 17, 9);
+// The throw: a wedge from under the shade onto the laptop's keyboard. Drawn once, faded by CSS.
+const throwPoly = poly(
+  P(shadeX + 2, shadeY + 3, shadeZ), P(shadeX + 17, shadeY + 3, shadeZ),
+  P(LX + LW - 4, LY + LD - 4, ZB + 0.3), P(LX + 4, LY + 6, ZB + 0.3),
+);
+
+// ---- parts bins, clipboard, mug ---------------------------------------------------------------
+const BINW = 30, BIND = 34, BINH = 13;
+const bins = [0, 1].map((i) => {
+  const x = 150 + i * (BINW + 7), y = 62;
   return {
     shell: box(x, y, Z, BINW, BIND, BINH),
-    // the contents sit just below the rim, so the bin reads as open rather than as a lid
-    fill: poly(
-      P(x + 3, y + 3, Z + BINH - 4), P(x + BINW - 3, y + 3, Z + BINH - 4),
-      P(x + BINW - 3, y + BIND - 3, Z + BINH - 4), P(x + 3, y + BIND - 3, Z + BINH - 4),
-    ),
+    fill: slab(x + 3, y + 3, Z + BINH - 3.5, BINW - 6, BIND - 6),
     hot: i === 1,
   };
 });
-
-// A clipboard lying flat, with its clip and two ruled lines. This is the piece of paper the
-// whole product replaces, so it earns its place.
-const CX = 132, CY = 16, CW = 58, CD = 74;
-const board = poly(P(CX, CY, Z + 1), P(CX + CW, CY, Z + 1), P(CX + CW, CY + CD, Z + 1), P(CX, CY + CD, Z + 1));
-const clip = box(CX + CW / 2 - 9, CY + CD - 13, Z + 1, 18, 9, 4);
-const rules = [0.34, 0.5, 0.66].map((k) =>
-  poly(P(CX + 7, CY + CD * k, Z + 2), P(CX + CW - 7, CY + CD * k, Z + 2)),
+const CX = 96, CY = 74, CW = 44, CD = 32;
+const board = slab(CX, CY, Z + 0.6, CW, CD);
+const clip = box(CX + CW / 2 - 7, CY + 2, Z + 0.6, 14, 6, 3);
+const rules = [0.42, 0.58, 0.74].map((k) =>
+  poly(P(CX + 5, CY + CD * k, Z + 1.4), P(CX + CW - 5, CY + CD * k, Z + 1.4)),
+);
+// ⚠️ NOT a cube. 13x13x14 was one, and a cube is the single shape this site's figure rule bans.
+// A squat body with a handle on its down-right face reads as a mug at any size.
+const MUX = BW - 36, MUY = 24;
+const mug = box(MUX, MUY, Z, 14, 14, 11);
+const mugHandle = poly(
+  P(MUX + 14, MUY + 4, Z + 8), P(MUX + 20, MUY + 5, Z + 7.5),
+  P(MUX + 20, MUY + 10, Z + 4.5), P(MUX + 14, MUY + 11, Z + 3),
 );
 
-// A bench lamp: a post and a shade, with the light falling on the top. The only warm thing here,
-// which is how the rest of the site handles a single accent, so it stays small.
-// ⚠️ A light POOL and two crates were drawn here and both are gone. The pool covered half the
-// bench in a pale slab that read as a stain, and the crates were a dark shape with no silhouette
-// of their own. Neither added information, and this object's whole lesson (see the drawer) is
-// that fewer competing planes win. A bench lamp: short, over the bins, where a bench lamp is.
-const LX = 30, LY = 26, LZ = Z, LH = 38;
-const post = box(LX, LY, LZ, 4, 4, LH);
-const shade = box(LX - 7, LY - 6, LZ + LH, 19, 17, 4.5);
-
-// viewBox from the projected extents of everything that is drawn, plus a margin. Computing it
-// from the geometry rather than guessing is what stops the object sitting in one corner of its
-// own frame, which cost three passes on the drawer.
-const all: [number, number][] = [];
-[[0, 0, 0], [BW, 0, 0], [BW, BD, 0], [0, BD, 0],
- [0, 0, Z], [BW, 0, Z], [BW, BD, Z], [0, BD, Z],
- [LX - 12, LY - 11, LZ + LH + 6], [LX + 18, LY + 15, LZ + LH + 6],
- [LX, LY, LZ + LH + 6]].forEach(([x, y, z]) => all.push(P(x, y, z)));
-const xs = all.map((p) => p[0]), ys = all.map((p) => p[1]);
+// viewBox from the real projected extents, so the object is never parked in a corner of its
+// own frame. That mistake cost the drawer three passes.
+const corners: [number, number, number][] = [
+  [0, 0, 0], [BW, 0, 0], [BW, BD, 0], [0, BD, 0],
+  [0, 0, Z], [BW, 0, Z], [BW, BD, Z], [0, BD, Z],
+  [MX, MY, Z + MRISE + MH], [MX + MW, MY, Z + MRISE + MH],
+  [LX, LY + LIDL * Math.cos(LIDOPEN), ZB + LIDL * Math.sin(LIDOPEN)],
+  [LX + LW, LY + LIDL * Math.cos(LIDOPEN), ZB + LIDL * Math.sin(LIDOPEN)],
+  [PX, PY, Z + PH], [shadeX, shadeY, shadeZ + 9], [shadeX + 20, shadeY + 17, shadeZ],
+];
+const pr = corners.map(([x, y, z]) => P(x, y, z));
+const xs = pr.map((p) => p[0]), ys = pr.map((p) => p[1]);
 const M = 14;
 const vb = [
   Math.min(...xs) - M, Math.min(...ys) - M,
   Math.max(...xs) - Math.min(...xs) + M * 2, Math.max(...ys) - Math.min(...ys) + M * 2,
 ];
+
+// Everything the runtime needs to redraw the lid, handed over as data rather than duplicated in
+// the script: one source of truth for the geometry.
+const lidCfg = JSON.stringify({ RX, RY, LX, LY, LW, ZB, LIDL, LIDOPEN });
 ---
 
-<figure class="wk" data-wk aria-hidden="true">
+<figure class="wk" data-wk data-lid={lidCfg} aria-hidden="true">
   <svg viewBox={vb.map((n) => n.toFixed(1)).join(" ")} role="presentation">
-    {/* legs first: the top has to occlude them */}
     {legs.map((l) => (<>
       <polygon class="face" points={l.front} />
       <polygon class="face" points={l.side} />
@@ -115,15 +179,24 @@ const vb = [
     <polygon class="face" points={shelf.front} />
     <polygon class="face" points={shelf.side} />
     <polygon class="face lit" points={shelf.top} />
+
     <polygon class="face" points={top.front} />
     <polygon class="face" points={top.side} />
     <polygon class="face lit wk-top" points={top.top} />
 
-    <polygon class="wk-board" points={board} />
-    {rules.map((r) => (<polyline class="wk-rule" points={r} />))}
-    <polygon class="face" points={clip.front} />
-    <polygon class="face" points={clip.side} />
-    <polygon class="face lit" points={clip.top} />
+    {/* back of the desk first, front last: painter order runs with increasing x + y */}
+    <polygon class="face" points={mFoot.front} /><polygon class="face" points={mFoot.side} />
+    <polygon class="face lit" points={mFoot.top} />
+    <polygon class="face" points={mStem.front} /><polygon class="face" points={mStem.side} />
+    <polygon class="face lit" points={mStem.top} />
+    <polygon class="face" points={mPanel.side} /><polygon class="face lit" points={mPanel.top} />
+    <polygon class="face" points={mPanel.front} />
+    <polygon class="wk-screen" points={mScreen} />
+    {mRows.map((r, i) => (<polygon class={i === 0 ? "wk-row hot" : "wk-row"} points={r} />))}
+
+    <polygon class="face" points={mug.front} /><polygon class="face" points={mug.side} />
+    <polygon class="face lit" points={mug.top} />
+    <polyline class="wk-handle" points={mugHandle} />
 
     {bins.map((b) => (<>
       <polygon class="face" points={b.shell.front} />
@@ -132,11 +205,34 @@ const vb = [
       <polygon class={b.hot ? "wk-fill hot" : "wk-fill"} points={b.fill} />
     </>))}
 
-    <polygon class="face" points={post.front} />
-    <polygon class="face" points={post.side} />
-    <polygon class="face" points={shade.front} />
-    <polygon class="face" points={shade.side} />
-    <polygon class="face lit wk-shade" points={shade.top} />
+    <polygon class="wk-board" points={board} />
+    {rules.map((r) => (<polyline class="wk-rule" points={r} />))}
+    <polygon class="face" points={clip.front} /><polygon class="face" points={clip.side} />
+    <polygon class="face lit" points={clip.top} />
+
+    {/* laptop: lid first so the base occludes its bottom edge */}
+    <polygon class="face wk-lid" points={lid0.lid} />
+    {lid0.insets.map((pts, i) => (
+      <polygon
+        class={LID_INSETS[i].cls}
+        points={pts}
+        data-lk={[LID_INSETS[i].x0, LID_INSETS[i].x1, LID_INSETS[i].k0, LID_INSETS[i].k1].join(",")}
+      />
+    ))}
+    <polygon class="face" points={lapBase.front} /><polygon class="face" points={lapBase.side} />
+    <polygon class="face lit" points={lapBase.top} />
+    <polygon class="wk-keys" points={lapKeys} />
+    <polygon class="wk-pad" points={lapPad} />
+
+    {/* The throw is drawn AFTER the laptop. Before it, the base painted straight over the light,
+        so the lamp lit nothing at all. Light falls ON a surface, so it goes on top of it. */}
+    <polygon class="wk-throw" points={throwPoly} />
+
+    <polygon class="face" points={lampPost.front} /><polygon class="face" points={lampPost.side} />
+    <polygon class="face" points={lampArm.front} /><polygon class="face" points={lampArm.side} />
+    <polygon class="face lit" points={lampArm.top} />
+    <polygon class="face" points={lampShade.front} /><polygon class="face" points={lampShade.side} />
+    <polygon class="face lit wk-shade" points={lampShade.top} />
   </svg>
 </figure>
 
@@ -144,31 +240,72 @@ const vb = [
   .wk { margin: 0; display: block; }
   .wk svg { width: 100%; height: auto; display: block; overflow: visible; }
 
-  /* the bench top catches the lamp, so it is a step lighter than the rest of the object */
-  .wk .wk-top { fill: color-mix(in oklab, var(--face-hi) 82%, #cfe4ea); }
+  .wk .wk-top { fill: color-mix(in oklab, var(--face-hi) 84%, #cfe4ea); }
   .wk .wk-shade { fill: #d2a765; stroke: rgba(240, 196, 130, 0.55); }
 
-  /* Paper, in the tone the security dome already uses for it. At #d6e2e6 the board was the
-     brightest thing on a near-black page and pulled the eye off the bench. */
+  /* Screens are the only lit surfaces. Teal, not white: white would out-shout the coral, which
+     is the page's single accent. */
+  .wk .wk-screen { fill: #17414c; stroke: var(--edge); stroke-width: 1;
+    vector-effect: non-scaling-stroke; }
+  .wk .wk-row { fill: rgba(160, 214, 214, 0.5); stroke: none; }
+  .wk .wk-row.hot { fill: rgba(232, 132, 90, 0.85); }
+  .wk .wk-keys { fill: #0d2029; stroke: var(--edge-soft); stroke-width: 1;
+    vector-effect: non-scaling-stroke; }
+  .wk .wk-pad { fill: #16303a; stroke: var(--edge-soft); stroke-width: 1;
+    vector-effect: non-scaling-stroke; }
+
   .wk .wk-board { fill: #20404e; stroke: rgba(214, 230, 236, 0.5); stroke-width: 1;
     vector-effect: non-scaling-stroke; }
   .wk .wk-rule { fill: none; stroke: rgba(206, 222, 228, 0.5); stroke-width: 1.4;
     vector-effect: non-scaling-stroke; }
-
   .wk .wk-fill { fill: #2f5f66; stroke: none; }
   .wk .wk-fill.hot { fill: var(--coral); }
 
-  /* One reveal, once, ease-out, transform and opacity only. Gated on html[data-js] so a no-JS
-     render shows the object plainly rather than an empty box, and every rule in the group
-     carries the same prefix (the [data-shot] trap, paid for once already). */
+  /* The lamp's throw. Kept very low: a warm wash over a near-black illustration turns to mud
+     quickly, and the earlier version of this object had a light pool that read as a stain. */
+  .wk .wk-throw { fill: rgba(240, 196, 130, 0.13); stroke: none; opacity: 0; }
+  .wk .wk-handle { fill: none; stroke: var(--edge); stroke-width: 2.2; stroke-linejoin: round;
+    stroke-linecap: round; vector-effect: non-scaling-stroke; }
+
+  /* ---- motion: one reveal, then two things strike, both once -------------------------------
+     Gated on html[data-js] with every rule in the group carrying the prefix, or a no-JS render
+     shows an empty box (the [data-shot] trap, paid for once already). */
   :global(html[data-js]) .wk { opacity: 0; transform: translateY(12px); }
   :global(html[data-js]) .wk.in {
     opacity: 1; transform: none;
     transition: opacity 420ms var(--ease-out), transform 420ms var(--ease-out);
   }
+  /* A lamp does not fade up, it strikes: two stutters and then steady. */
+  :global(html[data-js]) .wk.in .wk-throw { animation: wkStrike 1100ms steps(1, end) 420ms forwards; }
+  :global(html[data-js]) .wk.in .wk-shade { animation: wkShade 1100ms steps(1, end) 420ms forwards; }
+  @keyframes wkStrike {
+    0%, 18% { opacity: 0; } 22% { opacity: 1; } 30% { opacity: 0; }
+    38% { opacity: 1; } 44% { opacity: 0.25; } 52%, 100% { opacity: 1; }
+  }
+  @keyframes wkShade {
+    0%, 18% { fill: #5c4a30; } 22% { fill: #d2a765; } 30% { fill: #5c4a30; }
+    38% { fill: #d2a765; } 44% { fill: #8a7048; } 52%, 100% { fill: #d2a765; }
+  }
+  /* The screens come up with the lamp rather than before it. */
+  :global(html[data-js]) .wk .wk-row,
+  :global(html[data-js]) .wk .wk-lidrow,
+  :global(html[data-js]) .wk .wk-lidscreen { opacity: 0; }
+  :global(html[data-js]) .wk.in .wk-row { opacity: 1; transition: opacity 500ms ease 1000ms; }
+  :global(html[data-js]) .wk.in .wk-lidscreen,
+  :global(html[data-js]) .wk.in .wk-lidrow { opacity: 1; transition: opacity 400ms ease 900ms; }
+
   @media (prefers-reduced-motion: reduce) {
     :global(html[data-js]) .wk { opacity: 1; transform: none; }
     :global(html[data-js]) .wk.in { transition: none; }
+    :global(html[data-js]) .wk .wk-throw { opacity: 1; }
+    :global(html[data-js]) .wk.in .wk-throw,
+    :global(html[data-js]) .wk.in .wk-shade { animation: none; }
+    :global(html[data-js]) .wk .wk-row,
+    :global(html[data-js]) .wk .wk-lidrow,
+    :global(html[data-js]) .wk .wk-lidscreen { opacity: 1; }
+    :global(html[data-js]) .wk.in .wk-row,
+    :global(html[data-js]) .wk.in .wk-lidrow,
+    :global(html[data-js]) .wk.in .wk-lidscreen { transition: none; }
   }
 </style>
 
@@ -176,14 +313,54 @@ const vb = [
   (function () {
     var els = document.querySelectorAll("[data-wk]");
     if (!els.length) return;
+    var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // The lid is the one piece whose GEOMETRY changes, so it cannot be a CSS transform: a hinge
+    // rotation in 3D is not a 2D rotation once projected. The free edge is recomputed per frame
+    // from the same constants the build used, handed over on the element.
+    function openLid(fig) {
+      var cfg;
+      try { cfg = JSON.parse(fig.getAttribute("data-lid")); } catch (e) { return; }
+      var lid = fig.querySelector(".wk-lid");
+      var insets = fig.querySelectorAll("[data-lk]");
+      if (!lid) return;
+      var RX = cfg.RX, RY = cfg.RY;
+      function P(x, y, z) {
+        return (x * RX[0] + y * RY[0]).toFixed(1) + "," + (x * RX[1] + y * RY[1] - z).toFixed(1);
+      }
+      function draw(t) {
+        var dy = cfg.LIDL * Math.cos(t), dz = cfg.LIDL * Math.sin(t);
+        var X = cfg.LX, Y = cfg.LY, W = cfg.LW, ZB = cfg.ZB;
+        function q(x, k) { return P(X + x, Y + dy * k, ZB + dz * k); }
+        lid.setAttribute("points", q(0, 0) + " " + q(W, 0) + " " + q(W, 1) + " " + q(0, 1));
+        insets.forEach(function (el) {
+          var d = el.getAttribute("data-lk").split(",").map(Number);   // x0, x1, k0, k1
+          el.setAttribute("points",
+            q(d[0], d[2]) + " " + q(d[1], d[2]) + " " + q(d[1], d[3]) + " " + q(d[0], d[3]));
+        });
+      }
+      if (reduced) { draw(cfg.LIDOPEN); return; }
+      // closed is theta 0, where the lid lies flat over the keyboard
+      var t0 = performance.now() + 260, DUR = 760;
+      draw(0.02);
+      (function step(now) {
+        var k = Math.min(1, Math.max(0, (now - t0) / DUR));
+        var e = 1 - Math.pow(1 - k, 3);                    // ease-out, the site's only entrance
+        draw(0.02 + (cfg.LIDOPEN - 0.02) * e);
+        if (k < 1) requestAnimationFrame(step);
+      })(performance.now());
+    }
+
+    function fire(el) { el.classList.add("in"); openLid(el); }
+
     if (!("IntersectionObserver" in window)) {
-      els.forEach(function (e) { e.classList.add("in"); });
+      els.forEach(fire);
       return;
     }
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (en) {
         if (!en.isIntersecting) return;
-        en.target.classList.add("in");
+        fire(en.target);
         io.unobserve(en.target);          // never re-runs on scroll back
       });
     }, { rootMargin: "0px 0px -12% 0px" });
