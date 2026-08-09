@@ -53,7 +53,11 @@ const p = (path: string) => localePath(locale, path);
 
   // the shape each theme takes; see the file header
   const LAY: Record<string, string> = {
-    loop: "wide", ai: "statement", read: "strip", calc: "curve", gate: "crop", memory: "plain",
+    loop: "wide", ai: "statement", read: "strip", calc: "curve",
+    // The two chapters that say what the AI does on its own and how it grades itself carry no
+    // screenshot on purpose: they are the slots the isometric figures go into, and a figure is its
+    // own layout family, so the page keeps its rule that no two sections measure the same.
+    buy: "act", gate: "crop", learn: "score", memory: "plain",
   };
   // crops of the same screenshots, tight enough to be legible at the size they render
   const CROP = locale === "de"

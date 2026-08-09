@@ -92,12 +92,32 @@ export const produktCopy = {
         ],
         say: "Ein Ausreißer soll die Prognose nicht verbiegen, also wird er gemeldet statt eingerechnet.",
       },
+      buy: {
+        paras: [
+          { lead: "Sie sucht den Lieferanten aus, statt den ersten zu nehmen.", text: "Für denselben Bedarf vergleicht sie die hinterlegten Lieferanten mit ihren Staffelpreisen, ihrer Lieferzeit und ihrer bisherigen Termintreue, und schreibt dazu, warum es dieser wurde. Der Preis entscheidet nicht allein: ein Lieferant, der zwei Tage nach dem Engpass liefert, ist kein günstiger Lieferant." },
+          { lead: "Sie bündelt, statt zu stückeln.", text: "Offene Bedarfe für denselben Lieferanten zieht sie zu einer Bestellung zusammen und hält sie bis zu Ihrem Bestellschluss, damit nicht fünf Einzelbestellungen an dieselbe Adresse gehen. Was danach anfällt, geht am nächsten Tag." },
+          { lead: "Sie führt die Bestellung zu Ende.", text: "Sie legt sie mit allen Positionen an, verschickt Mail und PDF, ordnet die Antwort des Lieferanten der eigenen Bestellung zu und hält den bestätigten Termin nach. Beim Wareneingang wird gegen die Bestellung gebucht, Teilmengen eingeschlossen." },
+          { lead: "Sie bewertet Ihre Lieferanten laufend.", text: "Aus Termintreue, Antwortverhalten und Abweichungen zwischen Bestellung und Lieferung entsteht ein Risikowert je Lieferant. Der liegt nicht in einem Bericht, sondern fließt in den nächsten Vergleich zurück." },
+          { lead: "Und sie merkt, wenn ein Artikel ausläuft.", text: "Sie prüft, ob ein Teil abgekündigt oder durch ein Nachfolgeteil ersetzt wurde, trägt den Nachfolger am Artikel ein und meldet es, solange noch Zeit zum Umstellen bleibt. Ein Artikel, den es nicht mehr gibt, fällt sonst erst auf, wenn die Bestellung nicht mehr durchgeht." },
+        ],
+        say: "Das ist der Unterschied zwischen einem Vorschlag und einer Bestellung.",
+      },
       gate: {
         paras: [
           { lead: "Vier Dinge stellen Sie ein, und sie greifen ab der nächsten Bestellung.", text: "Die Freigabeschwelle ist der Betrag, ab dem eine Bestellung zu Ihnen kommt: darunter löst der Agent selbst aus, darüber legt er vor. Die Autonomie-Stufe entscheidet, ob er überhaupt handeln darf oder nur vorschlägt, und lässt sich ohne Neustart umstellen. Die Ausgabenlimits gelten je Bestellung und je Tag, unabhängig voneinander; am Tageslimit stoppt er und meldet sich. Und nach dem Bestellschluss geht nichts mehr raus, der Rest folgt am nächsten Tag." },
           { lead: "", text: "Wer was darf, legen Sie je Person fest. Freigeben, bestellen oder nur ansehen sind getrennte Rechte, jederzeit änderbar. Was nicht glatt lief, geht nicht zwischen den Bestellungen unter, sondern steht in einer eigenen Liste mit einem Vorschlag zur Lösung, und Sie können dem Agenten dort direkt sagen, was er falsch verstanden hat." },
         ],
         say: "Reißt eine Grenze, wird die Bestellung nicht abgebrochen. Sie wird Ihnen vorgelegt, mit der Rechnung daneben.",
+      },
+      learn: {
+        paras: [
+          { lead: "Jede Bestellentscheidung wird gespeichert, nicht nur ausgeführt.", text: "Mit dem gewählten Verfahren, den Signalen, auf die sie sich gestützt hat, der gerechneten Menge, dem Bestellpunkt, der Abweichung vom Richtwert und dem Vermerk, ob eine Ihrer Grenzen berührt wurde. Das ist der Datensatz, der später bewertet wird." },
+          { lead: "Später sieht sie nach, ob es richtig war.", text: "Dieselbe Entscheidung wird gegen den tatsächlichen Verlauf gehalten und mit einem Ergebnis versehen. Ein Fehlgriff bleibt an der Entscheidung stehen, statt im Durchschnitt zu verschwinden." },
+          { lead: "Passt keines der fünf Verfahren, schreibt sie ein eigenes.", text: "Es bekommt einen Namen, Auslöser, ab wann es greift, und eine Version. Danach wird es wie jedes andere an seinem Ergebnis gemessen, und es verschwindet wieder, wenn es nichts bringt." },
+          { lead: "Auch ihre Marktbeobachtung prüft sie gegen die Wirklichkeit.", text: "Was sie draußen aufliest, wird nicht ungeprüft zur Grundlage. Signale werden rückwärts gegen den tatsächlichen Verlauf getestet, bevor sie Gewicht bekommen." },
+          { lead: "", text: "Sie behalten das letzte Wort. Ein Verfahren, das Sie festsetzen, rührt sie nicht mehr an, und was Sie freigeben oder ablehnen, ist selbst wieder ein Signal." },
+        ],
+        say: "Eine Entscheidung, die nie nachbewertet wird, ist eine Regel mit besserem Marketing.",
       },
       memory: {
         paras: [
@@ -133,9 +153,21 @@ export const produktCopy = {
       },
 
       {
+        key: "buy", label: "Die Beschaffung", h: "Sie bestellt, ohne dass jemand sie anstößt",
+        lede: { lead: "Bestellen ist der Schritt, den Software sonst dem Menschen überlässt.",
+                rest: " Ein Vorschlag erscheint, jemand liest ihn, jemand klickt. Hier führt die KI den Vorgang selbst zu Ende, und Sie sehen nur, was über Ihrer Grenze liegt." },
+      },
+
+      {
         key: "gate", label: "Die Kontrolle", h: "Grenzen, die tatsächlich halten",
         lede: { lead: "Autonomie ohne Grenze ist ein Versprechen, das niemand einlösen kann.",
                 rest: " Deshalb prüft der Agent jede Bestellung gegen alle Ihre Grenzen und hält an, sobald eine reißt. Das Anhalten ist der Normalfall, nicht der Fehlerfall." },
+      },
+
+      {
+        key: "learn", label: "Das Lernen", h: "Sie bewertet ihre eigenen Entscheidungen",
+        lede: { lead: "Automatisierung wiederholt sich. Lernen heißt, dass die nächste Runde anders ausfällt.",
+                rest: " Deshalb ist hier jede Entscheidung ein Datensatz, den die KI später gegen das hält, was tatsächlich eingetreten ist." },
       },
 
       {
@@ -150,7 +182,7 @@ export const produktCopy = {
       h: "Was läuft, und was noch nicht",
       p: "Dieselbe Einteilung wie auf der Startseite. Was hier als „in Arbeit“ steht, können Sie heute noch nicht nutzen.",
       paras: [
-        { lbl: "Live", cls: "live", text: "Alles, was diese Seite beschreibt, läuft heute. Der Kreislauf arbeitet im Hintergrund, die KI liest Lieferantenmails und schreibt Bestellungen, sie wählt das Verfahren je Artikel und rechnet Reichweite, Prognose und Auffälligkeiten. Ihre Grenzen greifen, Freigaben und Ausnahmen landen bei Ihnen, das Protokoll steht, und mehrere Standorte, Lagerplätze und Chargen sind abgebildet." },
+        { lbl: "Live", cls: "live", text: "Alles, was diese Seite beschreibt, läuft heute. Der Kreislauf arbeitet im Hintergrund, die KI liest Lieferantenmails und schreibt Bestellungen, sie wählt das Verfahren je Artikel, vergleicht Lieferanten, bündelt offene Bedarfe, bewertet ihre eigenen Entscheidungen nachträglich und meldet abgekündigte Artikel. Sie rechnet Reichweite, Prognose und Auffälligkeiten. Ihre Grenzen greifen, Freigaben und Ausnahmen landen bei Ihnen, das Protokoll steht, und mehrere Standorte, Lagerplätze und Chargen sind abgebildet." },
         { lbl: "In Arbeit", cls: "wip", text: "Zwei Dinge können Sie heute noch nicht nutzen: den Verkauf mit Warenausgang, und die Rechnungsprüfung Position für Position. Beides ist begonnen und beides fehlt noch." },
         { lbl: "Vision", cls: "vis", text: "Und zwei Dinge halten wir für richtig, versprechen sie aber nicht: einen Marktplatz zwischen Firmen, und den Punkt, an dem ein Agent mit einem Agenten verhandelt." },
       ],
@@ -241,12 +273,32 @@ export const produktCopy = {
         ],
         say: "An outlier should not bend the forecast, so it is reported rather than absorbed.",
       },
+      buy: {
+        paras: [
+          { lead: "It picks the supplier rather than taking the first one.", text: "For the same requirement it compares the suppliers on file with their price breaks, their lead time and how reliably they have hit dates before, and writes down why this one won. Price does not decide alone: a supplier who delivers two days after the shortage is not a cheap supplier." },
+          { lead: "It consolidates rather than trickling orders out.", text: "Open requirements for the same supplier are pulled into one order and held until your cut-off, so five separate orders do not go to the same address. Whatever comes up after that goes the next day." },
+          { lead: "It carries the order through.", text: "It raises the order with every line, sends the email and the PDF, matches the supplier's reply to its own order and follows up the confirmed date. Goods-in is booked against the order, part deliveries included." },
+          { lead: "It scores your suppliers continuously.", text: "Delivery reliability, how they answer and the gaps between what was ordered and what arrived become a risk figure per supplier. It does not sit in a report; it flows back into the next comparison." },
+          { lead: "And it notices when an item is being discontinued.", text: "It checks whether a part has been withdrawn or superseded, records the replacement on the item and flags it while there is still time to switch. An item that no longer exists otherwise shows up when the order stops going through." },
+        ],
+        say: "That is the difference between a suggestion and an order.",
+      },
       gate: {
         paras: [
           { lead: "You set four things, and they apply from the next order.", text: "The approval threshold is the amount above which an order comes to you: below it the agent places the order, above it the agent puts it up. The autonomy level decides whether it may act at all or only suggest, and switches without a restart. Spend caps apply per order and per day, independently of each other; at the daily cap it stops and tells you. And after the order cut-off nothing goes out, with the rest following the next day." },
           { lead: "", text: "Who may do what is set per person. Approving, ordering and viewing are separate rights, changeable at any time. Anything that did not run cleanly does not get lost among the orders but sits in its own list with a suggested fix, and you can tell the agent right there what it misread." },
         ],
         say: "When a limit is breached the order is not cancelled. It is put to you, with the calculation beside it.",
+      },
+      learn: {
+        paras: [
+          { lead: "Every ordering decision is stored, not just executed.", text: "With the method it chose, the signals it leaned on, the quantity it worked out, the reorder point, the deviation from the baseline and a note on whether one of your limits was touched. That is the record that gets scored later." },
+          { lead: "Later it goes back and checks whether it was right.", text: "The same decision is held against what actually happened and given an outcome. A bad call stays visible on the decision instead of disappearing into an average." },
+          { lead: "If none of the five methods fits, it writes one.", text: "The new method gets a name, triggers that say when it applies, and a version. After that it is measured on its outcome like any other, and it disappears again if it earns nothing." },
+          { lead: "It tests its own market signals against reality too.", text: "What it picks up outside does not become a basis unchecked. Signals are tested backwards against what actually happened before they carry weight." },
+          { lead: "", text: "You keep the last word. A method you pin is left alone, and what you approve or reject is itself a signal." },
+        ],
+        say: "A decision that is never scored afterwards is a rule with better marketing.",
       },
       memory: {
         paras: [
@@ -282,9 +334,21 @@ export const produktCopy = {
       },
 
       {
+        key: "buy", label: "Procurement", h: "It orders without being asked",
+        lede: { lead: "Placing the order is the step software usually leaves to a person.",
+                rest: " A suggestion appears, somebody reads it, somebody clicks. Here the AI carries the job through itself, and you only see what sits above your limit." },
+      },
+
+      {
         key: "gate", label: "Control", h: "Limits that actually hold",
         lede: { lead: "Autonomy without a limit is a promise nobody can keep.",
                 rest: " So the agent checks every order against all of your limits and stops the moment one is breached. Stopping is the normal case, not the failure case." },
+      },
+
+      {
+        key: "learn", label: "Learning", h: "It scores its own decisions",
+        lede: { lead: "Automation repeats itself. Learning means the next lap comes out differently.",
+                rest: " So every decision here is a record the AI later holds against what actually happened." },
       },
 
       {
@@ -299,7 +363,7 @@ export const produktCopy = {
       h: "What runs, and what does not yet",
       p: 'The same split as on the front page. Anything listed here as "in progress" is not something you can use today.',
       paras: [
-        { lbl: "Live", cls: "live", text: "Everything this page describes runs today. The loop works in the background, the AI reads supplier email and writes orders, it picks the method per item and calculates cover, forecast and anomalies. Your limits hold, approvals and exceptions come to you, the log is there, and multiple sites, bins and batches are covered." },
+        { lbl: "Live", cls: "live", text: "Everything this page describes runs today. The loop works in the background, the AI reads supplier email and writes orders, it picks the method per item, compares suppliers, consolidates open requirements, scores its own decisions afterwards and flags discontinued items. It calculates cover, forecast and anomalies. Your limits hold, approvals and exceptions come to you, the log is there, and multiple sites, bins and batches are covered." },
         { lbl: "In progress", cls: "wip", text: "Two things you cannot use yet: sales with goods issue, and invoice checking line by line. Both are started and both are still missing." },
         { lbl: "Vision", cls: "vis", text: "And two we believe in but do not promise: a marketplace between companies, and the point where one agent negotiates with another." },
       ],

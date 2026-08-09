@@ -762,6 +762,12 @@
   .lay-curve     { padding-block: clamp(64px, 8.5vh, 108px); }
   .lay-crop      { padding-block: clamp(52px, 7vh, 88px); }
   .lay-plain     { padding-block: clamp(76px, 11vh, 140px); }
+  /* The two chapters about what the AI does by itself. No screenshot: an isometric figure goes
+     here, and until it does they run as a wide measure with their own rhythm, so the scroll still
+     never repeats a spacing. */
+  .lay-act       { padding-block: clamp(60px, 8vh, 112px); }
+  .lay-score     { padding-block: clamp(68px, 9.5vh, 124px); }
+  .lay-act .th-hd, .lay-score .th-hd { max-width: 74ch; }
 
   /* CHAPTER GROUNDS.
      Varying padding and measure was not enough: every chapter still stood on the same surface,
