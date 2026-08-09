@@ -170,8 +170,13 @@ const MPT = 3.5, MRISE = 15;
  *  setup actually looks like, and the two shapes together stop the pair reading as wallpaper. */
 function monitor(mx: number, my: number, w: number, h: number, rows: number, accentRow: number) {
   const bwid = Math.min(w - 8, 34);
-  bx(mx + w / 2 - bwid / 2, my + 2, Z, bwid, 17, 2.2, "face");   // base plate
-  bx(mx + w / 2 - 5, my + 6.5, Z + 2.2, 10, 7, MRISE);           // column
+  /* ⚠️ The stand has to sit BEHIND the panel, and behind is SMALLER y: the screen is drawn on the
+     panel's y + MPT face, so the viewer is on the large-y side. Placed at my + 6.5 the column
+     stood in front of the screen it was meant to hold, touching nothing, and both monitors
+     floated above their own feet. The plate reaches fore and aft, the way a monitor foot does,
+     and the column overruns the panel's lower edge so the two visibly meet. */
+  bx(mx + w / 2 - bwid / 2, my - 13, Z, bwid, 22, 2.2, "face");  // base plate
+  bx(mx + w / 2 - 5, my - 9, Z + 2.2, 10, 10, MRISE + 8);        // column, behind the panel
   bx(mx, my, Z + MRISE, w, MPT, h);                              // panel
   const y = my + MPT, z0 = Z + MRISE;
   panelY(mx + 3, mx + w - 3, z0 + 3, z0 + h - 3, y, "wk-screen", 0.5);
