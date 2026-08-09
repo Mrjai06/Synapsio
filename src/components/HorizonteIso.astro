@@ -433,16 +433,17 @@ const hz = homeCopy[locale].hz;
     [3.0,-3.0].forEach(function(off){
       for(i=0;i<N;i++){
         var th0=i/N*Math.PI*2, th1=(i+1)/N*Math.PI*2;
-        if(inJunction((th0+th1)/2)) continue;
         var a=ringXY(th0,off), b=ringXY(th1,off);
+        // BOTH ends, not the midpoint: a segment that only clips the junction still lay across it
+        if(inArmCorridor(a[0],a[1],1.4)||inArmCorridor(b[0],b[1],1.4)) continue;
         f.push({pts:[[a[0],a[1],0.1],[b[0],b[1],0.1]],nrm:null,cls:"rmk",open:true,ref:RC});
       }
     });
     var M=26;
     for(i=0;i<M;i++){
       var t0=i/M*Math.PI*2, t1=(i+0.5)/M*Math.PI*2;
-      if(inJunction((t0+t1)/2)) continue;
       var c=ringXY(t0,0), d=ringXY(t1,0);
+      if(inArmCorridor(c[0],c[1],1.4)||inArmCorridor(d[0],d[1],1.4)) continue;
       f.push({pts:[[c[0],c[1],0.1],[d[0],d[1],0.1]],nrm:null,cls:"rmkd",open:true,ref:RC});
     }
     return f;
@@ -456,34 +457,22 @@ const hz = homeCopy[locale].hz;
      The window is the street's half width converted to parameter space, which is why it is
      recomputed per junction: an ellipse's arc-length scale is B at th=0 and A at th=pi/2, so a
      fixed angle would be almost twice as wide at one crossing as at the next. */
-  function junctionWindows(){
-    // ⚠️ Do NOT assume 0 / pi/2 / pi / 3pi/2. ringXY maps its ellipse through a skew into model
-    // space, so an arm along a model axis does NOT meet the ring at that axis's parameter value.
-    // Masking those four angles masked four places where no junction is. The angle is SEARCHED
-    // per arm, and the window is the street's half width converted to local arc length, measured
-    // from the curve itself rather than from a closed form that the skew would invalidate.
-    return [[1,0],[-1,0],[0,-1],[0,1]].map(function(d){
-      var bt=-1,bd=1e9,bth=0,i,th,q,t,dd;
-      for(i=0;i<720;i++){
-        th=i/720*Math.PI*2; q=ringXY(th,0); t=q[0]*d[0]+q[1]*d[1];
-        if(t<=0) continue;
-        dd=Math.hypot(q[0]-d[0]*t,q[1]-d[1]*t);
-        if(dd<bd){ bd=dd; bt=t; bth=th; }
-      }
-      var e=0.004, a=ringXY(bth-e,0), b=ringXY(bth+e,0);
-      var L=Math.hypot(b[0]-a[0],b[1]-a[1])/(2*e);          // |d(ring)/dth| here
-      return {th:bth,w:(SW+1.2)/L};
-    });
-  }
-  var JUNCT=null;
-  function inJunction(th){
-    if(!JUNCT) JUNCT=junctionWindows();
-    for(var i=0;i<JUNCT.length;i++){
-      var d=Math.abs(((th-JUNCT[i].th+Math.PI)%(Math.PI*2)+Math.PI*2)%(Math.PI*2)-Math.PI);
-      if(d<JUNCT[i].w) return true;
+  /* Whether a point lies on one of the four arms' carriageways.
+     ⚠️ This replaces an ANGULAR window. An angle is wrong twice over: ringXY maps its ellipse
+     through a skew, so the crossing is not at the axis's parameter value; and one window cannot
+     serve both kerbs, because the outer kerb subtends a different angle than the inner one at the
+     same junction. Testing the POINT against the road's own corridor is exact for every offset. */
+  function inArmCorridor(x,y,pad){
+    for(var i=0;i<LANES.length;i++){
+      var L=LANES[i];
+      if(L.p[0]!==0||L.p[1]!==0) continue;                 // branches never reach the ring
+      var d=L.d, n=[-d[1],d[0]];
+      var t=x*d[0]+y*d[1], o=x*n[0]+y*n[1];
+      if(t>0 && Math.abs(o)<=SW+pad) return true;
     }
     return false;
   }
+
   // lamps standing just outside the ring, lighting the carriageway. Four, at the quarter points,
   // so none of them lands in a street junction (those sit at roughly 46°/134°/226°/314°).
   function ringLamps(T){
@@ -591,7 +580,7 @@ const hz = homeCopy[locale].hz;
        as a notch. Both were shipped, in that order. The near edge is now built from the band's
        own inner contour, sampled across the full width, so the join is exact at every offset and
        there is nothing left to tune. */
-    var near=[], i, o, tc;
+    var near=[], i, o, tc, mFrom=null;
     if(t0==="ring"){
       var K=14;
       for(i=K;i>=0;i--){
@@ -600,6 +589,7 @@ const hz = homeCopy[locale].hz;
         near.push(P(tc==null?0:tc-0.35,o));
       }
       t0=edgeCross(p0,d,n,0,INNER_S)-0.35;
+      mFrom=edgeCross(p0,d,n,0,-INNER_S);          // the far side of the band
     } else {
       near=[P(t0,SW),P(t0,-SW)];
     }
@@ -623,7 +613,12 @@ const hz = homeCopy[locale].hz;
     // without it every marking on the near half sorts behind the tarmac it is painted on.
     // They start clear of the junction at t0: markings that run into an intersection are what
     // made the near end look like a cut-off stub rather than a road joining another road.
-    var C=[p0[0]+d[0]*(t0+t1)/2,p0[1]+d[1]*(t0+t1)/2,0.088], m0=t0+5.0;
+    /* Markings must begin OUTSIDE the junction this street starts in, and t0+5 does not do
+       that: an arm's t0 now sits on the ring's INNER edge, and the band is 6.8 wide, so a
+       5-unit offset still lands inside the crossing. Arms measure from the ring's OUTER
+       contour; a branch tees off another carriageway, so it clears that road's full width. */
+    var m0 = (mFrom==null ? t0+2*SW+1.5 : mFrom+1.8);
+    var C=[p0[0]+d[0]*(t0+t1)/2,p0[1]+d[1]*(t0+t1)/2,0.088];
     function mk(a,b,cls){ f.push({pts:[a,b],nrm:null,cls:cls,open:true,ref:C}); }
     mk(P(m0,-SW+0.45,0.1),P(t1,-SW+0.45,0.1),"rmk");
     mk(P(m0, SW-0.45,0.1),P(t1, SW-0.45,0.1),"rmk");
