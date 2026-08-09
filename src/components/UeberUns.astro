@@ -13,6 +13,7 @@
 import { ueberUnsCopy } from "../i18n/ueber-uns";
 import { localePath, CAL_URL, type Locale } from "../i18n/ui";
 import SiteNav from "./SiteNav.astro";
+import IsoWerkstatt from "./IsoWerkstatt.astro";
 import SiteFooter from "./SiteFooter.astro";
 
 interface Props { locale?: Locale }
@@ -45,10 +46,18 @@ if (withheld.length) {
 <SiteNav locale={locale} path="/ueber-uns" active="ueber-uns" />
 
 <main>
+  {/* The page's own object sits here, where the hero left the widest empty band. It is a bench
+      and not a reused sphere: NeuralSphere anchors the startpage hero, and a device appearing
+      once is the only reason the five pages do not read as variants of one template. */}
   <section class="shell ab-hero">
-    <span class="chip"><span class="sq"></span>{c.hero.chip}</span>
-    <h1>{c.hero.h1a}<em>{c.hero.h1em}</em>{c.hero.h1b}</h1>
-    <p class="ab-sub">{c.hero.sub}</p>
+    <div class="ab-hero-in">
+      <div class="ab-hero-txt">
+        <span class="chip"><span class="sq"></span>{c.hero.chip}</span>
+        <h1>{c.hero.h1a}<em>{c.hero.h1em}</em>{c.hero.h1b}</h1>
+        <p class="ab-sub">{c.hero.sub}</p>
+      </div>
+      <div class="ab-hero-obj"><IsoWerkstatt /></div>
+    </div>
   </section>
 
   <section class="ab-origin">
@@ -156,6 +165,18 @@ if (withheld.length) {
 <style>
   /* ---- hero ---- */
   .ab-hero { padding-block:clamp(52px,9vh,104px) clamp(34px,5vh,58px); }
+  /* minmax(0,…) on the text column: without it the h1's longest word sets the grid's min-content
+     width and pushes the object off the page. That trap cost the startpage ~120 overflowing
+     elements once already. */
+  .ab-hero-in { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,42%); gap:clamp(28px,5vw,72px);
+    align-items:center; }
+  .ab-hero-obj { min-width:0; }
+  @media (max-width:900px){
+    .ab-hero-in { grid-template-columns:1fr; gap:clamp(26px,5vh,44px); }
+    /* On a phone the object follows the sentence it illustrates rather than leading it, and it
+       gives back some size: at full width it would be the first and largest thing on the page. */
+    .ab-hero-obj { max-width:420px; }
+  }
   .ab-hero h1 { margin:22px 0 0; max-width:19ch; font-size:clamp(2.1rem,4.6vw,3.5rem); font-weight:600;
     letter-spacing:-0.032em; line-height:1.06; text-wrap:balance; }
   .ab-hero h1 em { font-style:normal; color:var(--fg-muted); }
