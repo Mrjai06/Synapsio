@@ -33,35 +33,104 @@ const P2 = (p: V3): [number, number] => [
   p[0] * RX[1] + p[1] * RY[1] - p[2],
 ];
 
-interface Face { p: V3[]; cls: string; bias?: number }
+/* `lay` is a hard draw order, and it exists because a single depth key cannot express a desk.
+   The top is one enormous quad whose key sits at its own centre, so sorting by depth alone put
+   the pedestal OVER the top and everything on the desk's front half UNDER it. A bias fixed one
+   and broke the other. Layers state the truth instead:
+     0 under the desk   1 the top itself   2 on the desk   3 light, which falls on everything */
+interface Face { p: V3[]; cls: string; bias?: number; lay?: number; n?: V3 }
 const S: Face[] = [];
 const push = (f: Face) => { S.push(f); return f; };
 
 /** Prism from an origin and three edge vectors. All six faces; the culler picks. */
-function prism(o: V3, u: V3, v: V3, w: V3, cls: string, bias = 0, lit = "lit") {
+function prism(o: V3, u: V3, v: V3, w: V3, cls: string, lay = 2, capless = false) {
   const k = (a: number, b: number, c: number): V3 =>
     add(add(add(o, mul(u, a)), mul(v, b)), mul(w, c));
   const A = k(0, 0, 0), B = k(1, 0, 0), C = k(1, 1, 0), D = k(0, 1, 0);
   const E = k(0, 0, 1), F = k(1, 0, 1), G = k(1, 1, 1), H = k(0, 1, 1);
-  push({ p: [A, B, C, D], cls, bias });
-  push({ p: [E, F, G, H], cls: `${cls} ${lit}`, bias });
-  push({ p: [A, B, F, E], cls, bias });
-  push({ p: [D, C, G, H], cls, bias });
-  push({ p: [A, D, H, E], cls, bias });
-  push({ p: [B, C, G, F], cls, bias });
+  push({ p: [A, B, C, D], cls, lay });
+  if (!capless) push({ p: [E, F, G, H], cls: `${cls} lit`, lay });
+  push({ p: [A, B, F, E], cls, lay });
+  push({ p: [D, C, G, H], cls, lay });
+  push({ p: [A, D, H, E], cls, lay });
+  push({ p: [B, C, G, F], cls, lay });
 }
 /** Axis-aligned convenience. */
-const bx = (x: number, y: number, z: number, w: number, d: number, h: number, cls = "face", bias = 0) =>
-  prism([x, y, z], [w, 0, 0], [0, d, 0], [0, 0, h], cls, bias);
+const bx = (x: number, y: number, z: number, w: number, d: number, h: number, cls = "face", lay = 2) =>
+  prism([x, y, z], [w, 0, 0], [0, d, 0], [0, 0, h], cls, lay);
 /** A flat panel lying at height z. Winding gives +z, so it survives the cull. */
-const pad = (x: number, y: number, z: number, w: number, d: number, cls: string, bias = 0.4) =>
-  push({ p: [[x, y, z], [x + w, y, z], [x + w, y + d, z], [x, y + d, z]], cls, bias });
+const pad = (x: number, y: number, z: number, w: number, d: number, cls: string, bias = 0.4, lay = 2) =>
+  push({ p: [[x, y, z], [x + w, y, z], [x + w, y + d, z], [x, y + d, z]], cls, bias, lay });
+/** An OPEN tray: walls, an inner floor and a rim. No lid.
+ *  ⚠️ A prism has a top face, so a "bin" made from one is a closed box: the contents are drawn,
+ *  then the lid is drawn over them, and the whole point of an open bin is lost. That is why the
+ *  coral one had gone dark. */
+function tray(x: number, y: number, z: number, w: number, d: number, h: number, fill: string) {
+  prism([x, y, z], [w, 0, 0], [0, d, 0], [0, 0, h], "face", 2, true);
+  // Well inside the walls and well below the rim: at a 2.5 inset the contents sorted level with
+  // the front wall and appeared to spill over its edge.
+  pad(x + 4.5, y + 4.5, z + h - 5, w - 9, d - 9, fill, 0.4);
+  const t = 1.8;                                     // the rim, as four thin tops
+  pad(x, y, z + h, w, t, "face lit", 0.6);
+  pad(x, y + d - t, z + h, w, t, "face lit", 0.6);
+  pad(x, y + t, z + h, t, d - 2 * t, "face lit", 0.6);
+  pad(x + w - t, y + t, z + h, t, d - 2 * t, "face lit", 0.6);
+}
 /** A panel standing in a constant-y plane, facing the viewer.
  *  ⚠️ The winding matters and is not obvious: (x0,z0) → (x0,z1) → (x1,z1) → (x1,z0) gives a +y
  *  normal. Written the intuitive way round it gives -y, the culler drops it, and every screen,
  *  drawer front and handle silently disappears. That is exactly what happened once. */
-const panelY = (x0: number, x1: number, z0: number, z1: number, y: number, cls: string, bias = 0.4) =>
-  push({ p: [[x0, y, z0], [x0, y, z1], [x1, y, z1], [x1, y, z0]], cls, bias });
+const panelY = (x0: number, x1: number, z0: number, z1: number, y: number, cls: string, bias = 0.4, lay = 2) =>
+  push({ p: [[x0, y, z0], [x0, y, z1], [x1, y, z1], [x1, y, z0]], cls, bias, lay });
+
+/** A surface of revolution between two circles, drawn as ONE polygon.
+ *  ⚠️ Emitting N separate quads gives every one of them the stroke that .face carries, so a
+ *  cylinder came out as twenty vertical lines and read as a coil spring. That is what made the
+ *  lamp base and the mug look wrong. Only the visible arc is drawn, and it is a single face, so
+ *  the outline is the silhouette and nothing else. */
+function revolve(c0: V3, r0: number, c1: V3, r1: number, e1: V3, e2: V3, cls: string, lay = 2) {
+  const N = 40;
+  const at = (c: V3, r: number, i: number): V3 =>
+    add(c, add(mul(e1, r * Math.cos((i / N) * 2 * Math.PI)), mul(e2, r * Math.sin((i / N) * 2 * Math.PI))));
+  const vis: number[] = [];
+  for (let i = 0; i < N; i++) {
+    // ⚠️ ORDER. cross(tangent, axial) is the OUTWARD radial normal; the other way round it points
+    // inward, so the far half of the surface is kept and the near half thrown away. On a plain
+    // cylinder that is nearly invisible, because the silhouette is the same either way, which is
+    // why the lamp base looked fine while the mug came out as a crescent and the shade vanished.
+    const n = cross(sub(at(c0, r0, i + 1), at(c0, r0, i)), sub(at(c1, r1, i), at(c0, r0, i)));
+    if (vdot(n) > 0) vis.push(i);
+  }
+  if (vis.length) {
+    // the visible band wraps, so rotate it to a contiguous run before building the outline
+    let start = 0;
+    for (let k = 0; k < vis.length; k++) {
+      if (vis[(k + vis.length - 1) % vis.length] !== (vis[k] + N - 1) % N) { start = k; break; }
+    }
+    const run = vis.map((_, k) => vis[(start + k) % vis.length]);
+    const lo = run.map((i) => at(c0, r0, i));
+    lo.push(at(c0, r0, run[run.length - 1] + 1));
+    const hi = run.map((i) => at(c1, r1, i));
+    hi.push(at(c1, r1, run[run.length - 1] + 1));
+    // ⚠️ The cull derives a normal from a face's first three points. On this band those are
+    // three points of the SAME circle, so it would get the ring's plane normal, not the surface
+    // normal, and a shade aimed downward would be deleted while a cylinder survived by accident.
+    // The outward radial at the middle of the run is handed over explicitly.
+    const mid = run[Math.floor(run.length / 2)];
+    const nOut = sub(at(c0, r0 + 1, mid), at(c0, r0, mid));
+    push({ p: [...lo, ...hi.reverse()], cls, lay, n: nOut });
+  }
+  push({ p: Array.from({ length: N }, (_, i) => at(c1, r1, i)), cls: `${cls} lit`, bias: 0.4, lay });
+}
+/** The same band without its cap, for shapes that paint their own (a lamp shade's mouth). */
+function revolveNoCap(c0: V3, r0: number, c1: V3, r1: number, e1: V3, e2: V3, cls: string, lay = 2) {
+  const before = S.length;
+  revolve(c0, r0, c1, r1, e1, e2, cls, lay);
+  S.splice(before + (S.length - before) - 1, 1);       // drop the cap revolve() appended
+}
+/** Upright cylinder. */
+const cyl = (cx: number, cy: number, z: number, r: number, h: number, cls = "face", lay = 2) =>
+  revolve([cx, cy, z], r, [cx, cy, z + h], r, [1, 0, 0], [0, 1, 0], cls, lay);
 
 // ---- desk -------------------------------------------------------------------------------------
 // An OFFICE desk, not a workbench: a thin top on slim legs with a drawer pedestal. The previous
@@ -69,33 +138,34 @@ const panelY = (x0: number, x1: number, z0: number, z1: number, y: number, cls: 
 const DW = 226, DD = 116, TOPT = 5, LEGH = 64, LEG = 5;
 const Z = LEGH + TOPT;
 [[10, 10], [DW - 10 - LEG, 10], [10, DD - 10 - LEG], [DW - 10 - LEG, DD - 10 - LEG]]
-  .forEach(([x, y]) => bx(x, y, 0, LEG, LEG, LEGH));
+  .forEach(([x, y]) => bx(x, y, 0, LEG, LEG, LEGH, "face", 0));
 // side rails, so the legs belong to one frame rather than standing loose
-bx(10, 12, LEGH - 9, DW - 20, 3, 4);
-bx(10, DD - 15, LEGH - 9, DW - 20, 3, 4);
-bx(DW - 74, 16, 0, 58, DD - 32, LEGH - 2);                    // pedestal
+bx(10, 12, LEGH - 9, DW - 20, 3, 4, "face", 0);
+bx(10, DD - 15, LEGH - 9, DW - 20, 3, 4, "face", 0);
+bx(DW - 74, 16, 0, 58, DD - 32, LEGH - 2, "face", 0);         // pedestal
 [0.12, 0.42, 0.72].forEach((k) => {                            // three drawer fronts + handles
   const z = 6 + k * (LEGH - 14);
-  panelY(DW - 71, DW - 19, z, z + 14, DD - 16, "wk-drawer");
-  panelY(DW - 52, DW - 38, z + 10, z + 11.6, DD - 16.2, "wk-pull", 0.8);
+  panelY(DW - 71, DW - 19, z, z + 14, DD - 16, "wk-drawer", 0.4, 0);
+  panelY(DW - 52, DW - 38, z + 10, z + 11.6, DD - 16.2, "wk-pull", 0.8, 0);
 });
-// ⚠️ The top is ONE huge quad, so its painter key sits at its own middle and everything standing
-// on the front half of the desk sorted BEHIND it and vanished. A large negative bias pins it
-// under all of them. Same class of bug as the tall wall in the network scene.
-bx(0, 0, LEGH, DW, DD, TOPT, "face wk-topslab", -600);
+bx(0, 0, LEGH, DW, DD, TOPT, "face wk-topslab", 1);
 
 // ---- two monitors, behind the laptop ------------------------------------------------------------
 const MW = 68, MPT = 3.5, MH = 44, MRISE = 13;
 function monitor(mx: number, my: number, accentRow: number) {
-  bx(mx + MW / 2 - 14, my + 1, Z, 28, 15, 2.5);                // foot
-  bx(mx + MW / 2 - 4, my + 5, Z + 2.5, 8, 4, MRISE);           // stem
+  // A flat plate and a matchstick did not read as a stand. An oval foot, a solid neck and a panel
+  // with real thickness do, and a monitor is mostly stand at this size.
+  cyl(mx + MW / 2, my + 8, Z, 13, 2.2);                        // oval foot
+  bx(mx + MW / 2 - 5, my + 5.5, Z + 2.2, 10, 5, MRISE);        // neck
+  bx(mx + MW / 2 - 12, my + 4, Z + MRISE - 4, 24, 7, 6);       // yoke into the panel
   bx(mx, my, Z + MRISE, MW, MPT, MH);                          // panel
   const y = my + MPT, z0 = Z + MRISE;
-  panelY(mx + 2.5, mx + MW - 2.5, z0 + 2.5, z0 + MH - 2.5, y, "wk-screen", 0.5);
-  [0.2, 0.36, 0.52, 0.68, 0.82].forEach((k, i) => {
-    const w = [0.74, 0.46, 0.66, 0.52, 0.3][i];
-    const zz = z0 + MH - 6 - k * (MH - 12);
-    panelY(mx + 7, mx + 7 + (MW - 14) * w, zz, zz + 2.4, y,
+  panelY(mx + 3, mx + MW - 3, z0 + 3, z0 + MH - 3, y, "wk-screen", 0.5);
+  // four rows, not five: at this size five reads as a barcode rather than as a screen
+  [0.22, 0.44, 0.64, 0.82].forEach((k, i) => {
+    const w = [0.72, 0.44, 0.6, 0.3][i];
+    const zz = z0 + MH - 8 - k * (MH - 16);
+    panelY(mx + 8, mx + 8 + (MW - 16) * w, zz, zz + 2.6, y,
       i === accentRow ? "wk-row hot" : "wk-row", 0.9);
   });
 }
@@ -130,100 +200,80 @@ function lidAt(t: number) {
 }
 const lid0 = lidAt(LIDOPEN);
 
-// ---- the desk lamp: base, two arms on a joint, a real conical shade -------------------------------
-// A post with a flat box on top is not a desk lamp, which is what the last pass shipped. This one
-// is articulated, and the shade is a truncated cone built as a surface of revolution, which is
-// only possible now that faces are culled rather than hand-picked.
-/** A cylinder standing on z, as a strip plus a lit cap. Used for the lamp base and the mug. */
-function cyl(cx: number, cy: number, z: number, r: number, h: number, cls = "face", bias = 0) {
-  const N = 20;
-  const ring = (i: number, zz: number): V3 =>
-    [cx + r * Math.cos((i / N) * 2 * Math.PI), cy + r * Math.sin((i / N) * 2 * Math.PI), zz];
-  for (let i = 0; i < N; i++) {
-    push({ p: [ring(i, z), ring(i + 1, z), ring(i + 1, z + h), ring(i, z + h)], cls, bias });
-  }
-  push({ p: Array.from({ length: N }, (_, i) => ring(i, z + h)), cls: `${cls} lit`, bias: bias + 0.4 });
-}
-const LB: V3 = [24, 28, Z];
-cyl(LB[0], LB[1], Z, 12, 3);                                   // round base, not a square plate
-cyl(LB[0], LB[1], Z + 3, 4.5, 5);                              // collar
-const J1: V3 = [38, 33, Z + 50];                               // elbow
-const J2: V3 = [96, 62, Z + 43];                               // shade mount, out over the laptop
-function bar(a: V3, b: V3, t: number) {
-  const d = sub(b, a);
-  const e1 = norm(cross(d, [0, 0, 1] as V3));
-  const e2 = norm(cross(d, e1));
-  prism(add(add(a, mul(e1, -t / 2)), mul(e2, -t / 2)), d, mul(e1, t), mul(e2, t), "face", 6);
-}
-bar(add(LB, [0, 0, 7] as V3), J1, 5.6);
-bar(J1, J2, 5.2);
-bx(J1[0] - 3.5, J1[1] - 3.5, J1[2] - 3.5, 7, 7, 7, "face", 7); // the elbow itself
+/* ---- the light: a pendant hanging into the frame from above -----------------------------------
+   The desk lamp is gone. Three passes at it produced an articulated arm that still read as a
+   music stand at this size, because a jointed lamp needs more pixels than it gets here. A pendant
+   is one cord and one cone, which survives being small, and it can SWING, which is the only
+   motion on this object that repeats.
+   ⚠️ Everything on lay 4 is emitted inside its own <g> and rotated as a unit. The swing is a 2D
+   rotation about the cord's anchor: a small pendulum about a horizontal axis projects to almost
+   exactly that, and rebuilding the geometry per frame for a 2 degree sway would be waste. */
+const PX = 108, PY = 46;                       // the pendant hangs over the laptop
+// ⚠️ Hung at Z+74 with a 26 radius the shade filled the middle of the picture and covered the
+// laptop it was meant to light. A pendant reads from its SILHOUETTE, so it can be small; what it
+// cannot be is in the way.
+const PZTOP = Z + 186, PZSH = Z + 104;         // cord anchor, and where the shade begins
+bx(PX - 1, PY - 1, PZSH + 10, 2, 2, PZTOP - PZSH - 10, "face wk-cord", 4);
+bx(PX - 4, PY - 4, PZSH + 7, 8, 8, 4, "face", 4);          // the fitting at the top of the shade
 
-/** Truncated cone between two circles, as a strip of quads. */
+/** Truncated cone on an arbitrary axis. Its mouth is wound BACKWARDS on purpose: a shade aimed at
+ *  the desk points its opening away from this camera, a correct cull deletes it, and the lamp then
+ *  reads as unlit metal. The glow is the reason the lamp is in the picture. */
 function cone(c0: V3, r0: number, c1: V3, r1: number, cls: string, lit: string) {
   const ax = norm(sub(c1, c0));
   const e1 = norm(cross(ax, Math.abs(ax[2]) > 0.9 ? ([1, 0, 0] as V3) : ([0, 0, 1] as V3)));
   const e2 = cross(ax, e1);
-  const N = 18;
-  const ring = (c: V3, r: number, i: number): V3 =>
-    add(c, add(mul(e1, r * Math.cos((i / N) * 2 * Math.PI)), mul(e2, r * Math.sin((i / N) * 2 * Math.PI))));
-  for (let i = 0; i < N; i++) {
-    push({ p: [ring(c0, r0, i), ring(c0, r0, i + 1), ring(c1, r1, i + 1), ring(c1, r1, i)], cls });
-  }
-  // the mouth, which is the lit inside of the shade
-  push({ p: Array.from({ length: N }, (_, i) => ring(c1, r1, i)), cls: lit, bias: 0.5 });
+  revolveNoCap(c0, r0, c1, r1, e1, e2, cls, 4);
+  const N = 30;
+  const ring = (i: number): V3 =>
+    add(c1, add(mul(e1, r1 * Math.cos((i / N) * 2 * Math.PI)), mul(e2, r1 * Math.sin((i / N) * 2 * Math.PI))));
+  push({ p: Array.from({ length: N }, (_, i) => ring(N - i)), cls: lit, bias: 0.6, lay: 4 });
 }
-// ⚠️ Proportion is what makes this read as a lamp rather than a funnel. The mouth was 15 against
-// arms 4 units thick, so it projected as a wide tan fan detached from everything. A shade is
-// short and only a little wider than its own arm.
-const SH0: V3 = [J2[0] + 2, J2[1] + 1, J2[2] - 1];
-const SH1: V3 = [J2[0] + 10, J2[1] + 6, J2[2] - 15];
-cone(SH0, 4, SH1, 10.5, "face wk-shade", "wk-mouth");
+cone([PX, PY, PZSH + 9], 4, [PX, PY, PZSH - 9], 17, "face wk-shade", "wk-mouth");
 
-// The throw. A cone of light, not a ribbon: the last one was a narrow wedge and read as a crack.
-// Built from the shade's mouth to a disc on the desk, using the projected silhouette of each.
-const N2 = 26;
-const discPts: V3[] = Array.from({ length: N2 }, (_, i) => {
-  const a = (i / N2) * 2 * Math.PI;
-  return [SH1[0] + 12 + 30 * Math.cos(a), SH1[1] + 8 + 30 * Math.sin(a), Z + 0.3];
-});
-const mouthPts: V3[] = (() => {
-  const ax = norm(sub(SH1, SH0));
-  const e1 = norm(cross(ax, [0, 0, 1] as V3)), e2 = cross(ax, e1);
-  return Array.from({ length: N2 }, (_, i) => {
+// The beam, from the shade's rim down to the desk. Built from the projected silhouette of each
+// circle, so it is a real cone of light rather than a ribbon.
+const N2 = 30;
+const ringAt = (cz: number, r: number) =>
+  Array.from({ length: N2 }, (_, i): V3 => {
     const a = (i / N2) * 2 * Math.PI;
-    return add(SH1, add(mul(e1, 10.5 * Math.cos(a)), mul(e2, 10.5 * Math.sin(a))));
+    return [PX + r * Math.cos(a), PY + r * Math.sin(a), cz];
   });
-})();
+const mouthPts = ringAt(PZSH - 9, 17);
+const discPts = ringAt(Z + 0.3, 50);
 function silhouette(pts: V3[]) {
-  const pr = pts.map((p) => ({ p, s: P2(p) }));
+  const pr = pts.map((q) => ({ q, s: P2(q) }));
   let a = 0, b = 0;
-  pr.forEach((q, i) => { if (q.s[0] < pr[a].s[0]) a = i; if (q.s[0] > pr[b].s[0]) b = i; });
-  return [pr[a].p, pr[b].p];
+  pr.forEach((r, i) => { if (r.s[0] < pr[a].s[0]) a = i; if (r.s[0] > pr[b].s[0]) b = i; });
+  return [pr[a].q, pr[b].q];
 }
 const [mL, mR] = silhouette(mouthPts);
 const [dL, dR] = silhouette(discPts);
 const throwPoly = [mL, mR, dR, dL];
 // A hotspot where the beam actually lands. Without it the throw is one flat wash and reads as a
 // shadow rather than as light: light has a brightest point, a shadow does not.
-const hotspot: V3[] = Array.from({ length: 22 }, (_, i) => {
-  const a = (i / 22) * 2 * Math.PI;
-  return [SH1[0] + 10 + 17 * Math.cos(a), SH1[1] + 7 + 12 * Math.sin(a), Z + 0.5];
+const hotspot: V3[] = Array.from({ length: 26 }, (_, i) => {
+  const a = (i / 26) * 2 * Math.PI;
+  return [PX + 27 * Math.cos(a), PY + 27 * Math.sin(a), Z + 0.5];
 });
 
 // ---- mug: a cylinder, not a cube ----------------------------------------------------------------
 const MUC: V3 = [198, 30, Z], MUR = 8.5, MUH = 12;
 cyl(MUC[0], MUC[1], MUC[2], MUR, MUH);
-const handle = [0.62, 0.5, 0.38, 0.26].map((k) => {
+// The handle attaches ON the body at two points and bows out between them, rather than floating
+// beside it as a detached arc.
+const handle = Array.from({ length: 9 }, (_, i) => {
+  const k = -0.16 + (i / 8) * 0.32;                   // a third of a turn, centred on the near side
   const a = k * 2 * Math.PI;
-  return [MUC[0] + (MUR + 5.5) * Math.cos(a), MUC[1] + (MUR + 5.5) * Math.sin(a), MUC[2] + MUH * 0.55] as V3;
+  const bulge = MUR + 6.4 * Math.cos((i / 8 - 0.5) * Math.PI);
+  return [MUC[0] + bulge * Math.cos(a), MUC[1] + bulge * Math.sin(a), MUC[2] + MUH * 0.52] as V3;
 });
 
 // ---- bins, clipboard ------------------------------------------------------------------------------
+// ⚠️ These used to start at x = 12, which put the left one HALF OFF the desk: the top's left
+// corner is at (0, DD) and a tray at y = 80 is already well down that edge. They sit inboard now.
 [0, 1].forEach((i) => {
-  const x = 12 + i * 34, y = 80;
-  bx(x, y, Z, 30, 30, 12);
-  pad(x + 3, y + 3, Z + 8.6, 24, 24, i === 1 ? "wk-fill hot" : "wk-fill");
+  tray(26 + i * 34, 74, Z, 30, 30, 11, i === 1 ? "wk-fill hot" : "wk-fill");
 });
 const CX = 146, CY = 74, CW = 44, CD = 32;
 pad(CX, CY, Z + 0.5, CW, CD, "wk-board");
@@ -233,13 +283,20 @@ const rules = [0.42, 0.58, 0.74].map((k) =>
 
 // ---- cull, sort, project --------------------------------------------------------------------------
 const drawn = S.map((f) => {
-  const n = cross(sub(f.p[1], f.p[0]), sub(f.p[2], f.p[0]));
+  const n = f.n ?? cross(sub(f.p[1], f.p[0]), sub(f.p[2], f.p[0]));
   const c = f.p.reduce((a, p) => add(a, p), [0, 0, 0] as V3);
-  return { f, vis: vdot(n) > 0, key: vdot(c) / f.p.length + (f.bias ?? 0) };
+  return { f, vis: vdot(n) > 0, lay: f.lay ?? 2, key: vdot(c) / f.p.length + (f.bias ?? 0) };
 })
   .filter((d) => d.vis)
-  .sort((a, b) => a.key - b.key)
-  .map((d) => ({ cls: d.f.cls, pts: d.f.p.map((p) => P2(p).map((n) => n.toFixed(1)).join(",")).join(" ") }));
+  .sort((a, b) => (a.lay - b.lay) || (a.key - b.key))
+  .map((d) => ({ cls: d.f.cls, lay: d.lay, pts: d.f.p.map((p) => P2(p).map((n) => n.toFixed(1)).join(",")).join(" ") }));
+// The lid is outside the sorted set, because it MOVES and DOM order cannot. So the scene is
+// emitted in two halves with the laptop between them: everything on the desk, then the laptop,
+// then the lamp. Drawn after all of it, the lid painted straight over the lamp head.
+const behind = drawn.filter((d) => d.lay < 4);
+const infront = drawn.filter((d) => d.lay >= 4);
+// The pendant's anchor in SCREEN space: the swing is a rotation about it.
+const PIV = P2([PX, PY, PZTOP]);
 
 const line = (p: V3[]) => p.map((v) => P2(v).map((n) => n.toFixed(1)).join(",")).join(" ");
 
@@ -256,7 +313,7 @@ const lidCfg = JSON.stringify({ RX, RY, LX, LY, LW, ZB, LIDL, LIDOPEN });
 
 <figure class="wk" data-wk data-lid={lidCfg} aria-hidden="true">
   <svg viewBox={vb.map((n) => n.toFixed(1)).join(" ")} role="presentation">
-    {drawn.map((d) => (<polygon class={d.cls} points={d.pts} />))}
+    {behind.map((d) => (<polygon class={d.cls} points={d.pts} />))}
 
     {/* The lid sits outside the sorted set: it moves, and DOM order cannot. Before the base is
         correct for the open state, which is where it rests. */}
@@ -272,9 +329,13 @@ const lidCfg = JSON.stringify({ RX, RY, LX, LY, LW, ZB, LIDL, LIDOPEN });
     <polyline class="wk-handle" points={line(handle)} />
     {rules.map((r) => (<polyline class="wk-rule" points={line(r)} />))}
 
-    {/* Light falls ON things, so the throw is painted over them, last. */}
-    <polygon class="wk-throw" points={line(throwPoly)} />
-    <polygon class="wk-throw wk-hot" points={line(hotspot)} />
+    {/* The pendant and its light swing as ONE unit, so they live in one rotated group. Light
+        falls on everything, which is why it is painted last. */}
+    <g class="wk-pend" data-piv={`${PIV[0].toFixed(1)},${PIV[1].toFixed(1)}`}>
+      {infront.map((d) => (<polygon class={d.cls} points={d.pts} />))}
+      <polygon class="wk-throw" points={line(throwPoly)} />
+      <polygon class="wk-throw wk-hot" points={line(hotspot)} />
+    </g>
   </svg>
 </figure>
 
@@ -284,6 +345,7 @@ const lidCfg = JSON.stringify({ RX, RY, LX, LY, LW, ZB, LIDL, LIDOPEN });
 
   .wk .wk-topslab.lit { fill: color-mix(in oklab, var(--face-hi) 84%, #cfe4ea); }
   .wk .wk-shade { fill: #8a6a3e; stroke: rgba(240, 196, 130, 0.4); }
+  .wk .wk-cord { fill: #14262e; stroke: var(--edge-soft); }
   .wk .wk-mouth { fill: #f0c482; stroke: none; }
 
   .wk .wk-screen { fill: #17414c; stroke: var(--edge); stroke-width: 1;
@@ -359,12 +421,12 @@ const lidCfg = JSON.stringify({ RX, RY, LX, LY, LW, ZB, LIDL, LIDOPEN });
     // The lid is the one piece whose GEOMETRY changes, so it cannot be a CSS transform: a hinge
     // rotation in 3D is not a 2D rotation once projected. Its free edge is recomputed per frame
     // from the same constants the build used, handed over on the element.
-    function openLid(fig) {
+    function lidOf(fig) {
       var cfg;
-      try { cfg = JSON.parse(fig.getAttribute("data-lid")); } catch (e) { return; }
+      try { cfg = JSON.parse(fig.getAttribute("data-lid")); } catch (e) { return null; }
       var lid = fig.querySelector(".wk-lid");
       var insets = fig.querySelectorAll("[data-lk]");
-      if (!lid) return;
+      if (!lid) return null;
       var RX = cfg.RX, RY = cfg.RY;
       function P(x, y, z) {
         return (x * RX[0] + y * RY[0]).toFixed(1) + "," + (x * RX[1] + y * RY[1] - z).toFixed(1);
@@ -380,18 +442,52 @@ const lidCfg = JSON.stringify({ RX, RY, LX, LY, LW, ZB, LIDL, LIDOPEN });
             q(d[0], d[2]) + " " + q(d[1], d[2]) + " " + q(d[1], d[3]) + " " + q(d[0], d[3]));
         });
       }
-      if (reduced) { draw(cfg.LIDOPEN); return; }
+      return { draw: draw, open: cfg.LIDOPEN };
+    }
+
+    /* ⚠️ The build renders the lid OPEN, which is the right no-JS state. So the CLOSED state has
+       to be written here, at parse time, before the first paint. Setting it inside the observer
+       instead means that on a page where the observer fires late the lid is seen open, snaps
+       shut and then opens again. That is exactly what /ueber-uns did. */
+    // The rig is stored ON the element. An index into the NodeList is one lookup away from
+    // being -1, and when it is, the lid simply never animates and nothing reports it.
+    els.forEach(function (el) {
+      var r = lidOf(el);
+      el._rig = r;
+      if (r && !reduced) r.draw(0.02);
+    });
+
+    function animateLid(el) {
+      var r = el._rig;
+      if (!r) return;
+      if (reduced) { r.draw(r.open); return; }
       var t0 = performance.now() + 280, DUR = 780;
-      draw(0.02);
       (function step(now) {
         var k = Math.min(1, Math.max(0, (now - t0) / DUR));
         var e = 1 - Math.pow(1 - k, 3);                    // ease-out, the site's only entrance
-        draw(0.02 + (cfg.LIDOPEN - 0.02) * e);
+        r.draw(0.02 + (r.open - 0.02) * e);
         if (k < 1) requestAnimationFrame(step);
       })(performance.now());
     }
 
-    function fire(el) { el.classList.add("in"); openLid(el); }
+    /* The pendant sways. One sine against a slower one, so the motion never lands on an
+       obvious beat, and an amplitude small enough that it reads as air moving rather than as a
+       lamp being pushed. Reduced motion leaves it hanging still. */
+    function sway(el) {
+      if (reduced) return;
+      var g = el.querySelector(".wk-pend");
+      if (!g) return;
+      var piv = (g.getAttribute("data-piv") || "0,0").split(",");
+      var t0 = performance.now();
+      (function step(now) {
+        var t = (now - t0) / 1000;
+        var a = 1.5 * Math.sin(t * 1.32) + 0.55 * Math.sin(t * 0.51 + 1.1);
+        g.setAttribute("transform", "rotate(" + a.toFixed(3) + " " + piv[0] + " " + piv[1] + ")");
+        requestAnimationFrame(step);
+      })(performance.now());
+    }
+
+    function fire(el) { el.classList.add("in"); animateLid(el); sway(el); }
 
     if (!("IntersectionObserver" in window)) { els.forEach(fire); return; }
     var io = new IntersectionObserver(function (entries) {
