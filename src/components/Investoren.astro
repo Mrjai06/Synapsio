@@ -126,9 +126,25 @@ const planTicks = Array.from({ length: Math.floor(maxCase / 5) + 1 }, (_, i) => 
   <section class="in-heute">
     <div class="shell">
       <h2>{c.heute.h2}</h2>
-      <div class="in-measure">
-        <p>{c.heute.p1}</p>
-        <p>{c.heute.p2}</p>
+      {/* A 62ch measure alone in an 84rem shell left ~620px of dead line to its right on every
+          desktop. The measure is right; the emptiness was the defect. The margin column carries
+          the figures the paragraph states in passing, so the width is filled with substance
+          rather than with a wider, harder-to-read paragraph. */}
+      <div class="in-annot">
+        <div class="in-measure">
+          <p>{c.heute.p1}</p>
+          <p>{c.heute.p2}</p>
+        </div>
+        <aside class="in-notes">
+          {
+            c.heute.notes.map((n) => (
+              <div class="in-note">
+                <span class="mono">{n.k}</span>
+                <span>{n.v}</span>
+              </div>
+            ))
+          }
+        </aside>
       </div>
     </div>
     <div class="in-say"><div class="shell"><p>{c.heute.statement}</p></div></div>
@@ -170,7 +186,19 @@ const planTicks = Array.from({ length: Math.floor(maxCase / 5) + 1 }, (_, i) => 
       ))
     }
 
-    <p class="in-measure in-mod-note">{c.modell.note}</p>
+    <div class="in-annot in-mod-note">
+      <div class="in-measure"><p>{c.modell.note}</p></div>
+      <aside class="in-notes">
+        {
+          c.modell.noteNotes.map((n) => (
+            <div class="in-note">
+              <span class="mono">{n.k}</span>
+              <span>{n.v}</span>
+            </div>
+          ))
+        }
+      </aside>
+    </div>
   </section>
 
   <section class="shell in-plan">
@@ -223,26 +251,51 @@ const planTicks = Array.from({ length: Math.floor(maxCase / 5) + 1 }, (_, i) => 
       </dl>
     </figure>
 
-    <div class="in-measure in-honest">
-      <p>{c.plan.honest}</p>
-      <p class="in-peak">{c.plan.peak}</p>
+    <div class="in-annot in-honest">
+      <div class="in-measure">
+        <p>{c.plan.honest}</p>
+        <p class="in-peak">{c.plan.peak}</p>
+      </div>
+      <aside class="in-notes">
+        {
+          c.plan.honestNotes.map((n) => (
+            <div class="in-note">
+              <span class="mono">{n.k}</span>
+              <span>{n.v}</span>
+            </div>
+          ))
+        }
+      </aside>
     </div>
   </section>
 
   <section class="in-funding">
     <div class="shell">
       <h2>{c.funding.h2}</h2>
-      <div class="in-rail">
-        {
-          c.funding.steps.map((s) => (
-            <div class="in-stop">
-              <span class="in-dot" />
-              <span class="mono in-stop-k">{s.k}</span>
-              <span class="in-stop-v">{s.v}</span>
-              <p>{s.d}</p>
-            </div>
-          ))
-        }
+      {/* Three equal columns made a sequence look like a comparison, and it was the page's second
+          three-across grid, which the layout-repetition rule does not allow. It is a TIME axis
+          now: 24 columns spanning 2026 to 2029, six per year, each round placed and sized by its
+          own `c` (start column) and `s` (span) so its position and duration are the drawing.
+          Pre-seed 5/7 = mid 2026 into 2027, seed 11/6 = Q2 to Q3 2027, Series A 17/8 = 2028 to
+          2029. Each round's own top border is its lit stretch of the axis; the faint full-width
+          rule behind it is the rest of the timeline. */}
+      <div class="in-time">
+        <div class="in-years" aria-hidden="true">
+          {c.funding.years.map((y) => <span class="mono">{y}</span>)}
+        </div>
+        <div class="in-rail">
+          {
+            c.funding.steps.map((s) => (
+              <div class="in-stop" style={`--c:${s.c};--s:${s.s}`}>
+                <span class="in-dot" />
+                <span class="mono in-stop-k">{s.k}</span>
+                <span class="in-stop-v">{s.v}</span>
+                <span class="mono in-stop-w">{s.when}</span>
+                <p>{s.d}</p>
+              </div>
+            ))
+          }
+        </div>
       </div>
     </div>
   </section>
@@ -273,6 +326,23 @@ const planTicks = Array.from({ length: Math.floor(maxCase / 5) + 1 }, (_, i) => 
   .in-lede { margin:12px 0 0; max-width:54ch; color:var(--fg-muted); font-size:15.5px; }
   .in-src { display:block; font-size:10px; color:var(--fg-muted); line-height:1.5; }
   .in-measure { max-width:62ch; }
+  /* Prose with a margin column. minmax(0,62ch) rather than auto, or a long unbroken token in the
+     paragraph would push the notes off the page (the min-width:auto trap that cost the startpage
+     ~120 overflowing elements). */
+  .in-annot { display:grid; grid-template-columns:minmax(0,62ch) minmax(0,1fr);
+    gap:clamp(24px,4vw,64px); align-items:start; }
+  .in-notes { display:flex; flex-direction:column; gap:18px; max-width:230px; padding-top:4px; }
+  .in-note { border-top:1px solid var(--hairline-strong); padding-top:9px; }
+  .in-note .mono { display:block; color:var(--fg-muted); }
+  .in-note span:last-child { display:block; margin-top:5px; color:var(--fg-soft); font-size:14px;
+    line-height:1.45; }
+  /* Below the point where 62ch plus a note column stops fitting, the notes go under the prose as
+     a row. They are annotations, so they never become the first thing read. */
+  @media (max-width:1000px){
+    .in-annot { grid-template-columns:1fr; gap:26px; }
+    .in-notes { flex-direction:row; flex-wrap:wrap; gap:14px 34px; max-width:none; padding-top:0; }
+    .in-note { flex:1 1 200px; }
+  }
   .in-measure p { margin:0 0 17px; color:var(--fg-soft); font-size:16px; line-height:1.7; letter-spacing:0.004em; }
   .in-measure p:last-child { margin-bottom:0; }
 
@@ -391,13 +461,36 @@ const planTicks = Array.from({ length: Math.floor(maxCase / 5) + 1 }, (_, i) => 
   .in-honest { margin-top:clamp(34px,5vh,54px); }
   .in-peak { color:var(--fg) !important; }
 
-  /* ---- funding rail ---- */
+  /* ---- funding: a time axis, not three columns ---- */
   .in-funding { padding:clamp(44px,6.5vh,80px) 0; border-top:1px solid var(--hairline); }
-  .in-rail { margin-top:clamp(26px,4vh,44px); display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
-    gap:clamp(20px,3vw,44px); border-top:1px solid var(--hairline-strong); }
-  @media (max-width:800px){ .in-rail{ grid-template-columns:1fr; gap:26px; border-top:none; } }
-  .in-stop { position:relative; padding-top:26px; }
-  @media (max-width:800px){ .in-stop{ border-top:1px solid var(--hairline-strong); } }
+  .in-time { margin-top:clamp(26px,4vh,44px); }
+  /* Four year slots of six columns each, so a label sits exactly on its own boundary: 2026 at 0,
+     2027 at 25 %, 2028 at 50 %, 2029 at 75 %. The tick reaches down to the axis rule, which is
+     why the row has no bottom margin and the label has padding instead. */
+  .in-years { display:grid; grid-template-columns:repeat(4,1fr); }
+  .in-years span { position:relative; padding-bottom:9px; }
+  .in-years span::after { content:""; position:absolute; left:0; bottom:0; width:1px; height:5px;
+    background:var(--hairline-strong); }
+  /* 24 columns = 6 per year over 2026 to 2029. The faint rule is the whole timeline; each round
+     paints its own stretch of it with its top border, so position and duration are the drawing
+     rather than a decoration on top of it. */
+  .in-rail { display:grid; grid-template-columns:repeat(24,minmax(0,1fr));
+    border-top:1px solid var(--hairline); }
+  .in-stop { position:relative; grid-column:var(--c) / span var(--s); padding-top:26px;
+    border-top:1px solid var(--teal-soft); margin-top:-1px; }
+  /* The lit segment shows WHEN the round happens, so it must keep its grid width. The text under
+     it does not: capped to a readable measure, it stops Series A's ten columns from setting a
+     line length nobody would read. */
+  .in-stop > :not(.in-dot) { max-width:270px; }
+  .in-stop-w { display:block; margin-top:5px; color:var(--fg-muted); }
+  /* Under 800px the axis cannot carry three labelled spans, so it becomes a plain sequence and
+     `when` (which the axis was drawing) does the dating instead. */
+  @media (max-width:800px){
+    .in-time { margin-top:26px; }
+    .in-years { display:none; }
+    .in-rail { grid-template-columns:1fr; row-gap:26px; border-top:none; }
+    .in-stop { grid-column:1 / -1; margin-top:0; border-top:1px solid var(--hairline-strong); }
+  }
   .in-dot { position:absolute; top:-4.5px; left:0; width:8px; height:8px; border-radius:50%;
     background:var(--teal-soft); }
   .in-stop-k { display:block; color:var(--fg-muted); }

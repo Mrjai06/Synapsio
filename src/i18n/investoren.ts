@@ -105,6 +105,13 @@ export const investorenCopy = {
       p2: "Der Agent liest Lieferantenmails und Auftragsbestätigungen, rechnet Reichweite und Bestellpunkt pro Artikel, schreibt echte Bestellungen per Mail und legt jede Entscheidung mit ihrem Grund ins Protokoll. Pro Artikel wählt er ein benanntes Verfahren, von Bestellpunkt über Croston bis Newsvendor, und begründet die Wahl.",
       statement:
         "Ein Chatfenster kann Croston nicht gegen Newsvendor abwägen. Dafür braucht es den Bestand, die Historie und die Ausführung im selben System.",
+      // Margin notes beside the two paragraphs. They pull out the two facts an investor extracts
+      // from that prose, nothing new: the product is reachable, and the method is chosen per item.
+      // Keep it at two. A third turns the column into a restatement of the paragraph.
+      notes: [
+        { k: "Live", v: "app.synapsio.solutions" },
+        { k: "Fünf Verfahren", v: "je Artikel gewählt" },
+      ],
       link: "Die Details stehen auf der Produktseite",
       // Register of what is actually built. Every line is verifiable in the running system.
       // ⚠️ NO usage numbers here: the only numbers that exist come from the demo company, and
@@ -162,6 +169,10 @@ export const investorenCopy = {
         },
       ],
       note: "Die Preise legen wir zum Launch fest. Was bereits steht, ist die Mechanik darunter: Verbrauch und Budget werden pro Unternehmen gemessen und durchgesetzt. Abrechnung ist damit kein zweites System, sondern dieselbe Grundlage mit einem Preis daran.",
+      noteNotes: [
+        { k: "Preise", v: "offen bis zum Launch" },
+        { k: "Budget", v: "pro Unternehmen gemessen" },
+      ],
     },
 
     plan: {
@@ -190,15 +201,23 @@ export const investorenCopy = {
       caseAxis: "ARR 2030",
       honest:
         "Der frühe Hochlauf bleibt bewusst konservativ: rund zwölf zahlende Kunden bis Ende 2026. Synapsio wird vertrieblich verkauft, nicht per Selbstregistrierung, und die schnellen Hochlaufkurven aus dem KI-Umfeld stammen aus Produkten, die sich selbst ausrollen. Wir heben die Ambition im fünften Jahr, nicht die Geschwindigkeit im ersten.",
+      honestNotes: [
+        { k: "Ende 2026", v: "rund 12 zahlende Kunden" },
+        { k: "Breakeven", v: "2030" },
+      ],
       peak: "Spitzenbedarf an kumulierter Finanzierung bis zum Breakeven: rund 3,5 Mio. €.",
     },
 
     funding: {
       h2: "Finanzierung",
+      // The axis carries the time now, so the date is no longer repeated inside `d`. `c` is the
+      // start column and `s` the span on the 24-column grid described in Investoren.astro; both
+      // are derived from `when`, so change them together.
+      years: ["2026", "2027", "2028", "2029"],
       steps: [
-        { k: "Pre-Seed", v: "150 bis 300 T€", d: "Jetzt. Produkt, erste Piloten, Nachweis im Betrieb." },
-        { k: "Seed", v: "1,5 bis 2 Mio. €", d: "Q2 bis Q3 2027. Vertrieb in DACH, Transaktionsebene." },
-        { k: "Series A", v: "5 bis 8 Mio. €", d: "2028 bis 2029. EU-Expansion." },
+        { k: "Pre-Seed", when: "jetzt", v: "150 bis 300 T€", d: "Produkt, erste Piloten, Nachweis im Betrieb.", c: 5, s: 5 },
+        { k: "Seed", when: "Q2 bis Q3 2027", v: "1,5 bis 2 Mio. €", d: "Vertrieb in DACH, Transaktionsebene.", c: 10, s: 5 },
+        { k: "Series A", when: "2028 bis 2029", v: "5 bis 8 Mio. €", d: "EU-Expansion.", c: 15, s: 10 },
       ],
     },
 
@@ -283,6 +302,10 @@ export const investorenCopy = {
       p2: "The agent reads supplier mail and order confirmations, computes cover and reorder point per item, writes real orders by mail, and puts every decision in the log with its reason. Per item it picks a named method, from reorder point through Croston to newsvendor, and explains the choice.",
       statement:
         "A chat window cannot weigh Croston against newsvendor. That needs the stock, the history and the execution in one system.",
+      notes: [
+        { k: "Live", v: "app.synapsio.solutions" },
+        { k: "Five methods", v: "chosen per item" },
+      ],
       link: "The detail is on the product page",
       registerK: "Built and running",
       register: [
@@ -337,6 +360,10 @@ export const investorenCopy = {
         },
       ],
       note: "Prices are set closer to launch. What already stands is the mechanism underneath: usage and budget are metered and enforced per company. Billing is therefore not a second system, only the same foundation with a price attached.",
+      noteNotes: [
+        { k: "Prices", v: "open until launch" },
+        { k: "Budget", v: "metered per company" },
+      ],
     },
 
     plan: {
@@ -355,15 +382,20 @@ export const investorenCopy = {
       caseAxis: "ARR 2030",
       honest:
         "The early ramp stays deliberately measured: around twelve paying customers by the end of 2026. Synapsio is sold by a sales team, not by self-registration, and the fast ramp curves from the AI world come from products that roll themselves out. We raise the ambition in year five, not the velocity in year one.",
+      honestNotes: [
+        { k: "End of 2026", v: "around 12 paying customers" },
+        { k: "Breakeven", v: "2030" },
+      ],
       peak: "Peak cumulative funding need before breakeven: around €3.5M.",
     },
 
     funding: {
       h2: "Funding",
+      years: ["2026", "2027", "2028", "2029"],
       steps: [
-        { k: "Pre-seed", v: "€150 to 300K", d: "Now. Product, first pilots, proof in live operation." },
-        { k: "Seed", v: "€1.5 to 2M", d: "Q2 to Q3 2027. Sales in DACH, transaction layer." },
-        { k: "Series A", v: "€5 to 8M", d: "2028 to 2029. EU expansion." },
+        { k: "Pre-seed", when: "now", v: "€150 to 300K", d: "Product, first pilots, proof in live operation.", c: 5, s: 5 },
+        { k: "Seed", when: "Q2 to Q3 2027", v: "€1.5 to 2M", d: "Sales in DACH, transaction layer.", c: 10, s: 5 },
+        { k: "Series A", when: "2028 to 2029", v: "€5 to 8M", d: "EU expansion.", c: 15, s: 10 },
       ],
     },
 
