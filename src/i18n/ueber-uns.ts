@@ -89,7 +89,7 @@ export const ueberUnsCopy = {
       items: [
         {
           name: "28DIGITAL",
-          note: "Venture-Studio in Berlin. Synapsio ist im Accelerator-Programm, mit Netzwerk und operativer Begleitung.",
+          note: "Synapsio ist im Accelerator-Programm, mit Zugang zum Netzwerk und operativer Begleitung.",
           published: true,
         },
       ] as Partner[],
@@ -182,7 +182,7 @@ export const ueberUnsCopy = {
       items: [
         {
           name: "28DIGITAL",
-          note: "Venture studio in Berlin. Synapsio is in the accelerator programme, with network and hands-on support.",
+          note: "Synapsio is in the accelerator programme, with access to the network and hands-on support.",
           published: true,
         },
       ] as Partner[],

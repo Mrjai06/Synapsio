@@ -142,9 +142,12 @@
    and the non-scaling stroke they all use so the line weight never changes with the viewBox. */
 .ft-pen path { stroke-width: 1; stroke-linejoin: round; vector-effect: non-scaling-stroke;
   shape-rendering: geometricPrecision; }
-.ft-pen .pen-hi { fill: #7a512f; stroke: #d0925f; }
-.ft-pen .pen-lo { fill: #5c3a22; stroke: #d0925f; }
-.ft-pen .pen-collar { fill: var(--face-hi); stroke: var(--edge); }
+/* The pen is teal: it is part of the instrument, like both rulers and the hole rims, and the
+   copper it borrowed from the security dome read as a wooden pencil on a near-black tape.
+   Coral stays with the INK, which is the record it leaves, not the tool that leaves it. */
+.ft-pen .pen-hi { fill: #2f5f66; stroke: #7fc4c4; }
+.ft-pen .pen-lo { fill: #1c3f46; stroke: #7fc4c4; }
+.ft-pen .pen-collar { fill: #78a8ac; stroke: #bfe0e0; }
 .ft-pen .pen-tip { fill: #f2b98f; }
 /* pen off the tape: the whole nib assembly lifts, rather than parking at a coordinate that
    overflow:visible would still show */
