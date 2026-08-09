@@ -785,6 +785,34 @@
   .lay-statement { padding-block: clamp(84px, 11vh, 140px); }
   .lay-crop      { padding-block: clamp(64px, 8vh, 104px); }
 
+  /* IMAGES MUST NOT ALL SIT IN THE MEASURE.
+     Three screenshots, all centred at the same width in the same frame, is what made the page
+     read as a document with pictures pasted in. Each one now has a different relationship to the
+     text column: the opening shot BREAKS OUT of it entirely, the strip stays inside it, and the
+     limits crop sits inset in the margin. Three relationships, not three slabs.
+     Specificity note: Shot.astro's own rules are Astro-scoped (class + attribute), so a plain
+     `.shot-frame` here would lose. Three classes wins. aspect-ratio is set INLINE by the
+     component, which is why the override needs !important. */
+  .lay-wide .shot .shot-frame {
+    width: 100vw; max-width: none; margin-left: calc(50% - 50vw);
+    border-inline: none; border-radius: 0;
+    aspect-ratio: 2.55 / 1 !important;
+  }
+  .lay-wide .shot figcaption { max-width: 62ch; }
+
+  .lay-crop .shot { margin-left: auto; max-width: 430px; }
+  .lay-crop .shot .shot-frame { max-width: 430px; }
+
+  @media (max-width: 760px) {
+    /* A full-bleed band on a phone is just the image, so it keeps the gutter back and the
+       cropped ratio goes with it: at this width the app screenshot needs its height. */
+    .lay-wide .shot .shot-frame {
+      width: auto; margin-left: 0; border-inline: 1px solid var(--hairline); border-radius: 12px;
+      aspect-ratio: 16 / 10 !important;
+    }
+    .lay-crop .shot { margin-left: 0; max-width: none; }
+  }
+
   /* the "ai" section: no screenshot. Its one sentence leads, the prose follows under it. */
   .lay-statement .th-hd { max-width: 92ch; }
   /* The one section with no screenshot used to be a single 62ch column, which made it the
