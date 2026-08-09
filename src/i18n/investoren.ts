@@ -113,7 +113,7 @@ export const investorenCopy = {
       register: [
         {
           k: "Verfahren pro Artikel",
-          d: "Der Agent wählt je Artikel ein benanntes Nachbestellverfahren — Bestellpunkt (s,Q), Croston für sporadischen Bedarf, Newsvendor für Verderbliches, periodische Prüfung, mehrstufig — und legt Begründung und Konfidenz dazu. Der Mensch kann jede Wahl festsetzen.",
+          d: "Der Agent wählt je Artikel ein benanntes Nachbestellverfahren: Bestellpunkt (s,Q), Croston für sporadischen Bedarf, Newsvendor für Verderbliches, periodische Prüfung oder mehrstufig. Begründung und Konfidenz legt er dazu, und der Mensch kann jede Wahl festsetzen.",
         },
         {
           k: "Nachbewertung",
@@ -288,7 +288,7 @@ export const investorenCopy = {
       register: [
         {
           k: "A method per item",
-          d: "The agent picks a named replenishment method for each item — reorder point (s,Q), Croston for intermittent demand, newsvendor for perishables, periodic review, multi-echelon — and records the reason and its confidence. A person can pin any choice.",
+          d: "The agent picks a named replenishment method for each item: reorder point (s,Q), Croston for intermittent demand, newsvendor for perishables, periodic review or multi-echelon. It records the reason and its confidence alongside, and a person can pin any choice.",
         },
         {
           k: "Scored afterwards",
