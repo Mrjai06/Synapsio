@@ -518,11 +518,16 @@ const hz = homeCopy[locale].hz;
     // reads as unfinished scaffolding rather than a road carrying on out of frame. A street that
     // TERMINATES in a junction gets no taper — it simply ends against the other carriageway.
     // Six steps, not three: at three the opacity bands are wide enough to read as stripes.
-    // `nm` keeps the taper out of the frame measurement — it is ~invisible geometry, and letting
-    // it size the viewBox shrank every horizon for the sake of a fade.
+    // ⚠️ The taper MUST be measured into the frame. It used to carry `nm:true` to keep the
+    // viewBox small, which meant the fade was drawn entirely outside the measured frame and
+    // `overflow:hidden` cut it off — so every open road ended in exactly the hard diagonal the
+    // taper exists to prevent, and the fade had never once been visible. The step length is the
+    // lever instead: 6 x 0.62 units costs almost nothing in scene size, where the old 6 x 1.1
+    // would have shrunk the network by about a sixth.
+    var TS = 0.62;
     for(var q=0;taper&&q<6;q++){
-      f.push({pts:[P(t1+q*1.1,-SW),P(t1+q*1.1+1.1,-SW),P(t1+q*1.1+1.1,SW),P(t1+q*1.1,SW)],
-              nrm:[0,0,1],lit:true,cls:"ring",nm:true,op:Math.pow(1-(q+1)/7,1.5)});
+      f.push({pts:[P(t1+q*TS,-SW),P(t1+q*TS+TS,-SW),P(t1+q*TS+TS,SW),P(t1+q*TS,SW)],
+              nrm:[0,0,1],lit:true,cls:"ring",op:Math.pow(1-(q+1)/7,1.5)});
     }
     // markings carry the strip's own centre as their ref — a long face keys on its middle, so
     // without it every marking on the near half sorts behind the tarmac it is painted on.
@@ -599,8 +604,15 @@ const hz = homeCopy[locale].hz;
     var p=ringXY(th,off), q=ringXY(th+0.03*dir,off);
     var ang=Math.atan2(q[1]-p[1],q[0]-p[0])-Math.PI/2;
     // recentre before rotating — the lorry is modelled from its corner, so rotating it in place
-    // swung it off the carriageway
-    return shift(rotZ(shift(scaleF(lorrySimple(cabCls),0.56),[-0.7,-5.6,0]),ang),[p[0],p[1],0]);
+    // swung it off the carriageway.
+    // ⚠️ The half-extents MUST be taken from the SCALED model. This used to pass [-0.7,-5.6]:
+    // -0.7 is half the scaled width, but -5.6 is half the UNSCALED length (11.3/2), so every
+    // ring lorry sat 2.44 units behind its anchor along the tangent. On a curve a tangent offset
+    // leaves the curve, and at the ellipse's tight ends (radius of curvature ~8) that threw the
+    // lorry ~0.37 units past the edge of a carriageway only 3.4 wide. That is the traffic that
+    // looked like it was driving off the road.
+    var LS=0.56, HW=2.4/2*LS, HL=11.3/2*LS;
+    return shift(rotZ(shift(scaleF(lorrySimple(cabCls),LS),[-HW,-HL,0]),ang),[p[0],p[1],0]);
   }
 
   /* Everything in horizon 03 except our own site, the ring traffic and the lamps is STATIC, so it

@@ -989,17 +989,20 @@
   .map-foot h4 { font-size:16px; font-weight:500; }
   .map-foot p { color:var(--fg-muted); font-size:12.5px; line-height:1.55; margin:8px 0 0; }
 
-  /* infra spec strip */
-  .sb-strip { grid-area:strip; display:flex; align-items:center; flex-wrap:wrap; gap:14px clamp(22px,4vw,54px); }
+  /* infra spec strip.
+     This used to be one flex row: head left, facts pushed right with margin-left:auto. The two
+     together need about 1283px and only ~1290px exist inside the card, so the facts wrapped onto
+     a second line and, because the row was align-items:center, landed lower than the heading and
+     still right-aligned. It read as a mistake rather than a layout. It is now deliberately two
+     rows, both starting at the same left edge. */
+  .sb-strip { grid-area:strip; display:block; }
   .strip-head h4 { font-size:15px; font-weight:500; margin-top:5px; }
-  .strip-facts { display:flex; flex-wrap:wrap; gap:12px clamp(18px,2.6vw,32px); margin-left:auto; }
+  .strip-facts { display:flex; flex-wrap:wrap; gap:12px clamp(18px,2.6vw,32px); margin-top:16px; }
   .strip-facts span { display:inline-flex; align-items:center; gap:9px; font-size:12.5px; color:var(--fg-soft); }
   .strip-facts i { width:6px; height:6px; background:var(--teal-soft); flex:none; }
 
   @media (max-width:860px){
     .sec-bento { grid-template-columns:1fr; grid-template-areas:"map" "a" "b" "c" "d" "strip"; }
-    .sb-strip { flex-direction:column; align-items:flex-start; }
-    .strip-facts { margin-left:0; }
   }
   
 
