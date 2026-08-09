@@ -65,16 +65,16 @@ export const produktCopy = {
           { lead: "Jede Runde besteht aus denselben fünf Schritten.", text: "Er liest, was hereinkommt: Lieferantenmails, Auftragsbestätigungen, Wareneingänge, Produktionsläufe, also alles, was den Bestand bewegt. Er rechnet daraus die Reichweite je Artikel, die Prognose, die Saison und das Lieferantenrisiko. Er entscheidet, welches Verfahren gilt, welche Menge nötig ist und welcher Lieferant liefern soll, und prüft das Ergebnis gegen alle Ihre Grenzen. Er handelt, legt die Bestellung an, verschickt Mail und PDF und hält den Termin nach. Und er schreibt mit, mit Zeitstempel und Begründung." },
           { lead: "", text: "Was er nicht sauber abschließen kann, verschwindet nicht. Es wandert als Ausnahme in eine eigene Liste, zusammen mit einem Vorschlag, was zu tun ist. Eine Bestellung, die hängt, eine Antwort, die nicht zur Bestellung passt, eine Menge, die beim Wareneingang nicht stimmt: nichts davon wird stillschweigend übergangen." },
         ],
-        say: "Jede Runde macht die nächste genauer, weil der Agent nachträglich bewertet, ob seine Entscheidung gut war.",
+        say: "Sie starten nichts davon von Hand. Das ist der Unterschied zwischen einem Werkzeug und einem Betrieb.",
       },
       ai: {
         paras: [
           { lead: "Diese eine Regel gilt dann für Schrauben wie für Dichtungen.", text: "Ein Mindestbestand, von Hand gepflegt, der sich ändert, wenn jemand daran denkt. Eine Begründung, warum gerade diese Zahl dort steht, gibt es nicht." },
-          { lead: "Synapsio AI wählt das Verfahren je Artikel, nicht nur den Wert.", text: "Ein Artikel mit stetigem Verbrauch braucht einen anderen Rechenweg als einer, der dreimal im Jahr gezogen wird. Deshalb bekommt jeder Artikel eines von fünf Verfahren: den Bestellpunkt (s,Q) bei stetigem Verbrauch, Croston bei sporadischem Abgang, Newsvendor bei verderblicher Ware, die periodische Prüfung (R,S) bei festen Bestellrhythmen und eine Standortrechnung, wenn derselbe Artikel in mehreren Lägern liegt. Passt keines davon, schreibt die KI ein eigenes Verfahren für diesen Artikel und vermerkt, worauf es beruht." },
+          { lead: "Synapsio AI wählt das Verfahren je Artikel, nicht nur den Wert.", text: "Ein Artikel mit stetigem Verbrauch braucht einen anderen Rechenweg als einer, der dreimal im Jahr gezogen wird. Deshalb bekommt jeder Artikel eines von fünf Verfahren: den Bestellpunkt (s,Q) bei stetigem Verbrauch, Croston bei sporadischem Abgang, Newsvendor bei verderblicher Ware, die periodische Prüfung (R,S) bei festen Bestellrhythmen und eine Standortrechnung, wenn derselbe Artikel in mehreren Lägern liegt." },
           { lead: "Mit dem Verfahren setzt sie auch dessen Parameter.", text: "Lieferzeit, Sicherheitsbestand, Servicegrad und Prüfintervall stehen am Artikel und werden nachjustiert, wenn sich der Verbrauch ändert. Wenn Sie ein Verfahren festsetzen wollen, sperren Sie es, dann rührt die KI es nicht mehr an." },
-          { lead: "", text: "Und sie begründet, was sie tut. Angebote werden nicht nach Preis sortiert. Termin, Termintreue und Menge fließen ein, und die Wahl steht anschließend mit einem Satz im Protokoll, den Sie lesen können, ohne die Rechnung dahinter zu kennen." },
+          { lead: "", text: "Und sie schreibt dazu, warum. Am Artikel steht, welches Verfahren gilt, seit wann, auf welcher Grundlage es gewählt wurde und wie sicher sich die KI dabei war. Sie können das lesen, ohne die Rechnung dahinter zu kennen, und Sie können widersprechen." },
         ],
-        say: "Nicht der billigste Lieferant, sondern der einzige, der vor dem Engpass liefert. Das ist eine Entscheidung, keine Sortierung.",
+        say: "Eine Zahl kann man setzen. Ein Verfahren muss man begründen.",
       },
       read: {
         paras: [
@@ -121,8 +121,8 @@ export const produktCopy = {
       },
       memory: {
         paras: [
-          { lead: "Zu jeder Bestellung liegt der ganze Entscheidungsweg.", text: "Das gewählte Verfahren, die verwendeten Signale, die geprüften Grenzen und der Satz, warum es diese Bestellung wurde. Das ist kein Protokoll für den Notfall, sondern die Grundlage für die nächste Runde." },
-          { lead: "", text: "Fragen können Sie in normaler Sprache stellen. „Warum diese Bestellung?“ beantwortet der Agent mit der Reichweite, den geprüften Angeboten und der Schwellen-Prüfung, von jeder Seite aus. Lesen, vergleichen, bestellen, buchen: jeder Schritt steht mit Zeitstempel im Protokoll, dazu kommen Auswertungen zu Beständen, Bestellungen und Lieferanten ohne den Umweg über Excel." },
+          { lead: "Fragen stellen Sie in normaler Sprache.", text: "„Warum diese Bestellung?“ beantwortet der Agent von jeder Seite aus, mit der Reichweite, den geprüften Angeboten und der Schwellen-Prüfung. Sie müssen nicht wissen, wo etwas gespeichert ist, um danach zu fragen, und Sie müssen die Rechnung nicht selbst nachvollziehen können." },
+          { lead: "", text: "Lesen, vergleichen, bestellen, buchen: jeder Schritt steht mit Zeitstempel im Protokoll, dazu kommen Auswertungen zu Beständen, Bestellungen und Lieferanten ohne den Umweg über Excel. Wenn in drei Monaten jemand fragt, warum diese Menge bei diesem Lieferanten bestellt wurde, ist das eine Abfrage und keine Rekonstruktion." },
         ],
         say: "Nachvollziehbar heißt prüfbar, nicht abrufbar.",
       },
@@ -246,16 +246,16 @@ export const produktCopy = {
           { lead: "Every lap is the same five steps.", text: "It reads what comes in: supplier email, order confirmations, goods receipts, production runs, everything that moves stock. From that it calculates days of cover per item, the forecast, the season and supplier risk. It decides which method applies, what quantity is needed and which supplier should deliver, then checks the result against all of your limits. It acts, raises the order, sends the email and the PDF and chases the date. And it records, with a timestamp and a reason." },
           { lead: "", text: "Anything it cannot close cleanly does not disappear. It moves into a separate list as an exception, together with a suggestion for what to do. An order that stalls, a reply that does not match the order, a quantity that is wrong at goods-in: none of it is quietly skipped." },
         ],
-        say: "Every lap makes the next one sharper, because the agent goes back and scores whether its decision was a good one.",
+        say: "You start none of it by hand. That is the difference between a tool and an operation.",
       },
       ai: {
         paras: [
           { lead: "That one rule then covers screws and gaskets alike.", text: "A minimum level, maintained by hand, that changes when somebody remembers to change it. There is no record of why that particular number is the one sitting there." },
-          { lead: "Synapsio AI picks the method per item, not just the number.", text: "An item with steady consumption needs a different calculation from one pulled three times a year. So each item gets one of five methods: reorder point (s,Q) for steady consumption, Croston for intermittent demand, Newsvendor for perishable goods, periodic review (R,S) for fixed ordering rhythms, and a multi-location calculation when the same item sits in several warehouses. Where none of them fit, the AI writes a method of its own for that item and records what it rests on." },
+          { lead: "Synapsio AI picks the method per item, not just the number.", text: "An item with steady consumption needs a different calculation from one pulled three times a year. So each item gets one of five methods: reorder point (s,Q) for steady consumption, Croston for intermittent demand, Newsvendor for perishable goods, periodic review (R,S) for fixed ordering rhythms, and a multi-location calculation when the same item sits in several warehouses." },
           { lead: "With the method it also sets that method's parameters.", text: "Lead time, safety stock, service level and review interval sit on the item and are adjusted as consumption changes. If you want a method fixed in place, lock it and the AI will leave it alone." },
-          { lead: "", text: "And it gives a reason for what it does. Quotes are not sorted by price. Date, reliability and quantity all count, and the choice then sits in the log as a sentence you can read without knowing the calculation behind it." },
+          { lead: "", text: "And it writes down why. The item carries which method applies, since when, what the choice rested on and how confident the AI was about it. You can read that without knowing the calculation behind it, and you can disagree with it." },
         ],
-        say: "Not the cheapest supplier, but the only one that delivers before the shortage. That is a decision, not a sort.",
+        say: "A number can be set. A method has to be argued for.",
       },
       read: {
         paras: [
@@ -302,8 +302,8 @@ export const produktCopy = {
       },
       memory: {
         paras: [
-          { lead: "", text: "Every order carries its whole decision path. The method chosen, the signals used, the limits checked and the sentence explaining why this became the order. That is not a log kept for emergencies; it is what the next lap is built on." },
-          { lead: "You can ask about it in plain language.", text: "\"Why this order?\" is answered with the cover, the quotes it checked and the threshold check, from any page. Reading, comparing, ordering, booking: every step sits in the log with a timestamp, alongside analyses of stock, orders and suppliers without the detour through Excel." },
+          { lead: "You ask in plain language.", text: "\"Why this order?\" is answered from any page, with the cover, the quotes it checked and the threshold check. You do not have to know where anything is stored to ask about it, and you do not have to be able to follow the calculation yourself." },
+          { lead: "", text: "Reading, comparing, ordering, booking: every step sits in the log with a timestamp, alongside analyses of stock, orders and suppliers without the detour through Excel. When somebody asks in three months why that quantity went to that supplier, it is a query rather than a reconstruction." },
         ],
         say: "Traceable means checkable, not merely retrievable.",
       },
