@@ -138,42 +138,55 @@ const cyl = (cx: number, cy: number, z: number, r: number, h: number, cls = "fac
 const DW = 226, DD = 116, TOPT = 5, LEGH = 64, LEG = 5;
 const Z = LEGH + TOPT;
 [[10, 10], [DW - 10 - LEG, 10], [10, DD - 10 - LEG], [DW - 10 - LEG, DD - 10 - LEG]]
-  .forEach(([x, y]) => bx(x, y, 0, LEG, LEG, LEGH, "face", 0));
-// side rails, so the legs belong to one frame rather than standing loose
-bx(10, 12, LEGH - 9, DW - 20, 3, 4, "face", 0);
-bx(10, DD - 15, LEGH - 9, DW - 20, 3, 4, "face", 0);
-bx(DW - 74, 16, 0, 58, DD - 32, LEGH - 2, "face", 0);         // pedestal
+  // Legs on their own layer above the rails and the pedestal: they stand in front of both, and a
+  // depth key taken at a long face's middle keeps losing that argument.
+  .forEach(([x, y]) => bx(x, y, 0, LEG, LEG, LEGH, "face", 0.6));
+// Side rails, so the legs belong to one frame rather than standing loose.
+// ⚠️ SPLIT INTO SEGMENTS. As one box each, a rail is a single long face whose painter key sits at
+// its own middle, so it was drawn AFTER the legs standing in front of it and painted a line
+// straight through them. That is what "the legs are see-through" was: not transparency, a large
+// face winning a depth comparison it should have lost. Segments key locally and behave.
+for (let i = 0; i < 8; i++) {
+  const w = (DW - 20) / 8, x = 10 + i * w;
+  bx(x, 12, LEGH - 9, w, 3, 4, "face", 0);
+  bx(x, DD - 15, LEGH - 9, w, 3, 4, "face", 0);
+}
+// ⚠️ NOT split. Segmenting it, which is the right fix for the rails, left three visible seams
+// down its front: a rail is hidden behind legs, a pedestal face is the thing you look at.
+// It gets a layer under the legs instead, which is the truth anyway.
+bx(DW - 74, 16, 0, 58, DD - 32, LEGH - 2, "face", 0.2);        // pedestal
 [0.12, 0.42, 0.72].forEach((k) => {                            // three drawer fronts + handles
   const z = 6 + k * (LEGH - 14);
-  panelY(DW - 71, DW - 19, z, z + 14, DD - 16, "wk-drawer", 0.4, 0);
-  panelY(DW - 52, DW - 38, z + 10, z + 11.6, DD - 16.2, "wk-pull", 0.8, 0);
+  // Same layer as the pedestal they sit on, or the pedestal is drawn after them and they vanish.
+  panelY(DW - 71, DW - 19, z, z + 14, DD - 16, "wk-drawer", 0.4, 0.2);
+  panelY(DW - 52, DW - 38, z + 10, z + 11.6, DD - 16.2, "wk-pull", 0.8, 0.2);
 });
 bx(0, 0, LEGH, DW, DD, TOPT, "face wk-topslab", 1);
 
 // ---- two monitors, behind the laptop ------------------------------------------------------------
-const MW = 68, MPT = 3.5, MH = 44, MRISE = 13;
-function monitor(mx: number, my: number, accentRow: number) {
-  // A flat plate and a matchstick did not read as a stand. An oval foot, a solid neck and a panel
-  // with real thickness do, and a monitor is mostly stand at this size.
-  cyl(mx + MW / 2, my + 8, Z, 13, 2.2);                        // oval foot
-  bx(mx + MW / 2 - 5, my + 5.5, Z + 2.2, 10, 5, MRISE);        // neck
-  bx(mx + MW / 2 - 12, my + 4, Z + MRISE - 4, 24, 7, 6);       // yoke into the panel
-  bx(mx, my, Z + MRISE, MW, MPT, MH);                          // panel
+const MPT = 3.5, MRISE = 15;
+/** One monitor: a flat base plate, a thick column, a panel with real thickness. Taken from the
+ *  reference desk rather than invented: a portrait screen beside a landscape one is what the
+ *  setup actually looks like, and the two shapes together stop the pair reading as wallpaper. */
+function monitor(mx: number, my: number, w: number, h: number, rows: number, accentRow: number) {
+  const bwid = Math.min(w - 8, 34);
+  bx(mx + w / 2 - bwid / 2, my + 2, Z, bwid, 17, 2.2, "face");   // base plate
+  bx(mx + w / 2 - 5, my + 6.5, Z + 2.2, 10, 7, MRISE);           // column
+  bx(mx, my, Z + MRISE, w, MPT, h);                              // panel
   const y = my + MPT, z0 = Z + MRISE;
-  panelY(mx + 3, mx + MW - 3, z0 + 3, z0 + MH - 3, y, "wk-screen", 0.5);
-  // four rows, not five: at this size five reads as a barcode rather than as a screen
-  [0.22, 0.44, 0.64, 0.82].forEach((k, i) => {
-    const w = [0.72, 0.44, 0.6, 0.3][i];
-    const zz = z0 + MH - 8 - k * (MH - 16);
-    panelY(mx + 8, mx + 8 + (MW - 16) * w, zz, zz + 2.6, y,
+  panelY(mx + 3, mx + w - 3, z0 + 3, z0 + h - 3, y, "wk-screen", 0.5);
+  const widths = [0.74, 0.42, 0.62, 0.3, 0.55, 0.36, 0.66];
+  for (let i = 0; i < rows; i++) {
+    const zz = z0 + h - 9 - (i / rows) * (h - 18);
+    panelY(mx + 8, mx + 8 + (w - 16) * widths[i % widths.length], zz, zz + 2.6, y,
       i === accentRow ? "wk-row hot" : "wk-row", 0.9);
-  });
+  }
 }
-monitor(38, 9, 0);
-monitor(38 + MW + 9, 9, 2);
+monitor(34, 10, 44, 68, 7, 1);        // portrait
+monitor(88, 10, 78, 46, 4, 2);        // landscape
 
 // ---- laptop -------------------------------------------------------------------------------------
-const LX = 74, LY = 48, LW = 62, LD = 42, LBASE = 4;
+const LX = 86, LY = 50, LW = 62, LD = 42, LBASE = 4;
 const LIDL = 40, LIDOPEN = 1.92;
 const ZB = Z + LBASE;
 bx(LX, LY, Z, LW, LD, LBASE);
@@ -252,30 +265,47 @@ const [dL, dR] = silhouette(discPts);
 const throwPoly = [mL, mR, dR, dL];
 // A hotspot where the beam actually lands. Without it the throw is one flat wash and reads as a
 // shadow rather than as light: light has a brightest point, a shadow does not.
-const hotspot: V3[] = Array.from({ length: 26 }, (_, i) => {
-  const a = (i / 26) * 2 * Math.PI;
-  return [PX + 27 * Math.cos(a), PY + 27 * Math.sin(a), Z + 0.5];
+/* ⚠️ The pool is light lying ON THE DESK, so it goes under everything standing there. Inside the
+   pendant's group it was drawn last and washed straight over the laptop, which is what made the
+   whole middle of the picture look fogged. It sits on its own layer between the top and the
+   things on it, and it does not swing: a pool's edge is soft enough that nobody misses it. */
+push({
+  p: Array.from({ length: 26 }, (_, i): V3 => {
+    const a = (i / 26) * 2 * Math.PI;
+    return [PX + 27 * Math.cos(a), PY + 27 * Math.sin(a), Z + 0.5];
+  }),
+  cls: "wk-pool", lay: 1.5,
 });
 
 // ---- mug: a cylinder, not a cube ----------------------------------------------------------------
-const MUC: V3 = [198, 30, Z], MUR = 8.5, MUH = 12;
-cyl(MUC[0], MUC[1], MUC[2], MUR, MUH);
-// The handle attaches ON the body at two points and bows out between them, rather than floating
-// beside it as a detached arc.
-const handle = Array.from({ length: 9 }, (_, i) => {
-  const k = -0.16 + (i / 8) * 0.32;                   // a third of a turn, centred on the near side
-  const a = k * 2 * Math.PI;
-  const bulge = MUR + 6.4 * Math.cos((i / 8 - 0.5) * Math.PI);
-  return [MUC[0] + bulge * Math.cos(a), MUC[1] + bulge * Math.sin(a), MUC[2] + MUH * 0.52] as V3;
-});
+/* A pot of pens rather than a mug. A mug at this size is a cylinder with a hook on it and reads
+   as neither; pens give the object a silhouette that cannot be mistaken. */
+const POT: V3 = [192, 26, Z], POTR = 9, POTH = 13;
+cyl(POT[0], POT[1], POT[2], POTR, POTH);
+/** A pen: a thin prism on a tilted axis, seated inside the pot. */
+function pen(dx: number, dy: number, lift: number, cls: string) {
+  const d: V3 = [dx, dy, lift];
+  const e1 = norm(cross(d, [0, 0, 1] as V3));
+  const e2 = norm(cross(d, e1));
+  const t = 1.9;
+  const base: V3 = [POT[0] + dx * -0.25, POT[1] + dy * -0.25, POT[2] + POTH - 5];
+  prism(add(add(base, mul(e1, -t / 2)), mul(e2, -t / 2)), d, mul(e1, t), mul(e2, t), cls, 2);
+}
+pen(3.5, -1.5, 22, "face");
+pen(-2.5, 3, 20, "wk-pen-hot");
+pen(1, 4, 24, "face");
+pen(-4, -2, 18, "face");
+
 
 // ---- bins, clipboard ------------------------------------------------------------------------------
 // ⚠️ These used to start at x = 12, which put the left one HALF OFF the desk: the top's left
 // corner is at (0, DD) and a tray at y = 80 is already well down that edge. They sit inboard now.
+// ⚠️ The trays and the laptop shared x 74..90 and y 74..90, so the laptop's near corner grew out
+// of the right-hand tray. They are clear of each other now; check both boxes after moving either.
 [0, 1].forEach((i) => {
-  tray(26 + i * 34, 74, Z, 30, 30, 11, i === 1 ? "wk-fill hot" : "wk-fill");
+  tray(16 + i * 32, 74, Z, 28, 28, 11, i === 1 ? "wk-fill hot" : "wk-fill");
 });
-const CX = 146, CY = 74, CW = 44, CD = 32;
+const CX = 152, CY = 76, CW = 42, CD = 30;
 pad(CX, CY, Z + 0.5, CW, CD, "wk-board");
 bx(CX + CW / 2 - 7, CY + 2, Z + 0.5, 14, 6, 2.5);
 const rules = [0.42, 0.58, 0.74].map((k) =>
@@ -301,7 +331,7 @@ const PIV = P2([PX, PY, PZTOP]);
 const line = (p: V3[]) => p.map((v) => P2(v).map((n) => n.toFixed(1)).join(",")).join(" ");
 
 // viewBox from real projected extents, so the object never sits in a corner of its own frame.
-const every: V3[] = [...S.flatMap((f) => f.p), ...throwPoly, ...hotspot, [LX, LY + LIDL * Math.cos(LIDOPEN), ZB + LIDL * Math.sin(LIDOPEN)], [LX + LW, LY, ZB + LIDL]];
+const every: V3[] = [...S.flatMap((f) => f.p), ...throwPoly, [LX, LY + LIDL * Math.cos(LIDOPEN), ZB + LIDL * Math.sin(LIDOPEN)], [LX + LW, LY, ZB + LIDL]];
 const pj = every.map(P2);
 const xs = pj.map((p) => p[0]), ys = pj.map((p) => p[1]);
 const M = 12;
@@ -326,15 +356,15 @@ const lidCfg = JSON.stringify({ RX, RY, LX, LY, LW, ZB, LIDL, LIDOPEN });
       />
     ))}
 
-    <polyline class="wk-handle" points={line(handle)} />
     {rules.map((r) => (<polyline class="wk-rule" points={line(r)} />))}
 
     {/* The pendant and its light swing as ONE unit, so they live in one rotated group. Light
         falls on everything, which is why it is painted last. */}
     <g class="wk-pend" data-piv={`${PIV[0].toFixed(1)},${PIV[1].toFixed(1)}`}>
-      {infront.map((d) => (<polygon class={d.cls} points={d.pts} />))}
+      {/* ⚠️ The beam is drawn BEFORE the shade. After it, the light was painted over the lamp
+          that emits it, so the shade looked lit from in front and half transparent. */}
       <polygon class="wk-throw" points={line(throwPoly)} />
-      <polygon class="wk-throw wk-hot" points={line(hotspot)} />
+      {infront.map((d) => (<polygon class={d.cls} points={d.pts} />))}
     </g>
   </svg>
 </figure>
@@ -369,8 +399,12 @@ const lidCfg = JSON.stringify({ RX, RY, LX, LY, LW, ZB, LIDL, LIDOPEN });
   .wk .wk-handle { fill: none; stroke: var(--edge); stroke-width: 2.4; stroke-linejoin: round;
     stroke-linecap: round; vector-effect: non-scaling-stroke; }
 
-  .wk .wk-throw { fill: rgba(240, 196, 130, 0.14); stroke: none; opacity: 0; }
-  .wk .wk-hot { fill: rgba(245, 206, 148, 0.16); }
+  /* The beam itself is faint: at 0.14 it washed the monitors it passes and the whole desk read
+     as fogged. The POOL is where light on a desk is actually visible, so that carries it. */
+  .wk .wk-throw { fill: rgba(240, 196, 130, 0.055); stroke: none; opacity: 0; }
+  .wk .wk-pool { fill: rgba(245, 206, 148, 0.13); stroke: none; }
+  .wk .wk-pen-hot { fill: var(--coral); stroke: var(--edge); }
+  .wk .wk-pen-hot.lit { fill: #f0a07a; }
 
   /* ---- motion. Gated on html[data-js], every rule in the group carrying the prefix, or a
      no-JS render shows an empty box (the [data-shot] trap, paid for once already). */
@@ -380,7 +414,9 @@ const lidCfg = JSON.stringify({ RX, RY, LX, LY, LW, ZB, LIDL, LIDOPEN });
     transition: opacity 420ms var(--ease-out), transform 420ms var(--ease-out);
   }
   /* A lamp does not fade up, it strikes: two stutters, then steady. */
-  :global(html[data-js]) .wk.in .wk-throw { animation: wkStrike 1100ms steps(1, end) 460ms forwards; }
+  :global(html[data-js]) .wk .wk-pool { opacity: 0; }
+  :global(html[data-js]) .wk.in .wk-throw,
+  :global(html[data-js]) .wk.in .wk-pool { animation: wkStrike 1100ms steps(1, end) 460ms forwards; }
   :global(html[data-js]) .wk.in .wk-mouth { animation: wkMouth 1100ms steps(1, end) 460ms forwards; }
   @keyframes wkStrike {
     0%, 18% { opacity: 0; } 22% { opacity: 1; } 30% { opacity: 0; }
@@ -400,8 +436,10 @@ const lidCfg = JSON.stringify({ RX, RY, LX, LY, LW, ZB, LIDL, LIDOPEN });
   @media (prefers-reduced-motion: reduce) {
     :global(html[data-js]) .wk { opacity: 1; transform: none; }
     :global(html[data-js]) .wk.in { transition: none; }
-    :global(html[data-js]) .wk .wk-throw { opacity: 1; }
+    :global(html[data-js]) .wk .wk-throw,
+    :global(html[data-js]) .wk .wk-pool { opacity: 1; }
     :global(html[data-js]) .wk.in .wk-throw,
+    :global(html[data-js]) .wk.in .wk-pool,
     :global(html[data-js]) .wk.in .wk-mouth { animation: none; }
     :global(html[data-js]) .wk .wk-row,
     :global(html[data-js]) .wk .wk-lidrow,
