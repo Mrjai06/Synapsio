@@ -766,6 +766,12 @@
      here, and until it does they run as a wide measure with their own rhythm, so the scroll still
      never repeats a spacing. */
   .lay-act       { padding-block: clamp(60px, 8vh, 112px); }
+  /* The drawn objects. Not framed like a screenshot: a screenshot is evidence and sits inside a
+     window, a diagram is an argument and stands in the page. */
+  .pr-fig { margin: clamp(26px,4vh,44px) 0 0; max-width: 520px; }
+  .pr-fig-wide { max-width: 620px; }
+  .pr-fig figcaption { margin-top: 14px; font-size: 14px; line-height: 1.55; color: var(--fg-soft);
+    max-width: 56ch; }
   .lay-score     { padding-block: clamp(68px, 9.5vh, 124px); }
   .lay-act .th-hd, .lay-score .th-hd { max-width: 74ch; }
 

@@ -1,0 +1,128 @@
+---
+// /produkt, chapter "Das Lernen": a card index of decisions, graded after the fact.
+//
+// WHY THIS OBJECT. The chapter's claim is not that decisions are logged, it is that the SAME
+// decision is scored later against what happened. A drawer of filed cards draws the first half;
+// the second half is that the older cards carry a mark the newer ones do not have yet. That gap,
+// running from the back of the tray to the front, is the whole point in one picture.
+//
+// Built on the shared engine rather than on ArchivDrawer, which is wired to the blog's scroll
+// model and would have had to be unpicked to live here.
+//
+// MOTION CONTRACT: the object may animate, prose never does. The marks appear one after another,
+// once, on reveal, back to front, which is the order the grading actually happens in. Reduced
+// motion shows them already there.
+import { Scene } from "../lib/iso";
+
+const S = new Scene();
+
+// ⚠️ Proportion decides whether this is an index or a heat sink. 22 cards at a 4.4 pitch was a
+// comb, and cards standing 15 units above their own tray hid the tray completely. Fewer, further
+// apart, and only just proud of the walls.
+const N = 15;                       // cards
+const CT = 2.6, GAP = 6.2;          // card thickness and pitch along x
+const TX = 7, TY = 8, TD = 62;      // tray origin and depth
+const TW = TX * 2 + N * GAP;
+const WALL = 20, CARDH = 26;
+
+// ---- the tray. Open, and its walls stay below the card tops or it stops reading as an index ----
+S.prism([0, 0, 0], [TW, 0, 0], [0, TD + TY * 2, 0], [0, 0, WALL], "face", 1, true);
+S.pad(0, 0, 3, TW, TD + TY * 2, "de-floor", 0.3);
+const rim = 2.2;
+S.pad(0, 0, WALL, TW, rim, "face lit", 0.6);
+S.pad(0, TD + TY * 2 - rim, WALL, TW, rim, "face lit", 0.6);
+S.pad(0, rim, WALL, rim, TD + TY * 2 - 2 * rim, "face lit", 0.6);
+S.pad(TW - rim, rim, WALL, rim, TD + TY * 2 - 2 * rim, "face lit", 0.6);
+
+// ---- the cards ---------------------------------------------------------------------------------
+// Graded oldest first: the back of the tray carries marks, the front does not yet. `GRADED` is
+// where that boundary sits, and the two coral ones are decisions that were scored as wrong,
+// because a record that only ever says "good" is not a record.
+const GRADED = 10;
+const BAD = new Set([2, 7]);
+// ⚠️ Two DIVIDER cards, taller and with a tab. Without them a row of equal cards reads as a heat
+// sink whatever the pitch: a divider is the thing that says "index" and nothing else does. Same
+// finding as the archive drawer, which never got its divider and stayed ambiguous.
+const DIV = new Set([5, 11]);
+const cards = Array.from({ length: N }, (_, i) => {
+  const x = TX + i * GAP;
+  const div = DIV.has(i);
+  S.bx(x, TY, 3, CT, TD, div ? CARDH + 7 : CARDH, div ? "de-div" : "de-card", 2);
+  if (div) S.bx(x - 0.6, TY + 8, 3 + CARDH + 7, CT + 1.2, 26, 2, "de-div tab", 2);
+  return { i, x };
+});
+
+// ---- the marks, added later ---------------------------------------------------------------------
+// A tab on the card's top edge. Given its own layer so it always sits on the card it belongs to.
+const marks = cards.slice(0, GRADED).map(({ i, x }) => {
+  const M = new Scene();
+  M.bx(x - 0.4, TY + TD - 20, 3 + CARDH, CT + 0.8, 14, 1.8, BAD.has(i) ? "de-mark bad" : "de-mark", 1);
+  return { i, pts: M.draw() };
+});
+// they belong to the frame, so the viewBox has to know about them
+marks.forEach((m) => S.bx(0, 0, 0, 0, 0, 0, "face", 0));
+
+const faces = S.draw();
+const vb = S.viewBox(11, [
+  [0, 0, 3 + CARDH + 11], [TW, TD + TY * 2, 3 + CARDH + 11],
+]);
+---
+
+<figure class="iso de" data-iso-marks aria-hidden="true">
+  <svg viewBox={vb} role="presentation">
+    {faces.map((f) => (<polygon class={f.cls} points={f.pts} />))}
+    {marks.map((m, k) => (
+      <g class="de-mark-g" style={`--k:${k}`}>
+        {m.pts.map((f) => (<polygon class={f.cls} points={f.pts} />))}
+      </g>
+    ))}
+  </svg>
+</figure>
+
+<style>
+  .iso { margin: 0; display: block; }
+  .iso svg { width: 100%; height: auto; display: block; overflow: visible; }
+
+  .de .de-floor { fill: #08161c; stroke: none; }
+  .de .de-card { fill: #1b3b48; stroke: var(--edge); stroke-width: 1;
+    vector-effect: non-scaling-stroke; }
+  .de .de-card.lit { fill: #2a5566; }
+  .de .de-div { fill: #143039; stroke: var(--edge); stroke-width: 1;
+    vector-effect: non-scaling-stroke; }
+  .de .de-div.lit { fill: #1e4a58; }
+  .de .de-mark { fill: #3f8f8f; stroke: none; }
+  .de .de-mark.lit { fill: #62c2bd; }
+  .de .de-mark.bad { fill: #a85a3c; }
+  .de .de-mark.bad.lit { fill: var(--coral); }
+
+  /* The marks arrive one after another, back to front, which is the order the grading happens in.
+     Gated on html[data-js] with every rule in the group carrying the prefix, or a no-JS render
+     shows a tray of cards with nothing to say. */
+  :global(html[data-js]) .de .de-mark-g { opacity: 0; }
+  :global(html[data-js]) .de.in .de-mark-g {
+    opacity: 1;
+    transition: opacity 260ms var(--ease-out);
+    transition-delay: calc(280ms + var(--k) * 55ms);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(html[data-js]) .de .de-mark-g { opacity: 1; }
+    :global(html[data-js]) .de.in .de-mark-g { transition: none; }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var els = document.querySelectorAll("[data-iso-marks]");
+    if (!els.length) return;
+    var fire = function (el) { el.classList.add("in"); };
+    if (!("IntersectionObserver" in window)) { els.forEach(fire); return; }
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        fire(en.target);
+        io.unobserve(en.target);          // never re-runs on scroll back
+      });
+    }, { rootMargin: "0px 0px -15% 0px" });
+    els.forEach(function (e) { io.observe(e); });
+  })();
+</script>

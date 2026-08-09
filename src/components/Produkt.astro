@@ -14,6 +14,8 @@ import { homeCopy } from "../i18n/home";
 import Shot from "./Shot.astro";
 import SiteNav from "./SiteNav.astro";
 import SiteFooter from "./SiteFooter.astro";
+import IsoSort from "./IsoSort.astro";
+import IsoDecisions from "./IsoDecisions.astro";
 
 interface Props { locale?: Locale }
 const { locale = "de" } = Astro.props;
@@ -70,6 +72,12 @@ const p = (path: string) => localePath(locale, path);
         gate: { f:"/shots/c-limits.webp", n:"Limits", a:"Approval threshold, monthly budget and currency in settings",
                 c:"The limits themselves. What is set here applies from the next order." } };
 
+
+const FIG = locale === "de"
+  ? { act: "Drei offene Bedarfe kommen einzeln herein und verlassen die Maschine als eine Bestellung an einen Lieferanten.",
+      score: "Jede Karte ist eine Entscheidung. Die hinteren tragen eine Bewertung, die erst später dazukam; die vorderen warten noch auf ihre." }
+  : { act: "Three open requirements arrive separately and leave as one order to one supplier.",
+      score: "Each card is a decision. The ones at the back carry a score that was added later; the ones at the front are still waiting for theirs." };
 
 const L = locale === "de"
   ? { fields: ["Artikel", "Menge", "Termin", "Preis"], mail: "Lieferantenmail", parse: "gelesen",
@@ -131,6 +139,21 @@ const L = locale === "de"
         {lay === "wide" && <Shot src={sh.f} alt={sh.a} note={sh.n} caption={sh.c} />}
         {lay === "strip" && <Shot src={CROP.read.f} alt={CROP.read.a} note={CROP.read.n} caption={CROP.read.c} />}
         {lay === "crop" && <Shot src={CROP.gate.f} alt={CROP.gate.a} caption={CROP.gate.c} maxw="704px" />}
+
+        {/* The two chapters about what the AI does on its own carry a drawn object rather than a
+            screenshot: a screen can show a finished order, but not "these three became one". */}
+        {lay === "act" && (
+          <figure class="pr-fig">
+            <IsoSort />
+            <figcaption>{FIG.act}</figcaption>
+          </figure>
+        )}
+        {lay === "score" && (
+          <figure class="pr-fig pr-fig-wide">
+            <IsoDecisions />
+            <figcaption>{FIG.score}</figcaption>
+          </figure>
+        )}
 
         {lay === "curve" && (
           /* The one drawing on the page. A reorder point is a line stock falls through, and the
