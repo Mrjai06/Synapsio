@@ -763,6 +763,28 @@
   .lay-crop      { padding-block: clamp(52px, 7vh, 88px); }
   .lay-plain     { padding-block: clamp(76px, 11vh, 140px); }
 
+  /* CHAPTER GROUNDS.
+     Varying padding and measure was not enough: every chapter still stood on the same surface,
+     separated only by a hairline, which is exactly the shape of a long text document. Two of the
+     six now sit on their own full-bleed ground, so the page reads as a sequence of chapters
+     rather than one continuous page of prose.
+     The band is a pseudo-element rather than a wrapper because these sections live inside the
+     page's .shell and must keep its gutter for their text while the BACKGROUND escapes it.
+     100vw is safe here only because main{overflow-x:clip} is already in place. */
+  .th-full { position: relative; }
+  .lay-statement::before,
+  .lay-crop::before {
+    content: ""; position: absolute; inset: 0; left: 50%; transform: translateX(-50%);
+    width: 100vw; z-index: -1;
+    background: var(--panel, rgba(255,255,255,0.018));
+    border-block: 1px solid var(--hairline);
+  }
+  /* A chapter that brings its own ground does not also need a rule above it. */
+  .lay-statement, .lay-crop { border-top: none; }
+  .lay-statement + .th-full, .lay-crop + .th-full { border-top: none; }
+  .lay-statement { padding-block: clamp(84px, 11vh, 140px); }
+  .lay-crop      { padding-block: clamp(64px, 8vh, 104px); }
+
   /* the "ai" section: no screenshot. Its one sentence leads, the prose follows under it. */
   .lay-statement .th-hd { max-width: 92ch; }
   /* The one section with no screenshot used to be a single 62ch column, which made it the
