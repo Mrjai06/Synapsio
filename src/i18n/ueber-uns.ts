@@ -85,12 +85,12 @@ export const ueberUnsCopy = {
     },
     partners: {
       h2: "Partner",
-      lede: "Wer neben dem Team an Synapsio beteiligt ist.",
+      lede: "Wer Synapsio neben dem Team begleitet.",
       items: [
         {
           name: "28DIGITAL",
-          note: "Venture-Studio in Berlin. Beteiligt am Unternehmen, bringt Netzwerk und operative Begleitung ein.",
-          published: false,
+          note: "Venture-Studio in Berlin. Synapsio ist im Accelerator-Programm, mit Netzwerk und operativer Begleitung.",
+          published: true,
         },
       ] as Partner[],
     },
@@ -178,12 +178,12 @@ export const ueberUnsCopy = {
     },
     partners: {
       h2: "Partners",
-      lede: "Who else has a stake in Synapsio besides the team.",
+      lede: "Who supports Synapsio alongside the team.",
       items: [
         {
           name: "28DIGITAL",
-          note: "Venture studio in Berlin. Holds a stake in the company and contributes network and hands-on support.",
-          published: false,
+          note: "Venture studio in Berlin. Synapsio is in the accelerator programme, with network and hands-on support.",
+          published: true,
         },
       ] as Partner[],
     },
