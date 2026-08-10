@@ -3,7 +3,7 @@
 // only the markup was duplicated. /produkt used to render a three-column variant with the
 // company column missing, so the two pages disagreed about what the site contains.
 import { homeCopy } from "../i18n/home";
-import { localePath, APP_URL, CONTACT_EMAIL, type Locale } from "../i18n/ui";
+import { localePath, APP_URL, CONTACT_EMAIL, LINKEDIN_URL, type Locale } from "../i18n/ui";
 
 interface Props { locale: Locale }
 const { locale } = Astro.props;
@@ -28,6 +28,7 @@ const p = (to: string) => localePath(locale, to);
       <a href={p("/ueber-uns")}>{c.foot.about}</a>
       <a href={p("/investoren")}>{c.nav.investors}</a>
       <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+      <a href={LINKEDIN_URL} rel="me noopener" target="_blank">LinkedIn</a>
     </div>
     <div class="foot-col">
       <span class="mono">{c.foot.colLegal}</span>

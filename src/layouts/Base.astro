@@ -13,8 +13,10 @@ interface Props {
   hasAlternate?: boolean;
   /** prototype surfaces: tracked and built, but must never be indexed */
   noindex?: boolean;
+  /** a blog post: switches og:type and emits BlogPosting instead of the site-wide Organization */
+  article?: { published: string; modified?: string; section?: string };
 }
-const { locale, title, description, path, hasAlternate = true, noindex = false } = Astro.props;
+const { locale, title, description, path, hasAlternate = true, noindex = false, article } = Astro.props;
 
 const site = "https://synapsio.solutions";
 const canonical = site + localePath(locale, path);
@@ -36,7 +38,7 @@ const altEn = site + localePath("en", path);
     {hasAlternate && <link rel="alternate" hreflang="x-default" href={altDe} />}
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="sitemap" href="/sitemap-index.xml" />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={article ? "article" : "website"} />
     <meta property="og:site_name" content="Synapsio" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -50,6 +52,29 @@ const altEn = site + localePath("en", path);
         can act on it (scroll reveals, the mobile menu button) never flash. It used to live at the
         end of /produkt only, which is both too late and too narrow. */}
     <script is:inline>document.documentElement.setAttribute("data-js", "1");</script>
+    {/* ⚠️ STRUKTURIERTE DATEN. Ohne sie sieht eine Suchmaschine nur Fliesstext: sie weiss nicht,
+        dass hinter der Seite ein Unternehmen mit Anschrift und Registereintrag steht, und bei
+        einem Blogbeitrag nicht, wann er erschien und worum es geht. Beides ist bei einer neuen
+        Domain ohne Backlinks der guenstigste Hebel, den es gibt. Die Angaben stammen aus dem
+        Handelsregister und muessen mit dem Impressum uebereinstimmen. */}
+    <script type="application/ld+json" set:html={JSON.stringify(article ? {
+      "@context": "https://schema.org", "@type": "BlogPosting",
+      headline: title, description, inLanguage: locale === "de" ? "de-DE" : "en",
+      datePublished: article.published, dateModified: article.modified ?? article.published,
+      articleSection: article.section, image: site + "/og-image.png",
+      mainEntityOfPage: { "@type": "WebPage", "@id": canonical },
+      publisher: { "@type": "Organization", name: "Synapsio", url: site,
+                   logo: { "@type": "ImageObject", url: site + "/synapsio-logo.png" } },
+    } : {
+      "@context": "https://schema.org", "@type": "Organization",
+      name: "Synapsio UG (haftungsbeschränkt)", alternateName: "Synapsio",
+      url: site, logo: site + "/synapsio-logo.png", image: site + "/og-image.png",
+      description,
+      email: "contact@synapsio.co.site",
+      sameAs: ["https://www.linkedin.com/company/synapsioai"],
+      address: { "@type": "PostalAddress", streetAddress: "Berliner Allee 87 a",
+                 postalCode: "14621", addressLocality: "Schönwalde-Glien", addressCountry: "DE" },
+    })} />
   </head>
   <body>
     <slot />

@@ -10,6 +10,7 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 ---
 
-<Base locale="de" path={`/blog/${post.data.slug}`} title={`${post.data.title} · Synapsio`} description={post.data.description}>
+<Base locale="de" path={`/blog/${post.data.slug}`} title={`${post.data.title} · Synapsio`} description={post.data.description}
+  article={{ published: post.data.date instanceof Date ? post.data.date.toISOString() : String(post.data.date), section: post.data.category }}>
   <BlogPost locale="de" post={post} />
 </Base>

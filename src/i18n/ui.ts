@@ -4,6 +4,7 @@ export type Locale = (typeof locales)[number];
 export const CAL_URL = "https://cal.eu/synapsio/30min";
 export const APP_URL = "https://app.synapsio.solutions";
 export const CONTACT_EMAIL = "contact@synapsio.co.site";
+export const LINKEDIN_URL = "https://www.linkedin.com/company/synapsioai";
 
 export const ui = {
   de: {
