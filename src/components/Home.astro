@@ -22,7 +22,11 @@ const p = (path: string) => localePath(locale, path);
     <h1><span class="ln"><span>{c.hero.h1a}</span></span><span class="ln"><span><em>{c.hero.h1em}</em>{c.hero.h1b}</span></span></h1>
     <div class="hero-row">
       <p class="sub">{c.hero.sub}</p>
-      <a class="hero-link" href={p("/produkt")}><span class="tag">{c.hero.linkTag}</span> {c.hero.link}</a>
+      {/* ⚠️ Dieser Link geht in die ANWENDUNG, nicht auf /produkt. Es gibt eine öffentliche Demo,
+          also loest der Chip "Live" ein, was er verspricht: hier laeuft etwas, das man sich sofort
+          ansehen kann. Fuehrt er stattdessen auf eine Textseite, ist das Etikett eine leere
+          Behauptung. Nicht wieder auf eine interne Seite umbiegen, ohne den Chip mitzunehmen. */}
+      <a class="hero-link" href={APP_URL}><span class="tag">{c.hero.linkTag}</span> {c.hero.link}</a>
     </div>
 
     <div class="stage-wrap">
