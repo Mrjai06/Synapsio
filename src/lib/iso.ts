@@ -8,7 +8,12 @@
  *
  * Rules that are not obvious and have each cost a round:
  *  · A LONG FACE keys its depth at its own MIDDLE, so it beats small things standing in front of
- *    it, and the result looks like transparency. Split it into segments, or give it a `lay`.
+ *    it, and the result looks like transparency. Give it a `lay`. Do NOT split it into segments:
+ *    every segment carries its own stroke, so the slab renders as a ladder of rungs. Tried on the
+ *    /produkt sorter's chutes and reverted — `lay` is the only clean fix.
+ *  · `lay` beats depth ABSOLUTELY. That is what makes it the right tool for whole GROUPS that do
+ *    not interpenetrate (feed deck behind · machine · output · the finished order in front), and
+ *    the wrong tool inside one group, where it silently disables the depth sort you still need.
  *  · A panel standing in a constant-y plane must wind (x0,z0) → (x0,z1) → (x1,z1) → (x1,z0) to
  *    face the viewer. The intuitive order points away and the culler deletes it silently.
  *  · On a surface of revolution the outward normal is cross(tangent, axial), not the reverse, and
@@ -88,6 +93,15 @@ export class Scene {
     this.push({ p: [[x0, y, z0], [x0, y, z1], [x1, y, z1], [x1, y, z0]], cls, bias, lay });
   }
 
+  /**
+   * A panel in a constant-x plane, facing +x — the companion to panelY, for the broad face of
+   * anything standing edge-on in a row (a filed card, a book, a panel in a rack). Winds
+   * (y0,z0) → (y1,z0) → (y1,z1) → (y0,z1); the intuitive order points away and is culled.
+   */
+  panelX(y0: number, y1: number, z0: number, z1: number, x: number, cls: string, bias = 0.4, lay = 1) {
+    this.push({ p: [[x, y0, z0], [x, y1, z0], [x, y1, z1], [x, y0, z1]], cls, bias, lay });
+  }
+
   /** An OPEN tray: walls, an inner floor and a rim. A prism has a lid; a bin must not. */
   tray(x: number, y: number, z: number, w: number, d: number, h: number, fill: string, lay = 1) {
     this.prism([x, y, z], [w, 0, 0], [0, d, 0], [0, 0, h], "face", lay, true);
@@ -97,6 +111,71 @@ export class Scene {
     this.pad(x, y + d - t, z + h, w, t, "face lit", 0.6, lay);
     this.pad(x, y + t, z + h, t, d - 2 * t, "face lit", 0.6, lay);
     this.pad(x + w - t, y + t, z + h, t, d - 2 * t, "face lit", 0.6, lay);
+  }
+
+  /**
+   * A flat band that WINDS through a list of xy waypoints at a constant height — a conveyor, a
+   * walkway, a routed path. The top is emitted as ONE polygon so the whole run carries a single
+   * outline: cutting a path into per-segment slabs gives every seam its own stroke and the result
+   * reads as a ladder of rungs (the same finding as the LONG FACE note in the header).
+   * Waypoints must not double back on themselves — one top polygon cannot self-occlude.
+   */
+  ribbon(pts: [number, number][], z: number, w: number, thick: number, cls = "face", lay = 1) {
+    const n = pts.length;
+    // normal at each waypoint, from the direction its neighbours give it, so corners mitre
+    const nm = pts.map((_, i) => {
+      const a = pts[Math.max(0, i - 1)], b = pts[Math.min(n - 1, i + 1)];
+      const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1;
+      return [-dy / L, dx / L] as [number, number];
+    });
+    const edge = (s: number) =>
+      pts.map((p, i) => [p[0] + nm[i][0] * s * w / 2, p[1] + nm[i][1] * s * w / 2, z] as V3);
+    const lft = edge(1), rgt = edge(-1);
+    this.push({ p: [...lft, ...rgt.slice().reverse()], cls: `${cls} lit`, bias: 0.4, lay, n: [0, 0, 1] });
+    // the two rims. Their outward normal is the waypoint normal, which must be passed in: these
+    // quads are nearly edge-on and a derived normal flips with the slightest numeric noise.
+    for (let i = 0; i < n - 1; i++) {
+      const drop = (q: V3): V3 => [q[0], q[1], q[2] - thick];
+      this.push({ p: [lft[i], lft[i + 1], drop(lft[i + 1]), drop(lft[i])], cls, lay,
+        n: [nm[i][0], nm[i][1], 0] });
+      this.push({ p: [rgt[i + 1], rgt[i], drop(rgt[i]), drop(rgt[i + 1])], cls, lay,
+        n: [-nm[i][0], -nm[i][1], 0] });
+    }
+  }
+
+  /**
+   * Cross rollers laid along a ribbon path at a fixed spacing. This is what makes a conveyor read
+   * as a BELT rather than as a solid plane: the deck alone, however it is shaded, is just a surface.
+   * Each roller is one quad lying in the deck plane, turned to face across the direction of travel,
+   * so it follows the winding through corners.
+   */
+  rollers(pts: [number, number][], z: number, w: number, gap: number, cls: string, lay = 1) {
+    const seg: number[] = [];
+    let total = 0;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const d = Math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1]);
+      seg.push(d); total += d;
+    }
+    for (let s = gap * 0.6; s < total; s += gap) {
+      let t = s, i = 0;
+      while (i < seg.length - 1 && t > seg[i]) { t -= seg[i]; i++; }
+      const f = seg[i] ? t / seg[i] : 0;
+      const dx = pts[i + 1][0] - pts[i][0], dy = pts[i + 1][1] - pts[i][1];
+      const L = Math.hypot(dx, dy) || 1;
+      const cx = pts[i][0] + dx * f, cy = pts[i][1] + dy * f;
+      const ax = dx / L, ay = dy / L;          // along travel
+      const nx = -ay, ny = ax;                 // across it
+      const hw = w / 2, hl = 1.15;             // half width across, half thickness along
+      this.push({
+        p: [
+          [cx + nx * hw - ax * hl, cy + ny * hw - ay * hl, z],
+          [cx + nx * hw + ax * hl, cy + ny * hw + ay * hl, z],
+          [cx - nx * hw + ax * hl, cy - ny * hw + ay * hl, z],
+          [cx - nx * hw - ax * hl, cy - ny * hw - ay * hl, z],
+        ] as V3[],
+        cls, bias: 0.5, lay, n: [0, 0, 1],
+      });
+    }
   }
 
   /** Surface of revolution between two circles, drawn as ONE polygon so it carries one outline. */

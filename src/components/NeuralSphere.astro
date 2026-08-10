@@ -8,20 +8,42 @@
 // Non-interactive on purpose. On the login page it follows the pointer, but here it sits
 // behind the headline and the nav, and a background that reacts to the mouse pulls attention
 // off the copy. It keeps the slow auto-rotation and the firing cascades, nothing else.
+// ⚠️ TWO PLACEMENTS, ONE OBJECT. `corner` is the hero: offset so only a quadrant shows, masked,
+// absolutely positioned. `inline` stands in the flow, whole and unmasked, as the subject of its own
+// section. It is deliberately the SAME sphere and not a second device — the site's one-device rule
+// is about not inventing a new motif, not about using this one once.
 interface Props {
   size?: number;      // canvas edge in px; the sphere is drawn centred in it
   nodes?: number;
   opacity?: number;
+  variant?: "corner" | "inline";
+  /* ⚠️ THE DEPTH IS THIS RATIO, NOT THE SIZE. perspective / radius decides whether it reads as a
+     real sphere (front dots big and bright, back dots small and dim) or as a flat dot field. The
+     hero uses 2.04. The MVP's Ava orb uses 2.7 and that is what makes it look like an object —
+     copied verbatim from NeuralOrb.tsx together with the node count and the core glow. */
+  perspRatio?: number;
+  glow?: boolean;
+  /* ⚠️ THE MODEL RADIUS, IN THE SAME UNITS AS THE PROJECTION — not a CSS size. It was hard-coded
+     to 372, which happens to suit the 940px hero and is catastrophic anywhere else: on a 340px
+     canvas the sphere is drawn at more than twice the box and only its middle shows, while
+     DOT_SCALE (clamp(R/260, .5, 1)) pins every dot at full size. That is exactly why the section
+     orb looked like a loose net of fat dots instead of the MVP's dense field.
+     NeuralOrb.tsx uses radius = size * 0.42; pass that for anything orb-shaped. */
+  radius?: number;
 }
-const { size = 940, nodes = 320, opacity = 0.8 } = Astro.props;
+const {
+  size = 940, nodes = 320, opacity = 0.8, variant = "corner",
+  perspRatio = 2.04, glow = false, radius = 372,
+} = Astro.props;
 ---
 
-<div class="nsphere" aria-hidden="true" style={`--ns-size:${size}px; --ns-op:${opacity}`}>
-  <canvas data-nsphere data-nodes={nodes}></canvas>
+<div class={"nsphere ns-" + variant} aria-hidden="true" style={`--ns-size:${size}px; --ns-op:${opacity}`}>
+  {glow && <span class="ns-core"></span>}
+  <canvas data-nsphere data-nodes={nodes} data-persp={perspRatio} data-r={radius}></canvas>
 </div>
 
 <style is:global>
-  .nsphere {
+  .nsphere.ns-corner {
     position: absolute;
     /* Offsetting by exactly half would put the centre on the corner and show a clean quarter.
        Pulled in to 0.4 so a bit more than a quarter reads, without the sphere's centre coming
@@ -40,20 +62,31 @@ const { size = 940, nodes = 320, opacity = 0.8 } = Astro.props;
     mask-image: radial-gradient(circle at 50% 50%, transparent 3%, black 16%, black 50%, transparent 72%);
   }
   .nsphere canvas { display: block; width: 100%; height: 100%; }
+  /* the standing version: no offset, no mask, sized by its container */
+  .nsphere.ns-inline { position: relative; width: var(--ns-size); height: var(--ns-size);
+    max-width: 100%; opacity: var(--ns-op); pointer-events: none; }
+  @media (max-width: 760px) { .nsphere.ns-inline { --ns-size: 260px; } }
+  /* the teal core behind the sphere, verbatim from NeuralOrb.tsx */
+  .ns-core { position: absolute; inset: 8%; border-radius: 50%; pointer-events: none;
+    background: radial-gradient(circle at 50% 46%, rgba(79,179,168,0.20), transparent 64%);
+    filter: blur(8px); }
   /* The sphere is sized to stay a corner motif. Held at full size it covers ~40% of a 1000px
      hero and starts competing with the headline, so it steps down before it is hidden. */
-  @media (max-width: 1100px) { .nsphere { --ns-size: 580px; opacity: calc(var(--ns-op) * 0.6); } }
+  @media (max-width: 1100px) { .nsphere.ns-corner { --ns-size: 580px; opacity: calc(var(--ns-op) * 0.6); } }
   /* Below this the sphere stops reading as a corner motif: it is wider than the column it sits
      behind, so it covers the headline as loose noise instead of framing it. The hero is type
      only on a phone. It also drops the canvas rAF loop on the devices least able to afford it. */
-  @media (max-width: 820px) { .nsphere { display: none; } }
+  @media (max-width: 820px) { .nsphere.ns-corner { display: none; } }
   @media (prefers-reduced-motion: reduce) { .nsphere { opacity: calc(var(--ns-op) * 0.8); } }
 </style>
 
 <script is:inline>
-  (function () {
-    var cvs = document.querySelector("[data-nsphere]");
-    if (!cvs) return;
+  /* ⚠️ querySelectorAll, and guarded. This used to take the FIRST [data-nsphere] only, so a second
+     sphere on the page rendered as a dead canvas. The guard is because the component's inline
+     script is emitted once per instance, and running the whole loop twice would double every
+     rAF. */
+  if (!window.__nsphereDone) { window.__nsphereDone = 1;
+  function nsInit(cvs) {
     var ctx = cvs.getContext("2d");
     if (!ctx) return;
     var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -61,7 +94,8 @@ const { size = 940, nodes = 320, opacity = 0.8 } = Astro.props;
     var NODE_BASE = "rgba(180, 215, 225,";
     var NODE_ACCENT = "rgba(218, 138, 103,";
     var N = +(cvs.getAttribute("data-nodes") || 320);
-    var R = 372, PERSP = 760;
+    var R = +(cvs.getAttribute("data-r") || 372);
+    var PERSP = R * (+(cvs.getAttribute("data-persp") || 2.04));
     var CONNECT = R * 0.16 * Math.sqrt(600 / N);
     var DOT = Math.max(0.5, Math.min(1, R / 260));
     var FIRE = reduced ? 0 : 0.02;
@@ -189,5 +223,14 @@ const { size = 940, nodes = 320, opacity = 0.8 } = Astro.props;
         });
       }, { threshold: 0 }).observe(cvs);
     }
-  })();
+  }
+  /* ⚠️ WAIT FOR THE DOM. An inline script runs the moment it is parsed, and the hero's copy of it
+     sits far above the second sphere in the document — so querySelectorAll found one canvas and
+     the lower one stayed blank, glow and all. */
+  function nsBoot() {
+    Array.prototype.forEach.call(document.querySelectorAll("[data-nsphere]"), nsInit);
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", nsBoot);
+  else nsBoot();
+  }
 </script>

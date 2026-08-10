@@ -70,8 +70,8 @@ export const ueberUnsCopy = {
         },
         {
           name: "Luis Boy",
-          role: "Operations",
-          bio: "Koordiniert den E-Commerce-Betrieb bei Götze Gold. Bringt die Sicht von der Seite mit, auf der bestellt, gepackt und nachgefasst wird.",
+          role: "Operations und Geschäftsführer",
+          bio: "Koordiniert den E-Commerce-Betrieb bei Götze Gold und führt bei uns den Kontakt zu Interessenten und Pilotbetrieben. Bringt die Sicht von der Seite mit, auf der bestellt, gepackt und nachgefasst wird.",
           photo: "/team/luis.webp",
           linkedin: "https://www.linkedin.com/in/luis-boy-a6b787378/",
         },
@@ -163,8 +163,8 @@ export const ueberUnsCopy = {
         },
         {
           name: "Luis Boy",
-          role: "Operations",
-          bio: "Coordinates e-commerce operations at Götze Gold. Brings the view from the side where things are ordered, packed and chased.",
+          role: "Operations and Managing Director",
+          bio: "Coordinates e-commerce operations at Götze Gold and runs our contact with prospects and pilot companies. Brings the view from the side where things are ordered, packed and chased.",
           photo: "/team/luis.webp",
           linkedin: "https://www.linkedin.com/in/luis-boy-a6b787378/",
         },

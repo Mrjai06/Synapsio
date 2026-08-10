@@ -570,7 +570,7 @@ const hz = homeCopy[locale].hz;
     }
     return best;
   }
-  function street(p0,d,t0,t1,taper){
+  function street(p0,d,t0,t1,taper,gaps){
     var n=[-d[1],d[0]];
     function P(t,o,z){ return [p0[0]+d[0]*t+n[0]*o, p0[1]+d[1]*t+n[1]*o, z==null?0.088:z]; }
     /* t0 === "ring" means this street BEGINS at the ring, and then its near end must be a CURVE.
@@ -618,13 +618,74 @@ const hz = homeCopy[locale].hz;
        5-unit offset still lands inside the crossing. Arms measure from the ring's OUTER
        contour; a branch tees off another carriageway, so it clears that road's full width. */
     var m0 = (mFrom==null ? t0+2*SW+1.5 : mFrom+1.8);
+    /* ⚠️ A SHORT ARM LOSES ITS MARKINGS ENTIRELY, AND SILENTLY. m0 is measured forward from the
+       junction; t1 is wherever the peer's plot ends. On the west arm the plot sits close in, so m0
+       landed at or past t1 — both loops below then draw nothing at all and the arm renders as bare
+       tarmac while its longer neighbours look like roads. Nothing errors, which is why it survived.
+       Guarantee a usable run instead, but never let it start inside the junction: HARD is the
+       closest the paint may ever come to the crossing, and it wins over the comfortable offset. */
+    var HARD = (mFrom==null ? t0+2*SW+0.6 : mFrom+0.8);
+    if(t1-m0 < 6) m0 = Math.max(HARD, Math.min(m0, t1-6));
     var C=[p0[0]+d[0]*(t0+t1)/2,p0[1]+d[1]*(t0+t1)/2,0.088];
     function mk(a,b,cls){ f.push({pts:[a,b],nrm:null,cls:cls,open:true,ref:C}); }
-    mk(P(m0,-SW+0.45,0.1),P(t1,-SW+0.45,0.1),"rmk");
-    mk(P(m0, SW-0.45,0.1),P(t1, SW-0.45,0.1),"rmk");
-    var n2=Math.max(2,Math.round((t1-m0)/6));
-    for(var i=0;i<n2;i++)
-      mk(P(m0+(i+0.15)*(t1-m0)/n2,0,0.1),P(m0+(i+0.72)*(t1-m0)/n2,0,0.1),"rmkd");
+    /* ⚠️ MARKINGS MUST BREAK AT EVERY JUNCTION, NOT ONLY AT THE ONE THE STREET STARTS IN.
+       m0 above solves the START. It does nothing for a crossing further along, and both arms have
+       one: the south arm ENDS inside the branch T (t1 = BR2+SW, half a carriageway past the branch
+       centreline), and the north arm runs straight THROUGH its branch and carries on. So both had
+       two kerb lines and a row of centre dashes painted across the T — a line lying over a road,
+       which is exactly the artefact the ring's own junction test was written to kill. The ring got
+       that treatment; street-on-street crossings never did.
+       `gaps` are intervals in t where this street is inside another carriageway. Kerb lines are
+       split around them; a centre dash is dropped if its midpoint falls in one. */
+    function keep(a,b){
+      var segs=[[a,b]];
+      (gaps||[]).forEach(function(g){
+        var out=[];
+        segs.forEach(function(s){
+          if(g[1]<=s[0]||g[0]>=s[1]){ out.push(s); return; }
+          if(g[0]>s[0]) out.push([s[0],Math.min(g[0],s[1])]);
+          if(g[1]<s[1]) out.push([Math.max(g[1],s[0]),s[1]]);
+        });
+        segs=out;
+      });
+      return segs;
+    }
+    function inGap(t){
+      return (gaps||[]).some(function(g){ return t>g[0]&&t<g[1]; });
+    }
+    // a pedestrian crossing centred at t. Seven bars, inset from both kerbs.
+    function zebra(t){
+      var N=7, HL=0.9, span=2*SW-1.5;
+      for(var k=0;k<N;k++){
+        var o=-SW+0.75+span*k/(N-1);
+        mk(P(t-HL,o,0.1),P(t+HL,o,0.1),"rzeb");
+      }
+    }
+    keep(m0,t1).forEach(function(s){
+      mk(P(s[0],-SW+0.45,0.1),P(s[1],-SW+0.45,0.1),"rmk");
+      mk(P(s[0], SW-0.45,0.1),P(s[1], SW-0.45,0.1),"rmk");
+      /* ⚠️ A CROSSING AT EVERY JUNCTION EDGE. Holding the markings clear of a junction was only
+         half the job: where the paint stopped there was simply nothing, and an empty mouth reads
+         as unfinished road rather than as a junction. A single stop line was not enough either —
+         one thin rule across the tarmac is still mostly emptiness.
+         A zebra is the marking a junction actually carries, and it fills the mouth: the BARS RUN
+         ALONG the direction of travel while the BAND spans the carriageway, which is the part
+         that is easy to get backwards. Drawn at both ends of every painted run, so an arm gets
+         one where it leaves the ring and one where it meets the branch it dies in. */
+      zebra(s[0] + 1.0);
+      if(s[1] < t1-0.01) zebra(s[1] - 1.0);
+    });
+    /* ⚠️ THE CENTRE LINE STARTS BEHIND THE CROSSING, NOT WITH THE KERBS. Both the zebra bars and
+       the centre dashes run along the middle of the carriageway, so starting them at the same t
+       laid dashes straight over the crossing — the markings ran into each other. Order out of a
+       junction is: kerb lines, then the crossing, then the centre line. mc is that third step. */
+    var mc=m0+2.8;
+    var n2=Math.max(2,Math.round((t1-mc)/6));
+    for(var i=0;i<n2;i++){
+      var da=mc+(i+0.15)*(t1-mc)/n2, db=mc+(i+0.72)*(t1-mc)/n2;
+      if(inGap((da+db)/2)) continue;
+      mk(P(da,0,0.1),P(db,0,0.1),"rmkd");
+    }
     return f;
   }
   // static geometry — built once, then only faded.
@@ -643,16 +704,19 @@ const hz = homeCopy[locale].hz;
     return [
       {p:[0,0],d:[ 1,0],t0:"ring",t1:far(0, 1,0)+2.5,taper:1},   // east arm — ours
       {p:[0,0],d:[-1,0],t0:"ring",t1:far(0,-1,0)+2.5,taper:1},   // west arm
-      // the north arm runs past its plot and on out; the south arm ENDS in the branch junction
-      {p:[0,0],d:[0,-1],t0:"ring",t1:Math.max(far(1,-1,0)+2.5,BR1+SW+0.5),taper:1},
-      {p:[0,0],d:[0, 1],t0:"ring",t1:BR2+SW,taper:0},
+      // the north arm runs past its plot and on out; the south arm ENDS in the branch junction.
+      // Both cross a branch, so both carry a marking gap the width of that branch plus clearance.
+      {p:[0,0],d:[0,-1],t0:"ring",t1:Math.max(far(1,-1,0)+2.5,BR1+SW+0.5),taper:1,
+       gaps:[[BR1-SW-1.0,BR1+SW+0.4]]},
+      {p:[0,0],d:[0, 1],t0:"ring",t1:BR2+SW,taper:0,
+       gaps:[[BR2-SW-1.6,BR2+SW+1.6]]},
       {p:[0,-BR1],d:[ 1,0],t0:-SW,t1:far(0, 1,-BR1)+2.5,taper:1},       // north branch
       {p:[0, BR2],d:[-1,0],t0:-SW,t1:far(0,-1, BR2)+2.5,taper:1}        // south branch
     ];
   })();
   var STREETS=(function(){
     var f=[];
-    LANES.forEach(function(L){ f=f.concat(street(L.p,L.d,L.t0,L.t1,L.taper)); });
+    LANES.forEach(function(L){ f=f.concat(street(L.p,L.d,L.t0,L.t1,L.taper,L.gaps)); });
     return f;
   })();
   // Site-plan self-check. Every plot's footprint against every carriageway, and every plot
@@ -790,7 +854,7 @@ const hz = homeCopy[locale].hz;
     return [lerp(a[0],b[0],k),lerp(a[1],b[1],k),lerp(a[2],b[2],k),lerp(a[3],b[3],k)];
   }
 
-  var GROUND={ap:1,lane:1,ring:1,rmk:1,rmkd:1,"pool-on":1,"pool-off":1};
+  var GROUND={ap:1,lane:1,ring:1,rmk:1,rmkd:1,rzeb:1,"pool-on":1,"pool-off":1};
   var pool=[];
   function render(h,T){
     var vb=viewBoxAt(h);
@@ -801,7 +865,12 @@ const hz = homeCopy[locale].hz;
       var d="",depth=0,pts=fc.pts;
       for(var q=0;q<pts.length;q++){ var s=project(pts[q]); d+=(q?"L":"M")+s[0].toFixed(2)+" "+s[1].toFixed(2); depth+=s[2]; }
       depth/=pts.length;
-      if(fc.ref) depth=fc.ref[0]+fc.ref[1]+fc.ref[2]+0.02;         // decals sort on their host
+      /* ⚠️ THE DECAL OFFSET MUST CLEAR THE HOST, NOT TIE WITH IT. A marking sorts on its road's
+         CENTRE so it cannot fall behind the near half of the tarmac; but the road's own mean depth
+         IS that same centre, so +0.02 left them 0.01 apart and whether the paint or the asphalt was
+         drawn last came down to float noise. Two of the six arms lost every marking that way, and
+         nothing in the geometry was wrong — which is why it survived several passes. */
+      if(fc.ref) depth=fc.ref[0]+fc.ref[1]+fc.ref[2]+0.8;           // decals sort on their host
       // ground plates span so much x+y that their mean depth lands in FRONT of the wall they
       // abut — they were painting over the dock doors. Scenery goes under everything on it.
       if(GROUND[fc.cls]) depth-=1000;
@@ -1019,6 +1088,7 @@ const hz = homeCopy[locale].hz;
   /* road markings: solid edge lines + a broken centre. Tarmac without them reads as a slab. */
   .hzi-view .face.rmk { fill: none; stroke: rgba(232,237,240,.17); stroke-width: 1; }
   .hzi-view .face.rmkd { fill: none; stroke: rgba(232,237,240,.36); stroke-width: 1.3; stroke-linecap: round; }
+  .hzi-view .face.rzeb { fill: none; stroke: rgba(232,237,240,.42); stroke-width: 2.2; stroke-linecap: butt; }
   .hzi-view .face.wire { fill: none; stroke: rgba(232,237,240,.3); stroke-linecap: round; }
 
 </style>

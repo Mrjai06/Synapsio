@@ -13,7 +13,11 @@
 .fm-mast { padding-block: clamp(44px, 7vh, 88px) clamp(26px, 4vh, 44px); text-align: center; }
 .fm-kicker { font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em;
   text-transform: uppercase; color: var(--fg-muted); }
-.fm-mast h1 { margin: 14px 0 0; font-family: "Newsreader Variable", Georgia, serif;
+/* ⚠️ margin-inline MUST be auto. A global h1 rule caps the heading's width, so the box is narrower
+   than .fm-mast: text-align:center then centres the text INSIDE that box while the box itself sits
+   hard left. Measured 685 against 922 for the kicker and the lede — visibly off, and invisible in
+   the CSS unless you check the box rather than the text. */
+.fm-mast h1 { margin: 14px auto 0; font-family: "Newsreader Variable", Georgia, serif;
   font-weight: 400; font-size: clamp(2.4rem, 5.4vw, 4rem); line-height: 1.03;
   letter-spacing: -0.02em; }
 .fm-mast p { margin: 18px auto 0; max-width: 46ch; font-size: 1.02rem; color: var(--fg-soft); }

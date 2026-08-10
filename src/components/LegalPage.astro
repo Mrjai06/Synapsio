@@ -1,0 +1,52 @@
+---
+// Impressum und Datenschutz. Ein Bauteil für beide, weil sie dieselbe Form haben: ein Titel, eine
+// Einordnung, dann benannte Blöcke. Kein Bento, keine Figuren — eine Rechtsseite soll schnell zu
+// überfliegen sein und in der Suche gefunden werden, nicht beeindrucken.
+import { legalCopy } from "../i18n/legal";
+import type { Locale } from "../i18n/ui";
+import SiteNav from "./SiteNav.astro";
+import SiteFooter from "./SiteFooter.astro";
+
+interface Props { locale?: Locale; kind: "imprint" | "privacy" }
+const { locale = "de", kind } = Astro.props;
+const c = legalCopy[locale][kind];
+const path = kind === "imprint" ? "/impressum" : "/datenschutz";
+---
+
+<SiteNav locale={locale} path={path} active={null} />
+
+<main>
+  <section class="shell lg-page">
+    <h1>{c.title}</h1>
+    <p class="lg-lede">{c.lede}</p>
+
+    <div class="lg-body">
+      {c.blocks.map((b) => (
+        <section class="lg-block">
+          <h2>{b.h}</h2>
+          {b.p.map((line) => (<p class="pr-p">{line}</p>))}
+        </section>
+      ))}
+    </div>
+  </section>
+
+  <SiteFooter locale={locale} />
+</main>
+
+<style>
+  .lg-page { padding-block: clamp(52px, 8vh, 104px) clamp(60px, 9vh, 120px); }
+  .lg-page h1 { font-size: clamp(1.9rem, 3.4vw, 2.6rem); font-weight: 600;
+    letter-spacing: -0.024em; margin: 0; }
+  .lg-lede { margin: 16px 0 0; max-width: 62ch; font-size: 16px; line-height: 1.65;
+    color: var(--fg-soft); }
+  /* Two columns on a wide screen: a legal page in one 62ch column down a 1344px shell is the same
+     dead-right-hand-side the product page had. The blocks are independent, so they may reflow. */
+  .lg-body { margin-top: clamp(32px, 4.4vw, 56px); columns: 2;
+    column-gap: clamp(40px, 5vw, 80px); }
+  .lg-block { break-inside: avoid; margin: 0 0 clamp(26px, 3vw, 38px); }
+  .lg-block h2 { font-size: 14px; font-weight: 600; letter-spacing: -0.006em;
+    color: var(--fg); margin: 0 0 10px; }
+  .lg-block .pr-p { font-size: 15px; }
+  .lg-block .pr-p + .pr-p { margin-top: 10px; }
+  @media (max-width: 900px) { .lg-body { columns: 1; } }
+</style>

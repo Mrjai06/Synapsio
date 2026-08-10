@@ -47,7 +47,7 @@
   .nav-in { height:62px; display:flex; align-items:center; gap:clamp(14px,2.6vw,34px); }
   /* colour/decoration are explicit because the brand is a <span> on the startpage and an <a> on
      the subpages; as a bare link it fell back to the browser default (purple + underline) */
-  .brand { display:flex; align-items:center; gap:9px; margin-right:auto; color:inherit; text-decoration:none; }
+  .brand { display:flex; align-items:center; gap:9px; margin-right:auto; color:inherit; text-decoration:none; transition:color 160ms ease; }
   .brand svg { width:20px; height:20px; }
   /* real Synapsio brain mark (inlined PNG) */
   .synapsio-mark { display:block; flex:none; background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGgAAABkCAYAAABq3nXaAAAEYElEQVR42u1dyW3EMAy0CBbgIrb/ilJEOkheAQzHhw6SQ1ISkEewXmvNMe+RVDYH4+v7+6fmus++F815P/te7n6L9Ny1o0QARlJYT3M+AYQCqUQDp1dgNfO9AYQAihDASIDTArLUfIhBW/DxJnwNcCwBZ0/CvDMdNSBcfTey5pgDNOJ8/z5vEXgGcFyYuBaH+3StNSBW8xHyYXqiIVQ+kt7ESWudBxNmkTMxSv01NOEuWECCN/p7OFrYGTUN6AWKUODMBmrv8xKyIrA0TwkgScFGBemz7+X4p/Ws5EGg0UC6AqQFKLUgYTQ6e/q+pwhMM/psfU6SVvmVZDqsJEiVa9YYAGiVayYrlp5BigKadUDDGsSL7Jpk2X8irZZ25Pym9cXUfF5a5Zz/Eahm4ikK0AzlnDswtMxv633ZqpwzSpFC+CsPfSdC2Oye6zTsfIQghSXYN8f/td84pGYjXgaWbuP2MHAy5zxnmR3vWSNP0noDoiaiWlpzZaJrzDZrqmdvGchS+65a0qPzt97rqS3OHkNiBEtU2pz13O/KJzKqzNP78B5925OfGQWJes0USlCefNkVMBJyOd6DZm5dawYAUrLkbQ2YOVOtJCBNH8rMaWtNV5jdk21HIYDURmCWlZLzfDwy8VPOEgmkmqQaZRl4VCPeQPIelb3NjwDmXxSHjL5mp/+++TXytBZmNmCOyfedfFnqDc5UxUYFIyYLuLysfvNeK6y9nmppvK10qloqMNo8vvHF0RwG1o6wIvinc7nf04ZKtK0hVuyUBvCz72UBtC1u9jTrTENQf9cwAGjlMm1aAudmr/FMnFfVIG8t7Zk4czVz0CpktiXX1jkhW+05E7EfJF2n7JmDkdVsDxm7h37Uk2zZmoTewrREC1Ci8Dv6+8nKz/SGopq/L4LZppm7phGCINJuBUSOBKVZoj2fsxQdKSo4FkvqRxhO3OIIJbfir910ycJPnAWouaNXa+DB1uTDllV6CE3ytMxFrR/k7YgXyz0WVIIEyXrcTOUhTVP8dz+SFLgVd87TS3AGSRooqnXaI+FiVnDu5DMK1CV5vibCQAvHu/k8F5Zbg44rUMmCmeLpUChrjarVprtrWJMd2gNOpiDjCqTWwII1KrnS7YcMQB3NnlixtNXZWVJ5vWwX5uJogJp2sCVNWDvj9wQSRaoQaGuodk6TgnZ1tT2lpbCuchqkFvFsvkAqAkuvQSO5jfVuWK05TaqTiLVWpkUqjLoByGoHYS0QEdq0uNnOgSL0geeRjxKwAIqybt2fxT+RxQ5XM7TAtbSJMh+A4REo0WJpqxaNNqcy8xV6tYq85TmZNEyi0UhaAoh8htCWgTy/drgyWn6SfflG9GCG1zZkvv1eQXOPJedBbv66eT0FEnHuggdttTLvhHwYTe53Fv9IkVaxzbhvavEERq+m1S4Gi2jiSgZ+tfVSzLQdVRT32wuFKowPkhLW6Ll6EZLzEnE5CWp7AIQWlmh7EiCIhEjz+Asrr4BuTqJz7gAAAABJRU5ErkJggg=="); background-size:contain; background-repeat:no-repeat; background-position:center; }
@@ -55,11 +55,17 @@
   .nav-links { display:flex; gap:clamp(13px,1.8vw,24px); }
   @media (max-width:940px){ .nav-links{ display:none; } }
   .nav-links a,.lang a { color:var(--fg-muted); text-decoration:none; font-size:14px; transition:color 160ms ease; }
-  .nav-links a:hover,.lang a:hover { color:var(--fg); }
+  /* Hover in coral, matching the active state, so the header answers the pointer in one colour.
+     The wordmark is a link too and was the only one that stayed inert. */
+  .nav-links a:hover,.lang a:hover,.brand:hover { color:var(--coral); }
   .brand .synapsio-mark { width:22px; height:22px; }
   .nav-links a { position:relative; }
   .nav-links a::after { content:""; position:absolute; left:0; right:0; bottom:-7px; height:1px; background:var(--teal-soft); transform:scaleX(0); transform-origin:left center; transition:transform 220ms cubic-bezier(0.2,0.7,0.3,1); }
   @media (hover:hover) and (pointer:fine){ .nav-links a:hover::after { transform:scaleX(1); } }
+  /* THE PAGE YOU ARE ON. The mobile panel had .np-link.on in coral from the start; the desktop bar
+     never got the matching rule, so on a wide screen nothing marked the current page at all. */
+  .nav-links a.on { color:var(--coral); }
+  .nav-links a.on::after { background:var(--coral); transform:scaleX(1); }
   .lang { display:flex; gap:7px; font-size:12px; color:var(--fg-muted); }
   .lang .on { color:var(--fg); }
   .btn { display:inline-flex; align-items:center; gap:8px; text-decoration:none; font-size:14px; font-weight:500; padding:9px 17px; border-radius:7px; border:1px solid var(--hairline-strong); color:var(--fg); transition:border-color 160ms,background-color 160ms,transform 140ms; }
@@ -753,100 +759,220 @@
   @media (max-width: 640px) { .pr-vs > div + div { padding-left: 0; border-left: 0; } }
 
 
-  /* ---- per-section shapes (see Produkt.astro header) ------------------------
-     The point of these classes is that the six sections must NOT measure the same.
-     Padding, measure and the presence of a margin column all vary on purpose. */
-  .lay-wide      { padding-block: clamp(56px, 7.5vh, 96px); }
-  .lay-statement { padding-block: clamp(72px, 10vh, 128px); }
-  .lay-strip     { padding-block: clamp(48px, 6vh, 78px); }
-  .lay-curve     { padding-block: clamp(64px, 8.5vh, 108px); }
-  .lay-crop      { padding-block: clamp(52px, 7vh, 88px); }
-  .lay-plain     { padding-block: clamp(76px, 11vh, 140px); }
-  /* The two chapters about what the AI does by itself. No screenshot: an isometric figure goes
-     here, and until it does they run as a wide measure with their own rhythm, so the scroll still
-     never repeats a spacing. */
-  .lay-act       { padding-block: clamp(60px, 8vh, 112px); }
-  /* The drawn objects. Not framed like a screenshot: a screenshot is evidence and sits inside a
-     window, a diagram is an argument and stands in the page. */
-  .pr-fig { margin: clamp(26px,4vh,44px) 0 0; max-width: 520px; }
-  .pr-fig-wide { max-width: 620px; }
-  .pr-fig figcaption { margin-top: 14px; font-size: 14px; line-height: 1.55; color: var(--fg-soft);
-    max-width: 56ch; }
-  .lay-score     { padding-block: clamp(68px, 9.5vh, 124px); }
-  .lay-act .th-hd, .lay-score .th-hd { max-width: 74ch; }
+  /* ================= startpage: THE ASSISTANT =================
+     The section borrows the product's own shape: the sphere in the middle, what it has to say
+     hanging off it on hairlines. That is why the copy is in cards and not in a column — the
+     layout is the claim ("it speaks before you ask"), and a paragraph next to a picture of an
+     orb would not make it.
+     ⚠️ The wires are drawn by script from the real element boxes (see Home.astro). Do not
+     replace them with a hand-authored SVG: the cards move at every breakpoint and the lines
+     would detach, which is worse than having none. */
+  .ava { padding-block: clamp(64px, 9vh, 128px); border-top: 1px solid var(--hairline); }
+  .ava-hd { max-width: 62ch; }
+  .ava-hd h2 { margin: 16px 0 0; font-size: clamp(1.8rem, 3.4vw, 2.6rem); font-weight: 600;
+    letter-spacing: -0.026em; line-height: 1.1; }
+  .ava-sub { margin: 14px 0 0; font-size: 16px; line-height: 1.65; color: var(--fg-soft); max-width: 52ch; }
+
+  .ava-stage { position: relative; margin-top: clamp(32px, 5vh, 64px);
+    display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-rows: auto auto; gap: clamp(18px, 2.4vw, 34px) clamp(24px, 4vw, 72px);
+    align-items: center; justify-items: center; }
+  .ava-orb { grid-column: 2; grid-row: 1 / 3; display: grid; place-items: center; }
+
+  /* ⚠️ THESE ARE THE MVP'S OWN CARD VALUES, taken from AvaConsole.tsx and not re-invented: the
+     section only works if the cards look like the ones the product actually shows. Every one of
+     these differed before — 3px corners instead of 16, the page's card colour instead of the
+     console's, no shadow, and a mono label where the product uses semibold caps. */
+  .ava-card { position: relative; z-index: 1; max-width: 34ch;
+    border: 1px solid rgba(255,255,255,0.09); border-radius: 16px;
+    background: rgba(13,30,37,0.94); padding: 14px 16px;
+    box-shadow: 0 18px 55px -16px rgba(0,0,0,0.65); }
+  /* the product tints the left edge of a card that carries an accent; only one of three does */
+  .ava-c1 { grid-column: 1; grid-row: 1; justify-self: end; border-left: 2px solid rgba(95,212,200,0.55); }
+  .ava-c2 { grid-column: 3; grid-row: 1; justify-self: start; }
+  .ava-c3 { grid-column: 1; grid-row: 2; justify-self: end; }
+  .ava-lbl { display: block; font-size: 10px; font-weight: 600; letter-spacing: 0.05em;
+    text-transform: uppercase; color: #6F93A2; margin-bottom: 6px; }
+  .ava-card p { margin: 0; font-size: 13px; line-height: 1.62; color: #DCE7EA; }
+
+  .ava-wires { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;
+    z-index: 0; overflow: visible; }
+  .ava-wires path { fill: none; stroke: var(--hairline-strong); stroke-width: 1; }
+
+  .ava-foot { margin: clamp(28px, 4vh, 48px) 0 0; font-size: 15px; color: var(--fg-muted); }
+
+  /* Below this the three cards stack under the sphere and the wires would cross the copy, so
+     they are dropped rather than redrawn: a wire that ends in the middle of a paragraph reads
+     as a rendering fault, not as a connection. */
+  @media (max-width: 900px) {
+    .ava-stage { grid-template-columns: 1fr; grid-template-rows: auto; justify-items: stretch; }
+    .ava-orb { grid-column: 1; grid-row: 1; }
+    .ava-c1, .ava-c2, .ava-c3 { grid-column: 1; grid-row: auto; justify-self: stretch; max-width: none; }
+    .ava-wires { display: none; }
+  }
+
+  /* ================= /produkt: THE BENTO =================
+     ⚠️ WHY. The chapters used to be a 68ch measure with a margin note beside it. On an 84rem shell
+     that is ~600px of dead space down the right of every chapter, for the whole page. Each chapter
+     is now a 12-column grid whose cells fill the width.
+     ⚠️ EVERY CHAPTER ARRANGES THE SAME FOUR CELLS DIFFERENTLY (variants a-h). A bento that repeats
+     one arrangement is a table with gaps, and repetition is what made the earlier version read as
+     machine-made. That is why these spans are written out per variant rather than generated.
+     ⚠️ CELLS ARE NOT CARDS. The page's rule stands: explanations are prose, not elevation, so the
+     prose and the argument line are grouped by hairlines and space. Only the DATA TILE gets a
+     surface, because a table of figures genuinely is a separate object, like a screenshot. */
+  /* ⚠️ .bn-grid, NOT .bento. The startpage's control section already owns a class called
+     "bento" (a 1.25fr/1fr tile grid, further up this file). Defining a second one here won on
+     source order and forced that block's tiles into a 12-column grid they have no spans for — they
+     all collapsed into column 1 and overlapped. Never name a layout class after a concept when
+     the concept already has a class in the same stylesheet. */
+  .bn-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr));
+           gap: clamp(22px, 2.6vw, 40px); align-items: start;
+           margin-top: clamp(26px, 3.4vw, 42px); }
+
+  .bn-prose > .pr-p + .pr-p { margin-top: clamp(18px, 2.2vw, 26px); }
+  .bn-say .pr-say { max-width: 38ch; }
+  .bn-media .shot, .bn-media .curve { margin-top: 0; }
+
+  /* the data tile: the one framed thing besides a screenshot */
+  .bn-tile { border: 1px solid var(--hairline-strong); border-radius: 3px;
+             background: var(--app-card-2); padding: clamp(16px, 1.9vw, 24px); }
+  .bn-t { font-family: var(--mono); font-size: 11px; letter-spacing: 0.13em;
+          text-transform: uppercase; color: var(--fg-muted); font-weight: 500;
+          margin: 0 0 14px; display: flex; gap: 10px; align-items: baseline; }
+  .bn-t em { font-style: normal; color: var(--fg-soft); }
+
+  .bn-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; }
+  .bn-steps li { display: flex; gap: 12px; align-items: baseline; font-size: 14px;
+                 color: var(--fg-soft); }
+  .bn-steps span { font-family: var(--mono); font-size: 11px; color: var(--fg-muted); }
+
+  .bn-fields, .bn-list, .bn-opts { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .bn-fields li, .bn-list li { font-size: 14px; color: var(--fg-soft);
+                               padding-left: 14px; position: relative; }
+  .bn-fields li::before, .bn-list li::before { content: ""; position: absolute; left: 0; top: 0.62em;
+    width: 5px; height: 1px; background: var(--fg-muted); }
+
+  .bn-opts li { font-family: var(--mono); font-size: 12.5px; color: var(--fg-muted);
+                padding: 8px 10px; border: 1px solid transparent; border-radius: 2px; }
+  .bn-opts li.on { color: var(--fg); border-color: var(--hairline-strong);
+                   background: rgba(255,255,255,0.022); }
+  .bn-note { margin: 14px 0 0; font-size: 14px; line-height: 1.55; color: var(--fg-soft); }
+
+  .bn-gate { display: grid; gap: 8px; }
+  .bn-gate span { font-size: 14px; padding: 9px 12px; border-radius: 2px;
+                  border: 1px solid var(--hairline-strong); color: var(--fg-soft); }
+  .bn-gate .ok  { border-left: 2px solid #3A8080; }
+  .bn-gate .hot { border-left: 2px solid var(--coral); }
+
+  .bn-risk { width: 100%; border-collapse: collapse; }
+  .bn-risk td { font-size: 13.5px; color: var(--fg-soft); padding: 9px 0;
+                border-top: 1px solid var(--hairline); }
+  .bn-risk tr:first-child td { border-top: none; }
+  .bn-risk td.n { text-align: right; font-family: var(--mono); font-size: 12px; color: var(--fg-muted); }
+  .bn-risk tr.hot td.n { color: var(--coral); }
+
+  /* ⚠️ THE REAL CAUSE OF DEAD SPACE IS COLUMN HEIGHT, NOT COLUMN COUNT. A chapter's prose runs five
+     or six paragraphs; a data tile is four lines. Put them side by side in single columns and the
+     tile's column simply ends two thirds of the way down, which is the same hole the old margin
+     note left, just moved. Chapters without a tall screenshot therefore set their prose in TWO
+     columns, which roughly halves its height and lets the tile column finish with it. */
+  .bn-2col .bn-prose { columns: 2; column-gap: clamp(30px, 3.4vw, 54px); }
+  .bn-2col .bn-prose .pr-p { break-inside: avoid; }
+  .bn-2col .bn-prose .pr-p + .pr-p { margin-top: 0; padding-top: clamp(18px, 2.2vw, 26px); }
+
+  /* ---- the eight arrangements -------------------------------------------------------------- */
+  .bn-a .bn-media { grid-column: 1 / 8;  grid-row: 1; }
+  .bn-a .bn-prose { grid-column: 8 / 13; grid-row: 1 / 4; }
+  .bn-a .bn-tile  { grid-column: 1 / 8;  grid-row: 2; }
+  .bn-a .bn-say   { grid-column: 1 / 8;  grid-row: 3; }
+
+  /* the one chapter with no media: the statement leads, the prose runs in two columns under it */
+  .bn-b .bn-say   { grid-column: 1 / 13; }
+  .bn-b .bn-say .pr-say { max-width: 34ch; border: none; padding-left: 0;
+    font-size: clamp(1.6rem, 3.2vw, 2.35rem); line-height: 1.22; letter-spacing: -0.022em; }
+  .bn-b .bn-prose { grid-column: 1 / 13; columns: 2; column-gap: clamp(34px, 4.4vw, 68px); }
+  .bn-b .bn-prose .pr-p { break-inside: avoid; }
+  .bn-b .bn-prose .pr-p + .pr-p { margin-top: 0; padding-top: clamp(18px, 2.2vw, 26px); }
+
+  .bn-c .bn-prose { grid-column: 1 / 6;  grid-row: 1; }
+  .bn-c .bn-media { grid-column: 6 / 13; grid-row: 1 / 3; }
+  .bn-c .bn-tile  { grid-column: 1 / 6;  grid-row: 2; }
+  .bn-c .bn-say   { grid-column: 1 / 13; grid-row: 3; }
+
+  .bn-d .bn-media { grid-column: 1 / 13; grid-row: 1; }
+  .bn-d .bn-prose { grid-column: 1 / 9;  grid-row: 2; }
+  .bn-d .bn-tile  { grid-column: 9 / 13; grid-row: 2; }
+  .bn-d .bn-say   { grid-column: 9 / 13; grid-row: 3; }
+
+  .bn-e .bn-prose { grid-column: 1 / 9;  grid-row: 1; }
+  .bn-e .bn-tile  { grid-column: 9 / 13; grid-row: 1; }
+  .bn-e .bn-say   { grid-column: 9 / 13; grid-row: 2; }
+
+  .bn-f .bn-prose { grid-column: 1 / 8;  grid-row: 1 / 3; }
+  .bn-f .bn-media { grid-column: 8 / 13; grid-row: 1; }
+  .bn-f .bn-tile  { grid-column: 8 / 13; grid-row: 2; }
+  .bn-f .bn-say   { grid-column: 1 / 8;  grid-row: 3; }
+
+  .bn-g .bn-tile  { grid-column: 1 / 5;  grid-row: 1; }
+  .bn-g .bn-prose { grid-column: 5 / 13; grid-row: 1 / 3; }
+  .bn-g .bn-say   { grid-column: 1 / 5;  grid-row: 2; }
+
+  .bn-h .bn-media { grid-column: 1 / 7;  grid-row: 1; }
+  .bn-h .bn-prose { grid-column: 7 / 13; grid-row: 1; }
+  .bn-h .bn-say   { grid-column: 1 / 13; grid-row: 2; }
+
+  /* the assistant chapter: tile and screenshot side by side on top, prose beneath. The only
+     variant that puts a data tile LEVEL with an image, so the ninth chapter does not open like
+     any of the eight before it. */
+  .bn-i .bn-tile  { grid-column: 1 / 5;  grid-row: 1; }
+  .bn-i .bn-media { grid-column: 5 / 13; grid-row: 1; }
+  .bn-i .bn-prose { grid-column: 1 / 9;  grid-row: 2; }
+  .bn-i .bn-say   { grid-column: 9 / 13; grid-row: 2; }
+
+  /* section rhythm still varies, so the scroll does not feel metronomic */
+  .bn-a { padding-block: clamp(56px, 7.5vh, 96px); }
+  .bn-b { padding-block: clamp(84px, 11vh, 140px); }
+  .bn-c { padding-block: clamp(48px, 6vh, 78px); }
+  .bn-d { padding-block: clamp(64px, 8.5vh, 108px); }
+  .bn-e { padding-block: clamp(60px, 8vh, 112px); }
+  .bn-f { padding-block: clamp(64px, 8vh, 104px); }
+  .bn-g { padding-block: clamp(68px, 9.5vh, 124px); }
+  .bn-h { padding-block: clamp(76px, 11vh, 140px); }
+  .bn-i { padding-block: clamp(58px, 8vh, 104px); }
+
+  /* ⚠️ ONE breakpoint collapses ALL variants. Anything cleverer (per-variant intermediate states)
+     means eight more rule blocks to keep in sync, and the tiles are unreadable below a comfortable
+     measure anyway. */
+  @media (max-width: 1000px) {
+    .bn-grid > * { grid-column: 1 / 13 !important; grid-row: auto !important; }
+    .bn-b .bn-prose { columns: 1; }
+    .bn-b .bn-prose .pr-p + .pr-p { padding-top: 0; margin-top: clamp(18px, 2.2vw, 26px); }
+  }
 
   /* CHAPTER GROUNDS.
-     Varying padding and measure was not enough: every chapter still stood on the same surface,
-     separated only by a hairline, which is exactly the shape of a long text document. Two of the
-     six now sit on their own full-bleed ground, so the page reads as a sequence of chapters
-     rather than one continuous page of prose.
+     Varying the arrangement was not enough on its own: every chapter still stood on the same
+     surface, separated only by a hairline, which is the shape of a long document. Two chapters sit
+     on their own full-bleed ground, so the page reads as a sequence rather than one page of prose.
      The band is a pseudo-element rather than a wrapper because these sections live inside the
      page's .shell and must keep its gutter for their text while the BACKGROUND escapes it.
      100vw is safe here only because main{overflow-x:clip} is already in place. */
   .th-full { position: relative; }
-  .lay-statement::before,
-  .lay-crop::before {
+  .bn-b::before, .bn-f::before {
     content: ""; position: absolute; inset: 0; left: 50%; transform: translateX(-50%);
     width: 100vw; z-index: -1;
     background: var(--panel, rgba(255,255,255,0.018));
     border-block: 1px solid var(--hairline);
   }
   /* A chapter that brings its own ground does not also need a rule above it. */
-  .lay-statement, .lay-crop { border-top: none; }
-  .lay-statement + .th-full, .lay-crop + .th-full { border-top: none; }
-  .lay-statement { padding-block: clamp(84px, 11vh, 140px); }
-  .lay-crop      { padding-block: clamp(64px, 8vh, 104px); }
+  .bn-b, .bn-f { border-top: none; }
+  .bn-b + .th-full, .bn-f + .th-full { border-top: none; }
 
-  /* IMAGES MUST NOT ALL SIT IN THE MEASURE.
-     Three screenshots, all centred at the same width in the same frame, is what made the page
-     read as a document with pictures pasted in. Each one now has a different relationship to the
-     text column: the opening shot BREAKS OUT of it entirely, the strip stays inside it, and the
-     limits crop sits inset in the margin. Three relationships, not three slabs.
-     Specificity note: Shot.astro's own rules are Astro-scoped (class + attribute), so a plain
-     `.shot-frame` here would lose. Three classes wins. aspect-ratio is set INLINE by the
-     component, which is why the override needs !important. */
-  .lay-wide .shot .shot-frame {
-    width: 100vw; max-width: none; margin-left: calc(50% - 50vw);
-    border-inline: none; border-radius: 0;
-    aspect-ratio: 2.55 / 1 !important;
-  }
-  .lay-wide .shot figcaption { max-width: 62ch; }
-
-  .lay-crop .shot { margin-left: auto; max-width: 430px; }
-  .lay-crop .shot .shot-frame { max-width: 430px; }
-
-  @media (max-width: 760px) {
-    /* A full-bleed band on a phone is just the image, so it keeps the gutter back and the
-       cropped ratio goes with it: at this width the app screenshot needs its height. */
-    .lay-wide .shot .shot-frame {
-      width: auto; margin-left: 0; border-inline: 1px solid var(--hairline); border-radius: 12px;
-      aspect-ratio: 16 / 10 !important;
-    }
-    .lay-crop .shot { margin-left: 0; max-width: none; }
-  }
-
-  /* the "ai" section: no screenshot. Its one sentence leads, the prose follows under it. */
-  .lay-statement .th-hd { max-width: 92ch; }
-  /* The one section with no screenshot used to be a single 62ch column, which made it the
-     only block on the page taller than it was wide. The statement now spans the full measure
-     and the prose runs in two columns under it, so it uses width like everything else while
-     still being the section that looks least like the others. */
-  .pr-mid { display: block; max-width: 92ch; }
-  .pr-mid .pr-body { columns: 2; column-gap: clamp(34px, 4.4vw, 68px); }
-  .pr-mid .pr-p { break-inside: avoid; }
-  .pr-mid .pr-p + .pr-p { margin-top: 0; padding-top: clamp(18px, 2.2vw, 26px); }
-  @media (max-width: 900px) {
-    .pr-mid .pr-body { columns: 1; }
-    .pr-mid .pr-p + .pr-p { padding-top: 0; margin-top: clamp(18px, 2.2vw, 26px); }
-  }
-  .pr-say-lead { margin: 0 0 clamp(26px,3.4vw,40px) !important; padding: 0 !important; border: 0 !important;
-                 max-width: 34ch; font-size: clamp(1.6rem,3.2vw,2.35rem); line-height: 1.22;
-                 font-weight: 300; letter-spacing: -0.022em; color: var(--fg); }
-  /* the "memory" section: no image at all, a wider measure, the sentence closes it */
-  .pr-plain { display: block; max-width: 74ch; }
-  .pr-say-end { margin: clamp(34px,4.4vw,52px) 0 0 !important; padding: 0 !important; border: 0 !important;
-                max-width: 34ch; font-size: clamp(1.18rem,2vw,1.55rem); line-height: 1.34;
-                font-weight: 300; letter-spacing: -0.018em; color: var(--fg); }
+  /* ⚠️ NEVER OVERRIDE A SHOT'S ASPECT RATIO HERE. Shot.astro reads the real width and height out
+     of the WebP file for exactly one reason, stated in its own comment: a guessed ratio plus
+     object-fit:cover silently crops the screenshot, "which on a product page means cutting off the
+     thing you meant to show". This block once forced 16/11 onto 2.03:1 screenshots and cut the
+     right-hand third off the dashboard, including the numbers the paragraph beside it discussed. */
 
   /* the coverage curve: the only drawing on the page, and the only idea here no
      screenshot can state. Hairlines only, no fill, no glow. */

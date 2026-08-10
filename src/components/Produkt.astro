@@ -1,21 +1,24 @@
 ---
-// /produkt — the DEEP DIVE, six themes of prose.
+// /produkt — the DEEP DIVE, eight chapters, laid out as a BENTO.
 //
-// Every section deliberately gets a DIFFERENT shape. An earlier pass ran all six through one
-// template and the uniformity itself read as machine-made, which was the exact complaint the
-// rewrite was meant to answer: the tell was never the container, it was the repetition. So:
-//   loop   full-width screenshot        read   wide strip crop (the parsed replies)
-//   ai     no image, centred statement  calc   hairline coverage curve, drawn here
-//   gate   tight crop of the controls   memory no image, plain wide measure
-// Section padding varies with the shape so the scroll does not feel metronomic.
+// ⚠️ WHY A BENTO AND NOT THE OLD TWO-COLUMN SET. The page used to be a 68ch measure with a margin
+// note beside it. On a 84rem shell that leaves ~600px of dead space down the entire right-hand
+// side of every chapter, which is exactly what it looked like. Each chapter is now a 12-column
+// grid whose cells span the full width: media, prose, the chapter's one-line argument, and a DATA
+// TILE. Every chapter arranges those cells differently (variants a-h), because a bento that
+// repeats one arrangement is just a table and reads machine-made — the original complaint.
+//
+// ⚠️ THE DATA TILES USE COPY THAT ALREADY EXISTED. The `L` object below has carried verified DE+EN
+// strings for the loop steps, the signals, the supplier risk figures, the quote comparison and the
+// approval threshold since long before this rewrite, and none of it was ever rendered. Filling the
+// right-hand side with THAT is why the tiles are not decoration. Do not invent tile content: if a
+// new tile needs a claim that is not already in `L`, it needs verifying first.
 import { produktCopy } from "../i18n/produkt";
 import { localePath, CAL_URL, APP_URL, type Locale } from "../i18n/ui";
 import { homeCopy } from "../i18n/home";
 import Shot from "./Shot.astro";
 import SiteNav from "./SiteNav.astro";
 import SiteFooter from "./SiteFooter.astro";
-import IsoSort from "./IsoSort.astro";
-import IsoDecisions from "./IsoDecisions.astro";
 
 interface Props { locale?: Locale }
 const { locale = "de" } = Astro.props;
@@ -35,6 +38,8 @@ const p = (path: string) => localePath(locale, path);
              c:"Vier Regler. Was Sie hier setzen, gilt ab der nächsten Bestellung." },
     memory:{ f:"/shots/05-approvals.webp", n:"Freigaben", a:"Freigabe-Warteschlange mit Begründung der KI",
              c:"Jede Vorlage kommt mit ihrer Begründung. Freigeben oder ablehnen, beides ist ein Signal." },
+    assist:{ f:"/shots/08-ava.webp", n:"Der Assistent", a:"Der geöffnete Assistent mit einer Lagebeurteilung und drei Hinweiskarten",
+             c:"Ungefragt: was sich geändert hat, was ruhig bleibt, und ein Marktsignal, das zu einer bereits offenen Verzögerung gehört." },
   };
   const SHOTS_EN = {
     loop:  { f:"/shots/01-dashboard.webp", n:"Dashboard", a:"Synapsio dashboard with open items and key figures",
@@ -49,17 +54,26 @@ const p = (path: string) => localePath(locale, path);
              c:"Four controls. What you set here applies from the next order." },
     memory:{ f:"/shots/05-approvals.webp", n:"Approvals", a:"The approval queue with the AI's reasoning",
              c:"Every item comes with its reasoning. Approving or rejecting are both signals." },
+    assist:{ f:"/shots/08-ava.webp", n:"The assistant", a:"The assistant open, showing a status read and three cards",
+             c:"Unprompted: what changed, what stays quiet, and a market signal that belongs to a delay already open." },
   };
 
   const SHOTS = locale === "de" ? SHOTS_DE : SHOTS_EN;
 
-  // the shape each theme takes; see the file header
-  const LAY: Record<string, string> = {
-    loop: "wide", ai: "statement", read: "strip", calc: "curve",
-    // The two chapters that say what the AI does on its own and how it grades itself carry no
-    // screenshot on purpose: they are the slots the isometric figures go into, and a figure is its
-    // own layout family, so the page keeps its rule that no two sections measure the same.
-    buy: "act", gate: "crop", learn: "score", memory: "plain",
+  // Per chapter: which grid arrangement, what media it carries, and which data tile.
+  // `v` maps to .bn-a … .bn-h in global.css, where the cell spans live.
+  const BENTO: Record<string, { v: string; media: string; tile: string }> = {
+    loop:   { v: "a", media: "shot",  tile: "steps"  },
+    ai:     { v: "b", media: "none",  tile: "none"   },
+    read:   { v: "c", media: "cread", tile: "fields" },
+    calc:   { v: "d", media: "curve", tile: "sig"    },
+    buy:    { v: "e", media: "none",  tile: "opts"   },
+    gate:   { v: "f", media: "cgate", tile: "thr"    },
+    learn:  { v: "g", media: "none",  tile: "risk"   },
+    memory: { v: "h", media: "shot",  tile: "none"   },
+    // Kein Screenshot: von Ava gibt es noch keinen. Bis dahin traegt das Kapitel eine Datenkachel
+    // und zweispaltige Prosa, damit es die Breite genauso fuellt wie die uebrigen.
+    assist: { v: "i", media: "shot",  tile: "ava"    },
   };
   // crops of the same screenshots, tight enough to be legible at the size they render
   const CROP = locale === "de"
@@ -73,12 +87,6 @@ const p = (path: string) => localePath(locale, path);
                 c:"The limits themselves. What is set here applies from the next order." } };
 
 
-const FIG = locale === "de"
-  ? { act: "Drei offene Bedarfe kommen einzeln herein und verlassen die Maschine als eine Bestellung an einen Lieferanten.",
-      score: "Jede Karte ist eine Entscheidung. Die hinteren tragen eine Bewertung, die erst später dazukam; die vorderen warten noch auf ihre." }
-  : { act: "Three open requirements arrive separately and leave as one order to one supplier.",
-      score: "Each card is a decision. The ones at the back carry a score that was added later; the ones at the front are still waiting for theirs." };
-
 const L = locale === "de"
   ? { fields: ["Artikel", "Menge", "Termin", "Preis"], mail: "Lieferantenmail", parse: "gelesen",
       stock: "Bestand", time: "Zeit", rop: "Nachbestellpunkt", lead: "Lieferzeit", order: "Bestellpunkt",
@@ -89,7 +97,9 @@ const L = locale === "de"
       risk: [["Nordschraube AG", "niedrig", "24%"], ["Steel Precision", "mittel", "58%"], ["Dichttech GmbH", "erhöht", "81%"]],
       signals: "Signale", sig: ["Verbrauch", "Reichweite", "Termintreue"],
       opts: ["Steel Precision · 4.120 € · 12 Tage", "Nordschraube AG · 3.980 € · 6 Tage", "Dichttech GmbH · 3.850 € · 21 Tage"],
-      why: "Begründung", whyTxt: "Nicht der billigste, aber der einzige vor dem Engpass." }
+      why: "Begründung", whyTxt: "Nicht der billigste, aber der einzige vor dem Engpass.",
+      avaLbl: "Was er übernimmt",
+      ava: ["Fragen in eigenen Worten", "Antwort mit den Zahlen dahinter", "Handeln, im Rahmen Ihrer Grenzen", "Diktieren und vorlesen lassen", "Foto vom Regal statt Zettel"] }
   : { fields: ["Item", "Qty", "Date", "Price"], mail: "Supplier email", parse: "read",
       stock: "Stock", time: "Time", rop: "Reorder point", lead: "Lead time", order: "Order point",
       thr: "Approval threshold", pass: "goes through", stop: "to you", log: "Log", back: "feeds back",
@@ -99,7 +109,9 @@ const L = locale === "de"
       risk: [["Nordschraube AG", "low", "24%"], ["Steel Precision", "medium", "58%"], ["Dichttech GmbH", "raised", "81%"]],
       signals: "Signals", sig: ["Consumption", "Cover", "Reliability"],
       opts: ["Steel Precision · €4,120 · 12 days", "Nordschraube AG · €3,980 · 6 days", "Dichttech GmbH · €3,850 · 21 days"],
-      why: "Reason", whyTxt: "Not the cheapest, but the only one before the shortage." };
+      why: "Reason", whyTxt: "Not the cheapest, but the only one before the shortage.",
+      avaLbl: "What it takes on",
+      ava: ["Questions in your own words", "The answer with the figures behind it", "Acting, within your limits", "Dictate, and have it read back", "A photo of the shelf instead of a note"] };
 ---
 
 <SiteNav locale={locale} path="/produkt" active="produkt" />
@@ -126,85 +138,113 @@ const L = locale === "de"
 
   <div class="shell">
     {c.themes.map((t, i) => {
-      const lay = LAY[t.key] ?? "wide";
+      const b = BENTO[t.key] ?? { v: "a", media: "none", tile: "none" };
       const pr = (c.prose as any)[t.key];
       const sh = SHOTS[t.key];
       return (
-      <section class={"th-full lay-" + lay}>
+      <section class={"th-full bn-sec bn-" + b.v + (["d","e","g"].includes(b.v) ? " bn-2col" : "")}>
         <div class="th-hd">
           <div><span class="pr-num">{"0" + (i + 1)} · {t.label}</span><h2>{t.h}</h2></div>
           <p class="th-lede"><b>{t.lede.lead}</b>{t.lede.rest}</p>
         </div>
 
-        {lay === "wide" && <Shot src={sh.f} alt={sh.a} note={sh.n} caption={sh.c} />}
-        {lay === "strip" && <Shot src={CROP.read.f} alt={CROP.read.a} note={CROP.read.n} caption={CROP.read.c} />}
-        {lay === "crop" && <Shot src={CROP.gate.f} alt={CROP.gate.a} caption={CROP.gate.c} maxw="704px" />}
+        <div class="bn-grid">
+          {b.media === "shot" && (
+            <div class="bn-media"><Shot src={sh.f} alt={sh.a} note={sh.n} caption={sh.c} /></div>
+          )}
+          {b.media === "cread" && (
+            <div class="bn-media"><Shot src={CROP.read.f} alt={CROP.read.a} note={CROP.read.n} caption={CROP.read.c} /></div>
+          )}
+          {b.media === "cgate" && (
+            <div class="bn-media"><Shot src={CROP.gate.f} alt={CROP.gate.a} note={CROP.gate.n} caption={CROP.gate.c} /></div>
+          )}
+          {b.media === "curve" && (
+            /* The one drawing on the page. A reorder point is a line stock falls through, and the
+               gap between falling through it and the goods arriving is the whole problem. No
+               screenshot says that, so it is drawn. Static SVG, no script. */
+            <div class="bn-media">
+              <figure class="curve" data-shot>
+                <div class="curve-frame">
+                  <svg viewBox="0 0 1200 340" role="img" aria-label={L.rop + " / " + L.lead}>
+                    <line x1="60" y1="292" x2="1140" y2="292" class="cv-ax" />
+                    <line x1="60" y1="24" x2="60" y2="292" class="cv-ax" />
+                    <rect x="60" y="252" width="1080" height="40" class="cv-safe" />
+                    <line x1="60" y1="200" x2="1140" y2="200" class="cv-rop" />
+                    <path d="M60 50 L320 200 L460 252 L460 58 L720 200 L860 250 L860 52 L1120 175" class="cv-line" />
+                    <g class="cv-lead">
+                      <line x1="320" y1="316" x2="460" y2="316" /><line x1="320" y1="310" x2="320" y2="322" /><line x1="460" y1="310" x2="460" y2="322" />
+                      <line x1="720" y1="316" x2="860" y2="316" /><line x1="720" y1="310" x2="720" y2="322" /><line x1="860" y1="310" x2="860" y2="322" />
+                    </g>
+                    <circle cx="320" cy="200" r="4" class="cv-dot" /><circle cx="720" cy="200" r="4" class="cv-dot" />
+                    <text x="68" y="194" class="cv-t cv-t-rop">{L.rop}</text>
+                    <text x="68" y="246" class="cv-t cv-t-safe">{L.safety}</text>
+                    <text x="390" y="336" class="cv-t cv-c cv-t-lead">{L.lead}</text>
+                    <text x="68" y="18" class="cv-t cv-t-stock">{L.stock}</text>
+                    <text x="1140" y="316" class="cv-t cv-e">{L.time}</text>
+                  </svg>
+                </div>
+                <figcaption>{c.curveCap}</figcaption>
+              </figure>
+            </div>
+          )}
 
-        {/* The two chapters about what the AI does on its own carry a drawn object rather than a
-            screenshot: a screen can show a finished order, but not "these three became one". */}
-        {lay === "act" && (
-          <figure class="pr-fig">
-            <IsoSort />
-            <figcaption>{FIG.act}</figcaption>
-          </figure>
-        )}
-        {lay === "score" && (
-          <figure class="pr-fig pr-fig-wide">
-            <IsoDecisions />
-            <figcaption>{FIG.score}</figcaption>
-          </figure>
-        )}
+          <div class="bn-prose">
+            {pr.paras.map((p) => (<p class="pr-p">{p.lead && <b>{p.lead}</b>} {p.text}</p>))}
+          </div>
 
-        {lay === "curve" && (
-          /* The one drawing on the page. A reorder point is a line stock falls through, and the
-             gap between falling through it and the goods arriving is the whole problem. No
-             screenshot says that, so it is drawn. Static SVG, no script. */
-          <figure class="curve" data-shot>
-            <div class="curve-frame">
-              <svg viewBox="0 0 1200 340" role="img" aria-label={L.rop + " / " + L.lead}>
-                <line x1="60" y1="292" x2="1140" y2="292" class="cv-ax" />
-                <line x1="60" y1="24" x2="60" y2="292" class="cv-ax" />
-                <rect x="60" y="252" width="1080" height="40" class="cv-safe" />
-                <line x1="60" y1="200" x2="1140" y2="200" class="cv-rop" />
-                <path d="M60 50 L320 200 L460 252 L460 58 L720 200 L860 250 L860 52 L1120 175" class="cv-line" />
-                <g class="cv-lead">
-                  <line x1="320" y1="316" x2="460" y2="316" /><line x1="320" y1="310" x2="320" y2="322" /><line x1="460" y1="310" x2="460" y2="322" />
-                  <line x1="720" y1="316" x2="860" y2="316" /><line x1="720" y1="310" x2="720" y2="322" /><line x1="860" y1="310" x2="860" y2="322" />
-                </g>
-                <circle cx="320" cy="200" r="4" class="cv-dot" /><circle cx="720" cy="200" r="4" class="cv-dot" />
-                <text x="68" y="194" class="cv-t cv-t-rop">{L.rop}</text>
-                <text x="68" y="246" class="cv-t cv-t-safe">{L.safety}</text>
-                <text x="390" y="336" class="cv-t cv-c cv-t-lead">{L.lead}</text>
-                <text x="68" y="18" class="cv-t cv-t-stock">{L.stock}</text>
-                <text x="1140" y="316" class="cv-t cv-e">{L.time}</text>
-              </svg>
-            </div>
-            <figcaption>{c.curveCap}</figcaption>
-          </figure>
-        )}
+          <div class="bn-say"><p class="pr-say">{pr.say}</p></div>
 
-        {lay === "statement" ? (
-          <div class="pr pr-mid">
-            <p class="pr-say pr-say-lead">{pr.say}</p>
-            <div class="pr-body">
-              {pr.paras.map((p) => (<p class="pr-p">{p.lead && <b>{p.lead}</b>} {p.text}</p>))}
+          {b.tile === "steps" && (
+            <div class="bn-tile">
+              <h4 class="bn-t">{L.loopLbl}</h4>
+              <ol class="bn-steps">
+                {L.loopSteps.map((x, k) => (<li><span>{"0" + (k + 1)}</span>{x}</li>))}
+              </ol>
             </div>
-          </div>
-        ) : lay === "plain" ? (
-          <div class="pr pr-plain">
-            <div class="pr-body">
-              {pr.paras.map((p) => (<p class="pr-p">{p.lead && <b>{p.lead}</b>} {p.text}</p>))}
+          )}
+          {b.tile === "fields" && (
+            <div class="bn-tile">
+              <h4 class="bn-t">{L.mail}<em>{L.parse}</em></h4>
+              <ul class="bn-fields">{L.fields.map((f) => (<li>{f}</li>))}</ul>
             </div>
-            <p class="pr-say pr-say-end">{pr.say}</p>
-          </div>
-        ) : (
-          <div class="pr">
-            <div class="pr-body">
-              {pr.paras.map((p) => (<p class="pr-p">{p.lead && <b>{p.lead}</b>} {p.text}</p>))}
+          )}
+          {b.tile === "sig" && (
+            <div class="bn-tile">
+              <h4 class="bn-t">{L.signals}</h4>
+              <ul class="bn-list">{L.sig.map((x) => (<li>{x}</li>))}</ul>
             </div>
-            <aside class="pr-margin"><p class="pr-say">{pr.say}</p></aside>
-          </div>
-        )}
+          )}
+          {b.tile === "opts" && (
+            <div class="bn-tile">
+              <h4 class="bn-t">{L.why}</h4>
+              {/* the middle one is the pick: not the cheapest, which is the whole point of the note */}
+              <ul class="bn-opts">{L.opts.map((o, k) => (<li class={k === 1 ? "on" : ""}>{o}</li>))}</ul>
+              <p class="bn-note">{L.whyTxt}</p>
+            </div>
+          )}
+          {b.tile === "thr" && (
+            <div class="bn-tile">
+              <h4 class="bn-t">{L.thr}</h4>
+              <div class="bn-gate"><span class="ok">{L.pass}</span><span class="hot">{L.stop}</span></div>
+            </div>
+          )}
+          {b.tile === "ava" && (
+            <div class="bn-tile">
+              <h4 class="bn-t">{L.avaLbl}</h4>
+              <ul class="bn-list">{L.ava.map((x) => (<li>{x}</li>))}</ul>
+            </div>
+          )}
+          {b.tile === "risk" && (
+            <div class="bn-tile">
+              <h4 class="bn-t">{L.riskLbl}</h4>
+              <table class="bn-risk"><tbody>
+                {L.risk.map((r, k) => (
+                  <tr class={k === 2 ? "hot" : ""}><td>{r[0]}</td><td>{r[1]}</td><td class="n">{r[2]}</td></tr>
+                ))}
+              </tbody></table>
+            </div>
+          )}
+        </div>
       </section>
       );
     })}

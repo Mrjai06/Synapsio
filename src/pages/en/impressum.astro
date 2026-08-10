@@ -1,0 +1,10 @@
+---
+import Base from "../../layouts/Base.astro";
+import LegalPage from "../../components/LegalPage.astro";
+import { legalCopy } from "../../i18n/legal";
+const c = legalCopy.en.imprint;
+---
+
+<Base locale="en" path="/impressum" title={c.title + " · Synapsio"} description={c.lede}>
+  <LegalPage locale="en" kind="imprint" />
+</Base>

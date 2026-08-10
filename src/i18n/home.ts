@@ -107,6 +107,22 @@ export const homeCopy = {
       ],
     },
 
+    ava: {
+      chip: "Der Assistent",
+      h2a: "Er meldet sich,", h2b: "bevor Sie fragen.",
+      sub: "Was zählt, legt er von sich aus vor. Alles Weitere fragen Sie in eigenen Worten.",
+      // ⚠️ Jede Karte nennt den NUTZEN, nicht die Mechanik. Eine frühere Fassung beschrieb nur
+      // Zustände ("beim Öffnen steht da …") und überzeugte nicht. Eine zweite füllte die Karten
+      // mit erfundenen Meldungen; bewusst verworfen, denn Beispieldaten machen die Aussage nicht
+      // wahrer, sie machen sie nur voller. Die Sätze müssen ohne Zahlen tragen.
+      cards: [
+        { lbl: "Er meldet sich von selbst", t: "Sie müssen nicht suchen, was wichtig ist. Er legt es vor, sobald Sie ihn öffnen, und sagt genauso deutlich, wenn gerade nichts ansteht." },
+        { lbl: "Er antwortet aus Ihren Zahlen", t: "Keine allgemeinen Ratschläge. Was er sagt, kommt aus Ihrem Bestand, Ihren Bestellungen und Ihren Lieferanten, und er sieht dabei, worauf Sie gerade schauen." },
+        { lbl: "Er führt es auch aus", t: "Bestellen, freigeben, eine Grenze ändern: er tut es, statt es Ihnen zu erklären. Im Rahmen Ihrer Schwelle, und alles steht danach im Protokoll." },
+      ],
+      foot: "Sprechen statt tippen, und die Antwort wird auf Wunsch vorgelesen.",
+    },
+
     ctrl: {
       chip: "Kontrolle",
       h2: "Und wer entscheidet? Sie.",
@@ -149,7 +165,7 @@ export const homeCopy = {
       },
       b3: {
         h: "Harte Grenzen",
-        p: "Betrag pro Bestellung, Ausgaben pro Tag, Bestellschluss. Erreicht der Agent eine Grenze, hält er an.",
+        p: "Betrag pro Bestellung, Ausgaben pro Tag, Bestellschluss. An einer Grenze hält der Agent an, am Bestellschluss bündelt er.",
         used: "ausgeschöpft", cap: "Ausgaben heute · 12.400 / 20.000 €",
         t1l: "Pro Bestellung", t1v: "5.000 €", t1s: "Maximum",
         t2l: "Bestellschluss", t2v: "16:00", t2s: "täglich",
@@ -157,7 +173,7 @@ export const homeCopy = {
         t3n: "Am Limit stoppt der Agent und meldet sich. Ohne Sie läuft nichts weiter.",
         sub: [
           { h: "Zwei Grenzen", p: "Pro Bestellung und pro Tag, unabhängig voneinander gesetzt." },
-          { h: "Bestellschluss", p: "Nach der eingestellten Uhrzeit löst der Agent nichts mehr aus." },
+          { h: "Gebündelt statt gestückelt", p: "Bis zur eingestellten Uhrzeit sammelt er alle offenen Bedarfe. Dann geht pro Lieferant eine Bestellung raus, nicht fünf einzelne an dieselbe Adresse. Was später anfällt, geht am nächsten Tag." },
         ],
       },
       b4: {
@@ -228,7 +244,7 @@ export const homeCopy = {
     },
 
     pilot: {
-      chip: "Pilotprogramm · begrenzte Plätze",
+      chip: "Kostenloses Pilotprogramm · begrenzte Plätze",
       h2a: "30 Minuten. Danach wissen Sie,", h2b: "ob es passt.",
       p: "Wir nehmen eine kleine Zahl an Pilotkunden auf. Davor steht immer ein Gespräch. Unverbindlich, und vorbereiten müssen Sie dafür nichts.",
       lbl: "Worüber wir sprechen",
@@ -239,12 +255,13 @@ export const homeCopy = {
       ],
       cardLbl: "Das Gespräch",
       cta: "Pilot-Gespräch buchen",
-      spec: [["Dauer", "30 Minuten"], ["Verbindlichkeit", "Keine"], ["Vorbereitung", "Keine"], ["Danach", "Sie entscheiden"]],
+      spec: [["Dauer", "30 Minuten"], ["Verbindlichkeit", "Keine"], ["Vorbereitung", "Keine"], ["Danach", "Entscheiden Sie"]],
       alt: "Lieber erst lesen? Pitchdeck ansehen →",
     },
 
     foot: {
-      tag: "Der KI-Agent, der Ihre Beschaffung führt, von der Bedarfserkennung bis zur Bestellung.",
+      // The brand claim, English in both locales on purpose: it is the mark, not a sentence.
+      tag: "Connections you can rely on",
       entity: "Synapsio UG (haftungsbeschränkt) · Schönwalde-Glien",
       colProduct: "Produkt", overview: "Übersicht", app: "Zur App",
       colCompany: "Unternehmen", about: "Über uns",
@@ -379,6 +396,18 @@ export const homeCopy = {
       ],
     },
 
+    ava: {
+      chip: "The assistant",
+      h2a: "It speaks", h2b: "before you ask.",
+      sub: "What matters, it puts in front of you. Everything else you ask in your own words.",
+      cards: [
+        { lbl: "It speaks first", t: "You do not have to go looking for what matters. It puts that in front of you the moment you open it, and says just as plainly when nothing needs you." },
+        { lbl: "It answers from your figures", t: "No general advice. What it says comes from your stock, your orders and your suppliers, and it can see what you are looking at while you ask." },
+        { lbl: "It carries it out", t: "Order, approve, change a limit: it does the thing instead of explaining it to you. Within your threshold, and all of it lands in the log." },
+      ],
+      foot: "Speak instead of typing, and have the answer read back to you.",
+    },
+
     ctrl: {
       chip: "Control",
       h2: "So who decides? You do.",
@@ -421,7 +450,7 @@ export const homeCopy = {
       },
       b3: {
         h: "Hard limits",
-        p: "Amount per order, spend per day, daily cut-off. When the agent reaches a limit, it stops.",
+        p: "Amount per order, spend per day, daily cut-off. At a limit the agent stops; at the cut-off it bundles.",
         used: "used", cap: "Spend today · €12,400 / €20,000",
         t1l: "Per order", t1v: "€5,000", t1s: "Maximum",
         t2l: "Order cut-off", t2v: "16:00", t2s: "daily",
@@ -429,7 +458,7 @@ export const homeCopy = {
         t3n: "At the limit the agent stops and tells you. Nothing continues without you.",
         sub: [
           { h: "Two caps", p: "Per order and per day, set independently of each other." },
-          { h: "Cut-off time", p: "After the time you set, the agent places nothing further." },
+          { h: "Bundled, not dribbled out", p: "Up to the time you set it collects every open requirement. Then one order per supplier goes out, not five separate ones to the same address. Anything later goes the next day." },
         ],
       },
       b4: {
@@ -500,7 +529,7 @@ export const homeCopy = {
     },
 
     pilot: {
-      chip: "Pilot program · limited places",
+      chip: "Free pilot programme · limited places",
       h2a: "30 minutes. After that you know", h2b: "whether it fits.",
       p: "We are taking on a small number of pilot customers. There is always a conversation first. No obligation, and nothing for you to prepare.",
       lbl: "What we talk about",
@@ -516,7 +545,7 @@ export const homeCopy = {
     },
 
     foot: {
-      tag: "The AI agent that runs your procurement, from spotting demand to placing the order.",
+      tag: "Connections you can rely on",
       entity: "Synapsio UG (haftungsbeschränkt) · Schönwalde-Glien, Germany",
       colProduct: "Product", overview: "Overview", app: "Open the app",
       colCompany: "Company", about: "About",

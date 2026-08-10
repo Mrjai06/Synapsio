@@ -175,6 +175,34 @@ const p = (path: string) => localePath(locale, path);
     </div>
   </section>
 
+  <!-- The assistant. The SAME orb as the MVP's Ava (NeuralOrb.tsx: 560 nodes, perspective 2.7x
+       radius, teal core glow) and the same shape the product uses when it has something to say:
+       the copy sits in cards that hang off the sphere on hairlines. The form is the argument, so
+       nothing here describes a chat window. Lines are drawn by script against the real laid-out
+       positions, because a hand-placed SVG breaks at every width. -->
+  <section class="ava" id="avaSec">
+    <div class="shell">
+      <div class="ava-hd">
+        <span class="chip"><span class="sq"></span>{c.ava.chip}</span>
+        <h2>{c.ava.h2a}<br />{c.ava.h2b}</h2>
+        <p class="ava-sub">{c.ava.sub}</p>
+      </div>
+
+      <div class="ava-stage" id="avaStage">
+        <svg class="ava-wires" aria-hidden="true"><g></g></svg>
+        <div class="ava-orb"><NeuralSphere size={340} nodes={560} opacity={1} variant="inline" perspRatio={2.7} glow={true} radius={143} /></div>
+        {c.ava.cards.map((k, i) => (
+          <article class={"ava-card ava-c" + (i + 1)} data-ava-card>
+            <span class="ava-lbl">{k.lbl}</span>
+            <p>{k.t}</p>
+          </article>
+        ))}
+      </div>
+
+      <p class="ava-foot">{c.ava.foot}</p>
+    </div>
+  </section>
+
   <section class="ctrl">
     <div class="shell">
       <div class="ctrl-grid">
@@ -519,6 +547,39 @@ const p = (path: string) => localePath(locale, path);
   initOrbs();
   setGut("dashboard");
 
+  /* ===== the assistant section: wires from the sphere to the cards =====
+     Drawn against the REAL boxes after layout, and redrawn on resize. A hand-authored SVG cannot
+     survive three breakpoints and a variable font size; this always lands on the actual corners. */
+  (function(){
+    var stage=document.getElementById("avaStage");
+    if(!stage) return;
+    var svg=stage.querySelector(".ava-wires"), g=svg&&svg.querySelector("g");
+    var orb=stage.querySelector(".ava-orb");
+    if(!g||!orb) return;
+    function draw(){
+      if(getComputedStyle(svg).display==="none") return;
+      var sb=stage.getBoundingClientRect(), ob=orb.getBoundingClientRect();
+      svg.setAttribute("viewBox","0 0 "+sb.width+" "+sb.height);
+      var cx=ob.left-sb.left+ob.width/2, cy=ob.top-sb.top+ob.height/2, r=ob.width*0.34;
+      var d="";
+      Array.prototype.forEach.call(stage.querySelectorAll("[data-ava-card]"),function(c){
+        var b=c.getBoundingClientRect();
+        // anchor on the card edge that faces the sphere, vertically centred
+        var ax=(b.left-sb.left+b.width/2)<cx ? b.right-sb.left : b.left-sb.left;
+        var ay=b.top-sb.top+b.height/2;
+        // start on the sphere's rim, not its centre, so the line never crosses the dots
+        var vx=ax-cx, vy=ay-cy, L=Math.hypot(vx,vy)||1;
+        var sx=cx+vx/L*r, sy=cy+vy/L*r;
+        // one control point pulled toward the sphere's height: a gentle bow, never a diagonal
+        d+="M"+sx.toFixed(1)+" "+sy.toFixed(1)+"Q"+((sx+ax)/2).toFixed(1)+" "+sy.toFixed(1)+" "+ax.toFixed(1)+" "+ay.toFixed(1);
+      });
+      g.innerHTML='<path d="'+d+'"/>';
+    }
+    draw();
+    addEventListener("resize",draw,{passive:true});
+    if(window.ResizeObserver) new ResizeObserver(draw).observe(stage);
+  })();
+
   /* ===== isometric figures: Wahrnehmen · Produktion · Handeln · Lernen ===== */
   var SVGNS="http://www.w3.org/2000/svg",COS30=Math.cos(Math.PI/6),SIN30=0.5;
   function project(p){return[(p[0]-p[1])*COS30,(p[0]+p[1])*SIN30-p[2],p[0]+p[1]+p[2]];}
@@ -575,17 +636,45 @@ const p = (path: string) => localePath(locale, path);
         // inward and upward each week until one stands on the coral summit.
         var TIER=[[11,0,1.15],[7.5,1.15,1.15],[4.6,2.30,1.15],[2.0,3.45,1.25]];
         TIER.forEach(function(t,i){
-          f=f.concat(box([-t[0],-t[0],t[1]],[2*t[0],0,0],[0,2*t[0],0],[0,0,t[2]], -8+i, i===3)); });
+          // ⚠️ NO TIER IS HOT. The summit used to carry the accent, which was right when the
+          // marker on it was another small box. With a cup standing there, a coral cup on a coral
+          // plinth merged into one blob — the accent has to belong to ONE object.
+          f=f.concat(box([-t[0],-t[0],t[1]],[2*t[0],0,0],[0,2*t[0],0],[0,0,t[2]], -8+i, false)); });
         // a marker stands on whichever tier it has reached, so converging also means climbing
         function surfZ(x,y){ var m=Math.max(Math.abs(x),Math.abs(y));
           return m<=2.0?4.70 : m<=4.6?3.45 : m<=7.5?2.30 : m<=11?1.15 : 0; }
-        function marker(x,y,ch,ord){ var w=0.82, h=2.6, z=surfZ(x,y);
-          f=f.concat(box([x-w,y-w,z],[2*w,0,0],[0,2*w,0],[0,0,h], ord, ch));
-          f.push({line:true,pts:[[x,y,z+h],[x,y,z+h+0.9]],alpha:0.5,order:ord+0.5,hot:ch}); }
+        // ⚠️ NEITHER OF THESE IS A CUBE ANY MORE. Six identical little boxes climbing a stepped
+        // pyramid read as blocks on blocks — the tiers are already boxes, so the markers vanished
+        // into them. A flag has a mast and a blade at one height; a cup has a foot, a stem and a
+        // bowl. Both are silhouettes you recognise at 200px, which a box on a box never is.
+        function bx(x,y,w,zz,h,ord,ch){
+          return box([x-w,y-w,zz],[2*w,0,0],[0,2*w,0],[0,0,h], ord, ch); }
+        function flag(x,y,ord){ var z=surfZ(x,y), h=2.7;
+          f=f.concat(bx(x,y,0.11,z,h,ord,false));                      // mast
+          // the blade hangs off one side only, so the shape has a direction
+          f=f.concat(box([x+0.11,y-0.06,z+h-0.98],[0.92,0,0],[0,0.12,0],[0,0,0.48], ord+0.3, false));
+        }
+        // ⚠️ THE BOWL MUST BE WIDER THAN THE FOOT. Built the other way round first (foot 0.95,
+        // bowl 0.9) and it read as a small table on a plinth: a cup is recognised by that silhouette
+        // — narrow base, thin stem, wide open top — and nothing else at this size carries it.
+        function cup(x,y,ord){ var z=surfZ(x,y);
+          // ⚠️ TALL AND NARROW, NOT WIDE. Seen from above, a wide bowl is just a box with its lid
+          // showing — the eye reads the top face, not the profile. The silhouette has to be
+          // vertical for the shape to survive the viewing angle: long stem, bowl taller than wide.
+          f=f.concat(bx(x,y,0.8,z,0.24,ord,true));                     // foot
+          f=f.concat(bx(x,y,0.46,z+0.24,0.2,ord+0.1,true));            // plinth
+          f=f.concat(bx(x,y,0.17,z+0.44,1.5,ord+0.2,true));            // stem
+          // the bowl widens in two steps: box() makes prisms, so a taper has to be stacked
+          f=f.concat(bx(x,y,0.52,z+1.94,0.4,ord+0.3,true));
+          f=f.concat(bx(x,y,0.86,z+2.34,1.5,ord+0.4,true));
+          // handles: thin, or they read as blocks stuck to the sides
+          f=f.concat(box([x-1.12,y-0.1,z+2.5],[0.26,0,0],[0,0.2,0],[0,0,1.05], ord+0.5, true));
+          f=f.concat(box([x+0.86,y-0.1,z+2.5],[0.26,0,0],[0,0.2,0],[0,0,1.05], ord+0.5, true));
+        }
         var hits=[{a:0.5,r:9.6},{a:2.2,r:8.4},{a:3.5,r:10.2},{a:4.6,r:7.4},{a:5.7,r:9.0}];
         for(var i=0;i<hits.length;i++){ var hd=hits[i], q=p[i], rr=hd.r*(1-q)+3.3*q;
-          marker(rr*Math.cos(hd.a), rr*Math.sin(hd.a), false, 10+i); }
-        marker(0,0,true,20);   // your target, on the summit
+          flag(rr*Math.cos(hd.a), rr*Math.sin(hd.a), 10+i); }
+        cup(0,0,20);   // your target, on the summit
         return f;}}
   ];
 

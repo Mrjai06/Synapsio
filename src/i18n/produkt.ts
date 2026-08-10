@@ -88,6 +88,7 @@ export const produktCopy = {
         paras: [
           { lead: "Die Rechnung dahinter ist keine Schätzung.", text: "Bestand geteilt durch den durchschnittlichen Tagesverbrauch, gemessen gegen die Lieferzeit, die der Lieferant tatsächlich einhält. Der Bestellpunkt fällt aus dieser Rechnung, statt fest im Artikelstamm zu stehen: Tagesverbrauch mal Lieferzeit, plus einen Sicherheitsbestand aus Ihrem Servicegrad und der Streuung des Verbrauchs." },
           { lead: "Verändert sich der Verbrauch, verschiebt sich der Punkt mit.", text: "Niemand muss eine Liste pflegen, damit die Zahl aktuell bleibt. Die Bestellmenge kommt anschließend aus dem Verfahren des Artikels und aus den Staffelpreisen, die beim Lieferanten hinterlegt sind." },
+          { lead: "Bestand ist nicht eine Zahl pro Artikel.", text: "Mehrere Standorte, eigene Lagerplätze und Chargen sind abgebildet, und die Rechnung läuft je Standort. Wo der Bedarf aus der Fertigung kommt, zieht der Agent ihn aus den Stücklisten und den tatsächlich gelaufenen Produktionsläufen, statt ihn zu schätzen." },
           { lead: "", text: "Daneben rechnet der Agent laufend weiter. Er erstellt eine Bedarfsprognose je Artikel, erkennt wiederkehrende Muster über das Jahr und meldet Ausreißer im Verbrauch, statt sie in den Durchschnitt einzurechnen. Aus Termintreue und Antwortverhalten entsteht ein Risikowert je Lieferant, der wiederum in den Angebotsvergleich einfließt." },
         ],
         say: "Ein Ausreißer soll die Prognose nicht verbiegen, also wird er gemeldet statt eingerechnet.",
@@ -118,6 +119,16 @@ export const produktCopy = {
           { lead: "", text: "Sie behalten das letzte Wort. Ein Verfahren, das Sie festsetzen, rührt sie nicht mehr an, und was Sie freigeben oder ablehnen, ist selbst wieder ein Signal." },
         ],
         say: "Eine Entscheidung, die nie nachbewertet wird, ist eine Regel mit besserem Marketing.",
+      },
+      assist: {
+        paras: [
+          { lead: "Er wartet nicht auf eine Frage.", text: "Beim Öffnen steht da, was sich seit Ihrem letzten Blick geändert hat, und ebenso, was gerade nicht dringend ist. Dabei verbindet er, was in getrennten Listen liegt: ein Wettersignal aus der Marktbeobachtung neben der Lieferverzögerung, die dazu schon als Ausnahme offen war." },
+          { lead: "Er sieht, worauf Sie gerade schauen.", text: "Die Frage geht mit dem Kontext der geöffneten Seite raus, Sie müssen den Artikel also nicht noch einmal benennen. Was zurückkommt, stammt aus Ihren Beständen, Bestellungen und Lieferanten, nicht aus allgemeinem Wissen." },
+          { lead: "Er kann nicht nur antworten, sondern auch handeln.", text: "Was er dabei getan hat, führt er unter der Antwort auf und verlinkt es, damit Sie es nachsehen können. Es gelten dieselben Grenzen wie für den Agenten: über Ihrer Schwelle löst er nichts ohne Sie aus." },
+          { lead: "Sprechen statt tippen.", text: "Fragen lassen sich diktieren, und die Antwort kann vorgelesen werden. In der Halle ist das meist schneller als eine Tastatur." },
+          { lead: "Für das Regal gibt es die Kamera.", text: "Ein Foto vom Fach, ein Vermerk dazu, fertig. Der Vorgang landet im System, ohne dass jemand dafür an den Rechner zurückgeht." },
+        ],
+        say: "Er ersetzt keine Seite. Er tritt davor, wenn Sie ihn rufen, und geht wieder.",
       },
       memory: {
         paras: [
@@ -174,6 +185,12 @@ export const produktCopy = {
         key: "memory", label: "Das Gedächtnis", h: "Er merkt sich, was Sie entscheiden",
         lede: { lead: "Jede Freigabe und jede Ablehnung ist ein Signal.",
                 rest: " Der Agent schreibt nicht nur mit, was er getan hat. Er bewertet später, ob es richtig war, und zieht daraus die nächste Entscheidung." },
+      },
+
+      {
+        key: "assist", label: "Der Assistent", h: "Er meldet sich, bevor Sie fragen",
+        lede: { lead: "Ein Eingabefeld wäre ein Chatfenster.",
+                rest: " Dieser Assistent legt von sich aus vor, was gerade zählt, verbindet Dinge, die getrennt liegen, und beantwortet alles Weitere in Ihren eigenen Worten." },
       },
     ],
 
@@ -269,6 +286,7 @@ export const produktCopy = {
         paras: [
           { lead: "The calculation behind it is not an estimate.", text: "Stock divided by average daily consumption, measured against the lead time the supplier actually keeps. The reorder point falls out of that calculation instead of sitting fixed in the item master: daily consumption times lead time, plus a safety stock derived from your service level and the variability of demand." },
           { lead: "When consumption changes, the point moves with it.", text: "Nobody has to maintain a list to keep the number current. The order quantity then comes from the item's method and from the volume prices held against the supplier." },
+          { lead: "Stock is not one number per item.", text: "Multiple locations, their own storage bins and batches are represented, and the calculation runs per location. Where demand comes from production, the agent derives it from the bills of material and the production runs that actually happened, rather than estimating it." },
           { lead: "", text: "Alongside that the agent keeps calculating. It produces a demand forecast per item, recognises patterns that repeat across the year, and reports outliers in consumption rather than averaging them in. Delivery reliability and responsiveness produce a risk score per supplier, which in turn feeds into how quotes are compared." },
         ],
         say: "An outlier should not bend the forecast, so it is reported rather than absorbed.",
@@ -299,6 +317,16 @@ export const produktCopy = {
           { lead: "", text: "You keep the last word. A method you pin is left alone, and what you approve or reject is itself a signal." },
         ],
         say: "A decision that is never scored afterwards is a rule with better marketing.",
+      },
+      assist: {
+        paras: [
+          { lead: "It does not wait for a question.", text: "When it opens, it states what has changed since you last looked, and equally what is not urgent right now. It connects what sits in separate lists: a weather signal from market monitoring next to the delivery delay already open as an exception." },
+          { lead: "It sees what you are looking at.", text: "The question carries the context of the page you have open, so you do not have to name the item again. What comes back is drawn from your stock, orders and suppliers, not from general knowledge." },
+          { lead: "It can act, not only answer.", text: "Whatever it did is listed under the answer and linked, so you can check it. The same limits apply as for the agent: above your threshold it triggers nothing without you." },
+          { lead: "Speak instead of typing.", text: "Questions can be dictated, and the answer can be read aloud. On the shop floor that is usually faster than a keyboard." },
+          { lead: "For the shelf there is the camera.", text: "A photo of the bin, a note with it, done. The record lands in the system without anyone walking back to a computer." },
+        ],
+        say: "It replaces no page. It steps in front when you call it, and steps away again.",
       },
       memory: {
         paras: [
@@ -355,6 +383,12 @@ export const produktCopy = {
         key: "memory", label: "Memory", h: "It remembers what you decide",
         lede: { lead: "Every approval and every rejection is a signal.",
                 rest: " The agent does not just record what it did. It scores later whether that was right, and draws the next decision from it." },
+      },
+
+      {
+        key: "assist", label: "The assistant", h: "It speaks before you ask",
+        lede: { lead: "A text box would be a chat window.",
+                rest: " This assistant opens with what currently matters, connects things that sit apart, and answers everything else in your own words." },
       },
     ],
 

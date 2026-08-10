@@ -31,9 +31,16 @@ const p = (to: string) => localePath(locale, to);
     </div>
     <div class="foot-col">
       <span class="mono">{c.foot.colLegal}</span>
-      <a href="/Imprint-Synapsio.pdf">{c.foot.imprint}</a>
-      <a href="/privacy-policy-synapsio.pdf">{c.foot.privacy}</a>
-      <a href="/terms-of-service-synapsio.pdf">{c.foot.terms}</a>
+      {/* ⚠️ Impressum und Datenschutz sind SEITEN, keine PDFs mehr. § 5 DDG verlangt "unmittelbar
+          erreichbar", was bei einem Download verbreitet bezweifelt wird — und die alten PDFs waren
+          inhaltlich überholt (Anbieter war eine natürliche Person, nicht die UG).
+          ⚠️ KEINE AGB HIER. Sie regeln die Nutzung der ANWENDUNG, nicht dieser Marketing-Seite;
+          verlinkt gehören sie dorthin, wo ein Vertrag zustande kommt. Der alte PDF-Link ist
+          deshalb entfernt und nicht ersetzt worden.
+          ⚠️ KEINE USt-IdNr.: es gibt keine. § 5 Abs. 1 Nr. 6 DDG verlangt sie nur "soweit
+          vorhanden", also ist die Angabe korrekt abwesend und darf nicht erfunden werden. */}
+      <a href={p("/impressum")}>{c.foot.imprint}</a>
+      <a href={p("/datenschutz")}>{c.foot.privacy}</a>
     </div>
   </div>
   <div class="foot-bottom">
