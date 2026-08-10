@@ -855,6 +855,14 @@ const hz = homeCopy[locale].hz;
   }
 
   var GROUND={ap:1,lane:1,ring:1,rmk:1,rmkd:1,rzeb:1,"pool-on":1,"pool-off":1};
+  /* ⚠️ PAINT SORTS ABOVE EVERY SURFACE, NOT JUST ITS OWN. A marking keys on its road's centre so
+     it cannot sink behind the near half of that road — but the roads around it key on THEIR
+     centres, and a neighbouring carriageway whose centre sits closer wins by tens of units. Two
+     arms lost their markings to exactly that, and a +0.8 nudge could never close a gap that size.
+     Proven with elementsFromPoint: the stack over a marking read ["face lit ring", "face rmk"].
+     +40 clears any ground plate in this scene while staying far below buildings and lorries,
+     which carry no -1000 at all. */
+  var MARK={rmk:1,rmkd:1,rzeb:1,lane:1};
   var pool=[];
   function render(h,T){
     var vb=viewBoxAt(h);
@@ -874,6 +882,7 @@ const hz = homeCopy[locale].hz;
       // ground plates span so much x+y that their mean depth lands in FRONT of the wall they
       // abut — they were painting over the dock doors. Scenery goes under everything on it.
       if(GROUND[fc.cls]) depth-=1000;
+      if(MARK[fc.cls]) depth+=40;
       recs.push({d:d+(fc.open?"":"Z"),depth:depth,lit:fc.lit,cls:fc.cls,op:fc.op});
     });
     recs.sort(function(a,b){ return a.depth-b.depth; });
