@@ -89,6 +89,49 @@ export const legalCopy = {
         ] },
       ],
     },
+    subprocessors: {
+      title: "Subprozessoren",
+      lede: "Wer im Auftrag von Synapsio Daten verarbeitet. Diese Liste gilt für die Anwendung unter app.synapsio.solutions. Wir aktualisieren sie, bevor sich etwas ändert.",
+      blocks: [
+        { h: "Warum diese Liste existiert", p: [
+          "Wer eine Software einsetzt, die seine Daten verarbeitet, muss wissen, wer sie sonst noch berührt. Artikel 28 der Datenschutz-Grundverordnung verlangt, dass wir unsere Unterauftragsverarbeiter offenlegen und Änderungen vorher ankündigen.",
+          "Wir kündigen jede Änderung mindestens 30 Tage vorher an. Wer als Kunde einen datenschutzbezogenen Grund hat, kann widersprechen.",
+        ] },
+        { h: "Supabase — Datenbank und Anmeldung", p: [
+          "Zweck: Speicherung sämtlicher Anwendungsdaten, Benutzerkonten und Anmeldung.",
+          "Ort der Verarbeitung: Europäische Union, Region Frankfurt am Main.",
+          "Es liegt eine unterzeichnete Auftragsverarbeitungsvereinbarung vor.",
+        ] },
+        { h: "OpenAI — Sprachmodell", p: [
+          "Zweck: Analyse von Bestands- und Lieferantendaten, Entwurf von Texten.",
+          "Ort der Verarbeitung: Vereinigte Staaten. Grundlage der Übermittlung sind die Standardvertragsklauseln der EU-Kommission.",
+          "Es liegt eine unterzeichnete Auftragsverarbeitungsvereinbarung vor. Ihre Daten werden nicht zum Training von Modellen verwendet.",
+        ] },
+        { h: "Anthropic — Sprachmodell", p: [
+          "Zweck: Analyse und der Assistent in der Anwendung.",
+          "Ort der Verarbeitung: Vereinigte Staaten. Grundlage der Übermittlung sind die Standardvertragsklauseln der EU-Kommission.",
+          "Die Auftragsverarbeitungsvereinbarung ist Bestandteil der Geschäftsbedingungen. Ihre Daten werden nicht zum Training von Modellen verwendet.",
+        ] },
+        { h: "Resend — E-Mail", p: [
+          "Zweck: Versand der Bestellungen an Ihre Lieferanten und Empfang der Antworten.",
+          "Ort der Verarbeitung: Vereinigte Staaten und Europäische Union.",
+          "Es liegt eine unterzeichnete Auftragsverarbeitungsvereinbarung vor.",
+        ] },
+        { h: "Vercel — Auslieferung der Oberfläche", p: [
+          "Zweck: Bereitstellung der Web-Anwendung im Browser.",
+          "Ort der Verarbeitung: Vereinigte Staaten und Randserver in der Europäischen Union.",
+        ] },
+        { h: "Keine Auftragsverarbeiter: Bauteilkataloge", p: [
+          "Für die Prüfung, ob ein Bauteil abgekündigt wurde, fragen wir Kataloge von Distributoren ab. Übermittelt wird dabei ausschließlich die Artikelnummer des Herstellers — keine personenbezogenen Daten und keine Angaben über Sie oder Ihr Unternehmen.",
+        ] },
+        { h: "Keine Auftragsverarbeiter: Ihre Lieferanten", p: [
+          "Wenn Synapsio in Ihrem Auftrag eine Bestellung versendet, empfängt Ihr Lieferant diese als eigenständig Verantwortlicher. Er handelt nicht in unserem Auftrag.",
+        ] },
+        { h: "Stand", p: [
+          "Diese Liste gilt ab August 2026.",
+        ] },
+      ],
+    },
   },
   en: {
     imprint: {
@@ -149,6 +192,49 @@ export const legalCopy = {
         ] },
         { h: "Status", p: [
           "This policy applies from August 2026. We update it when our processing changes.",
+        ] },
+      ],
+    },
+    subprocessors: {
+      title: "Subprocessors",
+      lede: "Who processes data on behalf of Synapsio. This list covers the application at app.synapsio.solutions. We update it before anything changes.",
+      blocks: [
+        { h: "Why this list exists", p: [
+          "Anyone using software that processes their data should know who else touches it. Article 28 GDPR requires us to disclose our subprocessors and to announce changes in advance.",
+          "We announce every change at least 30 days ahead. Customers with a data-protection reason may object.",
+        ] },
+        { h: "Supabase — database and sign-in", p: [
+          "Purpose: storage of all application data, user accounts and authentication.",
+          "Place of processing: European Union, Frankfurt region.",
+          "A signed data processing agreement is in place.",
+        ] },
+        { h: "OpenAI — language model", p: [
+          "Purpose: analysis of stock and supplier data, drafting of text.",
+          "Place of processing: United States, on the basis of the EU Standard Contractual Clauses.",
+          "A signed data processing agreement is in place. Your data is not used to train models.",
+        ] },
+        { h: "Anthropic — language model", p: [
+          "Purpose: analysis and the in-app assistant.",
+          "Place of processing: United States, on the basis of the EU Standard Contractual Clauses.",
+          "The data processing addendum forms part of the commercial terms. Your data is not used to train models.",
+        ] },
+        { h: "Resend — email", p: [
+          "Purpose: sending purchase orders to your suppliers and receiving their replies.",
+          "Place of processing: United States and European Union.",
+          "A signed data processing agreement is in place.",
+        ] },
+        { h: "Vercel — delivery of the interface", p: [
+          "Purpose: serving the web application to the browser.",
+          "Place of processing: United States and edge servers in the European Union.",
+        ] },
+        { h: "Not subprocessors: component catalogues", p: [
+          "To check whether a part has been discontinued we query distributor catalogues. Only the manufacturer part number is transmitted — no personal data and nothing about you or your company.",
+        ] },
+        { h: "Not subprocessors: your suppliers", p: [
+          "When Synapsio sends an order on your behalf, your supplier receives it as an independent controller. They do not act on our behalf.",
+        ] },
+        { h: "Status", p: [
+          "This list applies from August 2026.",
         ] },
       ],
     },

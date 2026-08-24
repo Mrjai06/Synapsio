@@ -7,10 +7,12 @@ import type { Locale } from "../i18n/ui";
 import SiteNav from "./SiteNav.astro";
 import SiteFooter from "./SiteFooter.astro";
 
-interface Props { locale?: Locale; kind: "imprint" | "privacy" }
+interface Props { locale?: Locale; kind: "imprint" | "privacy" | "subprocessors" }
 const { locale = "de", kind } = Astro.props;
 const c = legalCopy[locale][kind];
-const path = kind === "imprint" ? "/impressum" : "/datenschutz";
+const path = kind === "imprint" ? "/impressum"
+  : kind === "subprocessors" ? "/subprozessoren"
+  : "/datenschutz";
 ---
 
 <SiteNav locale={locale} path={path} active={null} />

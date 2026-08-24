@@ -42,6 +42,7 @@ const p = (to: string) => localePath(locale, to);
           vorhanden", also ist die Angabe korrekt abwesend und darf nicht erfunden werden. */}
       <a href={p("/impressum")}>{c.foot.imprint}</a>
       <a href={p("/datenschutz")}>{c.foot.privacy}</a>
+      <a href={p("/subprozessoren")}>{locale === "en" ? "Subprocessors" : "Subprozessoren"}</a>
     </div>
   </div>
   <div class="foot-bottom">
