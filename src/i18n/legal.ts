@@ -10,8 +10,10 @@
 // consult an attorney" trug. Ausserdem verlangt § 5 DDG "unmittelbar erreichbar", was bei einem
 // PDF verbreitet bezweifelt wird. Die PDFs bleiben liegen, sind aber nicht mehr verlinkt.
 //
-// ⚠️ KEINE RECHTSBERATUNG. Vor dem ersten Pilotkunden anwaltlich prüfen lassen. Offen ist
-// insbesondere die USt-IdNr. (unten auskommentiert, sobald sie vorliegt eintragen).
+// ⚠️ KEINE RECHTSBERATUNG. Vor dem ersten Pilotkunden anwaltlich prüfen lassen.
+//
+// USt-IdNr. seit 03.09.2026 eingetragen. § 5 DDG verlangt sie, SOBALD eine vorliegt — sie darf
+// also nicht mehr fehlen. Sie steht nur hier und fliesst von hier in beide Sprachfassungen.
 
 export const COMPANY = {
   name: "Synapsio UG (haftungsbeschränkt)",
@@ -20,6 +22,7 @@ export const COMPANY = {
   country: "Deutschland",
   countryEn: "Germany",
   register: "HRB 42364 P",
+  vatId: "DE464500566",
   court: "Amtsgericht Potsdam",
   courtEn: "Local Court of Potsdam",
   directors: "Jakob Ibrahim, Luis Marten Boy",
@@ -40,6 +43,9 @@ export const legalCopy = {
         { h: "Handelsregister", p: [
           `Eingetragen im Handelsregister des ${COMPANY.court}`,
           `Registernummer: ${COMPANY.register}`,
+        ] },
+        { h: "Umsatzsteuer-Identifikationsnummer", p: [
+          `Umsatzsteuer-Identifikationsnummer gemäß § 27 a Umsatzsteuergesetz: ${COMPANY.vatId}`,
         ] },
         { h: "Vertretungsberechtigte Geschäftsführer", p: [COMPANY.directors] },
         { h: "Kontakt", p: [`E-Mail: ${COMPANY.email}`] },
@@ -146,6 +152,9 @@ export const legalCopy = {
         { h: "Commercial register", p: [
           `Registered with the ${COMPANY.courtEn}`,
           `Registration number: ${COMPANY.register}`,
+        ] },
+        { h: "VAT identification number", p: [
+          `VAT identification number pursuant to § 27 a of the German VAT Act: ${COMPANY.vatId}`,
         ] },
         { h: "Managing directors", p: [COMPANY.directors] },
         { h: "Contact", p: [`Email: ${COMPANY.email}`] },
