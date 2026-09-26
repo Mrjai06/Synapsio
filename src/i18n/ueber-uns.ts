@@ -80,7 +80,7 @@ export const ueberUnsCopy = {
           name: "Arne Schildmeyer",
           role: "Mitgründer",
           bio: "BWL (B.A.) an der TH Wildau. Plant Bedarf und Nachschub, steuert Lieferanten, Distribution und Lager. Früher bei Heineken und Stone Brewing, heute baut er Bestands- und Produktionssteuerung mit Stücklisten in der Medizintechnik.",
-          photo: "/team/arne.webp",
+          photo: "", // no photo until he has agreed to it being published
           linkedin: "https://www.linkedin.com/in/arne-schildmeyer-831766140/",
         },
       ] as Person[],
@@ -174,7 +174,7 @@ export const ueberUnsCopy = {
           name: "Arne Schildmeyer",
           role: "Co-founder",
           bio: "B.A. in business at TH Wildau. Plans demand and replenishment, runs suppliers, distribution and warehousing. Formerly at Heineken and Stone Brewing, today he builds inventory and production control with bills of materials in medtech manufacturing.",
-          photo: "/team/arne.webp",
+          photo: "", // no photo until he has agreed to it being published
           linkedin: "https://www.linkedin.com/in/arne-schildmeyer-831766140/",
         },
       ] as Person[],
