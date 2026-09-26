@@ -5,6 +5,9 @@ export const CAL_URL = "https://cal.eu/synapsio/30min";
 export const APP_URL = "https://app.synapsio.solutions";
 export const CONTACT_EMAIL = "contact@synapsio.co.site";
 export const LINKEDIN_URL = "https://www.linkedin.com/company/synapsioai";
+// The pitch deck, one PDF per language (built by Synapsio_Pitchdeck_2026-09_v2_build.py).
+// The German one keeps the old /Synapsio_Pitch.pdf address so links already sent out still work.
+export const deckUrl = (locale: Locale) => (locale === "en" ? "/Synapsio_Pitch_EN.pdf" : "/Synapsio_Pitch.pdf");
 
 export const ui = {
   de: {

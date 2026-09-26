@@ -1,9 +1,10 @@
 // /ueber-uns — who is behind Synapsio, and the company facts a German SMB checks before signing.
 //
 // FACT SOURCES, so nothing here is invented:
-//  - Team names, titles and one-line bios are carried over VERBATIM from the previous site's
-//    TeamSection (origin/main, src/components/premium/TeamSection.tsx). ⚠️ Jakob still has to
-//    confirm Luis Boy's title, since the co-founder situation has moved since that page shipped.
+//  - Team (since 2026-09): identical to the pitch deck v2. All three are "Mitgründer" (roles are
+//    deliberately open), bios describe what each person does. Arne's employer is NOT named (it is
+//    a pilot candidate). Degrees: Jakob TU Berlin (Informatik), Luis HWR Berlin (BWL, studies from
+//    WS 2026/27), Arne TH Wildau (BWL, B.A.), all confirmed by Jakob 2026-09-25.
 //  - Company facts come from the footer legal line already published site-wide:
 //    Synapsio UG (haftungsbeschränkt), Schönwalde-Glien, Amtsgericht Potsdam, HRB 42364 P.
 //  - Photos: public/team/*.webp, re-encoded from the old repo's src/assets/team/*.png.
@@ -63,23 +64,24 @@ export const ueberUnsCopy = {
       people: [
         {
           name: "Jakob Ibrahim",
-          role: "Gründer und Geschäftsführer",
-          bio: "Informatikstudium an der TU Berlin. Davor Beratung in Vertrieb und Marketing. Baut das Produkt und führt die Pilotgespräche selbst.",
+          role: "Mitgründer",
+          bio: "Informatikstudium an der TU Berlin. Baut Produkt und KI, von der Datenbank über die Agenten bis zur Oberfläche, und hat die Plattform allein geschrieben.",
           photo: "/team/jakob.webp",
           linkedin: "https://linkedin.com/in/jakob-ibrahim-62807721b",
         },
         {
           name: "Luis Boy",
-          role: "Operations und Geschäftsführer",
-          bio: "Koordiniert den E-Commerce-Betrieb bei Götze Gold und führt bei uns den Kontakt zu Interessenten und Pilotbetrieben. Bringt die Sicht von der Seite mit, auf der bestellt, gepackt und nachgefasst wird.",
+          role: "Mitgründer",
+          bio: "BWL-Studium an der HWR Berlin. Führt Vertrieb und Kundengespräche: gewinnt die Piloten und holt zurück, was Kunden im Betrieb wirklich brauchen.",
           photo: "/team/luis.webp",
           linkedin: "https://www.linkedin.com/in/luis-boy-a6b787378/",
         },
         {
           name: "Arne Schildmeyer",
-          role: "",
-          bio: "",
-          photo: "",
+          role: "Mitgründer",
+          bio: "BWL (B.A.) an der TH Wildau. Plant Bedarf und Nachschub, steuert Lieferanten, Distribution und Lager. Früher bei Heineken und Stone Brewing, heute baut er Bestands- und Produktionssteuerung mit Stücklisten in der Medizintechnik.",
+          photo: "/team/arne.webp",
+          linkedin: "https://www.linkedin.com/in/arne-schildmeyer-831766140/",
         },
       ] as Person[],
     },
@@ -156,23 +158,24 @@ export const ueberUnsCopy = {
       people: [
         {
           name: "Jakob Ibrahim",
-          role: "Founder and Managing Director",
-          bio: "Computer science at TU Berlin. Before that, advisory work in sales and marketing. Builds the product and runs the pilot conversations himself.",
+          role: "Co-founder",
+          bio: "Computer science at TU Berlin. Builds the product and the AI, from the database through the agents to the interface, and wrote the platform on his own.",
           photo: "/team/jakob.webp",
           linkedin: "https://linkedin.com/in/jakob-ibrahim-62807721b",
         },
         {
           name: "Luis Boy",
-          role: "Operations and Managing Director",
-          bio: "Coordinates e-commerce operations at Götze Gold and runs our contact with prospects and pilot companies. Brings the view from the side where things are ordered, packed and chased.",
+          role: "Co-founder",
+          bio: "Business studies at HWR Berlin. Runs sales and customer conversations: wins the pilots and brings back what customers actually need on the floor.",
           photo: "/team/luis.webp",
           linkedin: "https://www.linkedin.com/in/luis-boy-a6b787378/",
         },
         {
           name: "Arne Schildmeyer",
-          role: "",
-          bio: "",
-          photo: "",
+          role: "Co-founder",
+          bio: "B.A. in business at TH Wildau. Plans demand and replenishment, runs suppliers, distribution and warehousing. Formerly at Heineken and Stone Brewing, today he builds inventory and production control with bills of materials in medtech manufacturing.",
+          photo: "/team/arne.webp",
+          linkedin: "https://www.linkedin.com/in/arne-schildmeyer-831766140/",
         },
       ] as Person[],
     },

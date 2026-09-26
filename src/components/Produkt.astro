@@ -14,7 +14,7 @@
 // right-hand side with THAT is why the tiles are not decoration. Do not invent tile content: if a
 // new tile needs a claim that is not already in `L`, it needs verifying first.
 import { produktCopy } from "../i18n/produkt";
-import { localePath, CAL_URL, APP_URL, type Locale } from "../i18n/ui";
+import { localePath, deckUrl, CAL_URL, APP_URL, type Locale } from "../i18n/ui";
 import { homeCopy } from "../i18n/home";
 import Shot from "./Shot.astro";
 import SiteNav from "./SiteNav.astro";
@@ -285,7 +285,7 @@ const L = locale === "de"
       <p class="pr-close-p">{c.close.p}</p>
       <div class="pr-close-act">
         <a class="btn lg primary" href={CAL_URL}>{c.close.cta}</a>
-        <a class="pr-alt" href="/Synapsio_Pitch.pdf">{c.close.alt}</a>
+        <a class="pr-alt" href={deckUrl(locale)}>{c.close.alt}</a>
       </div>
     </div>
   </section>

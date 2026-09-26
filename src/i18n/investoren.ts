@@ -11,17 +11,17 @@
 //     ERP is the most-used system in purchasing with spreadsheets immediately behind.
 //     BME / Onventis, Einkaufsbarometer Mittelstand 2024.
 //
-//  Market size
-//   · AI in supply chain, global, by 2030: 40.5 bn USD at 28.2 % CAGR (MarketsandMarkets, 2024)
-//     to 51.1 bn USD at 38.9 % CAGR (Grand View Research, 2024). The page states the RANGE,
-//     because the two credible houses disagree and pretending to one number would be false
-//     precision.
-//   · Europe took 24.6 % of global supply chain management software revenue in 2025.
-//   · Germany held 26.2 % of the European ERP software market in 2025.
+//  Market size, bottom-up (since 2026-09, identical to the pitch deck v2):
+//   · Eurostat sbs_sc_ovw 2023, 10-249 employees: manufacturing 318,709 + wholesale 145,876
+//     = 464,585 firms; retail (G47) 163,317 shown as "later", NOT in the sum.
+//   · Subscription at today's blended price 4,848 €/yr (45 % Start 199 · 40 % Base 449 ·
+//     15 % Advanced 899 €/month) → 2.25 bn €. Marketplace 1 % of the manufacturers' purchasing
+//     (1.78 tn €, Eurostat 2023) → 17.8 bn €. Together ≈ 20 bn €.
 //
-//  Plan and funding: Synapsio_Business_and_Financial_Plan_2026.docx +
-//     Synapsio_Financial_Model_2026.xlsx (OneDrive\SYNAPSIO). Three ARR cases at 2030,
-//     breakeven 2030, peak cumulative funding need ≈ 3.5 M€, ~12 paying customers by end 2026.
+//  Plan and funding: the pitch deck v2 and Synapsio_Budget_PreSeed.xlsx (OneDrive\SYNAPSIO).
+//     ARR 2032: 23 / 145 / 610 M€ (computed in Synapsio_Pitchdeck_2026-09_v2_build.py).
+//     Round 410 T€ for 18 months, derived from the budget. ⚠️ Change a number there first, then here.
+//     The August financial model (breakeven 2030, 3.5 M€ peak need) is SUPERSEDED, not quoted.
 //
 // ⚠️ The previous site published a TAM of 847 bn USD (an unused stale component) and a DACH SOM
 // of 25 to 60 M USD that never reconciled with the deck. Neither is carried over. The three ARR
@@ -74,27 +74,36 @@ export const investorenCopy = {
 
     markt: {
       h2: "Der Markt",
-      p1: "Die Ebene, auf der wir spielen, ist der KI-Anteil an Lieferketten-Software. Die beiden belastbaren Häuser sind sich über die Größe nicht einig, deshalb steht hier die Spanne und nicht eine Scheingenauigkeit.",
-      p2: "Europa ist dabei kein Randmarkt, und Deutschland trägt den europäischen Anteil. Genau dort sitzt zugleich der stagnierende ERP-Bestand aus dem Abschnitt darüber. Das ist die Lücke, in die Synapsio hineinbaut.",
-      scaleMax: "60 Mrd. USD",
+      p1: "Wir rechnen von unten, statt einen Marktbericht zu zitieren: Firmen mal Preis. In der EU haben 465.000 Hersteller und Großhändler zwischen 10 und 249 Beschäftigte.",
+      p2: "Zur heutigen Preisleiter ergibt das Abo 2,3 Mrd. € im Jahr. Der größere Teil ist der Einkauf selbst: Allein die Hersteller kaufen für 1,78 Bio. € im Jahr ein, 1 % davon über den Marktplatz sind 17,8 Mrd. €. Der Einzelhandel ist noch nicht eingerechnet.",
+      scaleMax: "20 Mrd. €",
       rings: [
         {
-          k: "TAM",
-          v: "40,5 bis 51,1 Mrd. USD",
-          d: "KI in der Lieferkette, weltweit, 2030",
-          src: "MarketsandMarkets (28,2 % CAGR) · Grand View Research (38,9 % CAGR)",
+          k: "Firmen",
+          v: "465.000",
+          d: "Herstellung 318.709 und Großhandel 145.876, je 10 bis 249 Beschäftigte. Später dazu: Einzelhandel mit 163.317.",
+          src: "Eurostat, 2023",
         },
         {
-          k: "SAM",
-          v: "24,6 %",
-          d: "Anteil Europas am weltweiten Umsatz mit Lieferketten-Software, 2025",
-          src: "Marktberichte 2025",
+          k: "Abo",
+          v: "2,3 Mrd. €",
+          n: 2.25,
+          d: "465.000 Firmen zum heutigen Mischpreis von 4.848 € im Jahr.",
+          src: "Preisleiter, Stand September 2026",
         },
         {
-          k: "Einstieg",
-          v: "26,2 %",
-          d: "Anteil Deutschlands am europäischen ERP-Markt, 2025. Unser Startmarkt ist DACH.",
-          src: "Europe ERP Market, 2025",
+          k: "Marktplatz",
+          v: "17,8 Mrd. €",
+          n: 17.8,
+          d: "1 % des Einkaufs der Hersteller.",
+          src: "Eurostat, 2023 · Gebühr = Annahme",
+        },
+        {
+          k: "Zusammen",
+          v: "20 Mrd. €",
+          n: 20.05,
+          d: "Im Jahr adressierbar in der EU.",
+          src: "gerechnet",
         },
       ],
     },
@@ -159,53 +168,53 @@ export const investorenCopy = {
       rows: [
         {
           k: "Abonnement",
-          h: "Monatlich, gestaffelt nach Geschäftsvolumen",
-          d: "Vier Stufen vom Einstieg bis Enterprise. Jede Stufe hat ein Monatslimit, das weich ist: Wer darüber liegt, wird benachrichtigt und zahlt einen kleinen Mehrverbrauch, statt mitten im Betrieb abgeschaltet zu werden. Bei Software, die Bestellungen auslöst, ist ein harter Stopp kein vertretbares Verhalten.",
+          h: "Monatlich, nach Artikelzahl, Nutzer frei",
+          d: "Start 199 € bis 300 Artikel, Base 449 € bis 1.500, Advanced 899 € bis 6.000, Enterprise mit Preis je Kunde. Wer über die Grenze seiner Stufe kommt, wird benachrichtigt. Bestellungen hält der Tarif nie an: Bei Software, die Bestellungen auslöst, wäre ein harter Stopp kein vertretbares Verhalten.",
         },
         {
           k: "Transaktion",
-          h: "Anteil an Käufen über den Marktplatz, später",
-          d: "Wenn ein Unternehmen über Synapsio einkauft, fällt eine Gebühr an, die mit steigendem Volumen sinkt und für ausgewählte Branchen ermäßigt ist. Diese Ebene gehört zum Marktplatz und ist noch nicht gebaut. Zahlungsdienstleister-Gebühren sind davon getrennt und keine Einnahme von uns.",
+          h: "1 bis 1,5 % je Kauf über den Marktplatz, später",
+          d: "Wenn ein Unternehmen über Synapsio einkauft, fällt eine Gebühr an, die mit steigendem Volumen sinkt. Diese Ebene gehört zum Marktplatz und ist noch nicht gebaut. Zahlungsdienstleister-Gebühren sind davon getrennt und keine Einnahme von uns.",
         },
       ],
-      note: "Die Preise legen wir zum Launch fest. Was bereits steht, ist die Mechanik darunter: Verbrauch und Budget werden pro Unternehmen gemessen und durchgesetzt. Abrechnung ist damit kein zweites System, sondern dieselbe Grundlage mit einem Preis daran.",
+      note: "Alle Preise netto, Stand September 2026. Die Mechanik darunter ist gebaut: Artikelzahl, Verbrauch und Budget werden je Unternehmen gemessen und durchgesetzt. Abrechnung ist damit kein zweites System, sondern dieselbe Grundlage mit einem Preis daran.",
       noteNotes: [
-        { k: "Preise", v: "offen bis zum Launch" },
-        { k: "Budget", v: "pro Unternehmen gemessen" },
+        { k: "Preise", v: "ab 199 € im Monat" },
+        { k: "Achse", v: "Artikelzahl, nicht Nutzer" },
       ],
     },
 
     plan: {
       h2: "Der Plan",
-      lede: "Drei Fälle für 2030, statt einer Zahl, die alles tragen muss.",
+      lede: "Drei Fälle für 2032, alle mit der heutigen Preisleiter gerechnet.",
       cases: [
         {
-          k: "Boden",
-          v: 9,
-          label: "9 Mio. €",
-          d: "Nur DACH, nur Abo. Ohne Transaktionsebene und ohne EU-Expansion.",
+          k: "Vorsichtig",
+          v: 23,
+          label: "23 Mio. €",
+          d: "1 % der Firmen zu heutigen Preisen, ohne Marktplatz.",
         },
         {
-          k: "Basis",
-          v: 42,
-          label: "42 Mio. €",
-          d: "DACH in der Tiefe, EU ab 2028, Transaktionsebene aktiv. Das ist der Fall, den wir unterschreiben. Breakeven 2030.",
+          k: "Plan",
+          v: 145,
+          label: "145 Mio. €",
+          d: "3 % der Firmen zu heutigen Preisen, 10 % ihres Einkaufs über den Marktplatz zu 1 %, also 7,8 Mrd. € Volumen. Das ist der Fall, den wir unterschreiben.",
         },
         {
           k: "Ambition",
-          v: 115,
-          label: "115 Mio. €",
-          d: "EU vollständig, Marktplatz-Effekt und Abwicklung zwischen Systemen.",
+          v: 610,
+          label: "610 Mio. €",
+          d: "6 % der Firmen, alle auf Advanced, 20 % ihres Einkaufs über den Marktplatz zu 1 %, also 31 Mrd. € Volumen.",
         },
       ],
-      caseAxis: "ARR 2030",
+      caseAxis: "ARR 2032",
       honest:
-        "Der frühe Hochlauf bleibt bewusst konservativ: rund zwölf zahlende Kunden bis Ende 2026. Synapsio wird vertrieblich verkauft, nicht per Selbstregistrierung, und die schnellen Hochlaufkurven aus dem KI-Umfeld stammen aus Produkten, die sich selbst ausrollen. Wir heben die Ambition im fünften Jahr, nicht die Geschwindigkeit im ersten.",
+        "Der frühe Hochlauf bleibt bewusst konservativ: erste bezahlte Piloten drei Monate nach der Runde, 20 zahlende Kunden nach 18 Monaten. Synapsio wird vertrieblich verkauft, nicht per Selbstregistrierung, und die schnellen Hochlaufkurven aus dem KI-Umfeld stammen aus Produkten, die sich selbst ausrollen. Keiner der Fälle setzt höhere Preise voraus als die, die heute auf der Preisliste stehen.",
       honestNotes: [
-        { k: "Ende 2026", v: "rund 12 zahlende Kunden" },
-        { k: "Breakeven", v: "2030" },
+        { k: "Monat 18", v: "20 Kunden, ~100 T€ ARR" },
+        { k: "Rechnung", v: "heutige Preisleiter" },
       ],
-      peak: "Spitzenbedarf an kumulierter Finanzierung bis zum Breakeven: rund 3,5 Mio. €.",
+      peak: "Diese Runde: 410 T€ für 18 Monate, bis zur Seed-Runde.",
     },
 
     funding: {
@@ -215,9 +224,9 @@ export const investorenCopy = {
       // are derived from `when`, so change them together.
       years: ["2026", "2027", "2028", "2029"],
       steps: [
-        { k: "Pre-Seed", when: "jetzt", v: "150 bis 300 T€", d: "Produkt, erste Piloten, Nachweis im Betrieb.", c: 5, s: 5 },
-        { k: "Seed", when: "Q2 bis Q3 2027", v: "1,5 bis 2 Mio. €", d: "Vertrieb in DACH, Transaktionsebene.", c: 10, s: 5 },
-        { k: "Series A", when: "2028 bis 2029", v: "5 bis 8 Mio. €", d: "EU-Expansion.", c: 15, s: 10 },
+        { k: "Pre-Seed", when: "jetzt, 18 Monate", v: "410 T€", d: "Entwickler, Supply-Chain-Team, die ersten 20 Kunden.", c: 5, s: 9 },
+        { k: "Seed", when: "ab Frühjahr 2028", v: "1,5 bis 2 Mio. €", d: "Vertrieb in DACH, Marktplatz.", c: 14, s: 5 },
+        { k: "Series A", when: "2029", v: "5 bis 8 Mio. €", d: "EU-Expansion.", c: 19, s: 6 },
       ],
     },
 
@@ -271,27 +280,36 @@ export const investorenCopy = {
 
     markt: {
       h2: "The market",
-      p1: "The layer we play on is the AI share of supply chain software. The two credible houses disagree about its size, so this page states the range rather than a false precision.",
-      p2: "Europe is not a side market in this, and Germany carries the European share. That is also where the stagnating ERP base from the section above sits. That gap is what Synapsio builds into.",
-      scaleMax: "60 bn USD",
+      p1: "We compute it from the bottom up instead of quoting a market report: firms times price. The EU has 465,000 manufacturers and wholesalers with 10 to 249 employees.",
+      p2: "At today's price ladder the subscription comes to €2.3B a year. The larger part is purchasing itself: manufacturers alone buy €1.78T a year, and 1 % of that through the marketplace is €17.8B. Retail is not counted yet.",
+      scaleMax: "€20B",
       rings: [
         {
-          k: "TAM",
-          v: "40.5 to 51.1 bn USD",
-          d: "AI in supply chain, global, 2030",
-          src: "MarketsandMarkets (28.2 % CAGR) · Grand View Research (38.9 % CAGR)",
+          k: "Firms",
+          v: "465,000",
+          d: "Manufacturing 318,709 and wholesale 145,876, each with 10 to 249 employees. Later: retail, another 163,317.",
+          src: "Eurostat, 2023",
         },
         {
-          k: "SAM",
-          v: "24.6 %",
-          d: "Europe's share of global supply chain software revenue, 2025",
-          src: "Market reports 2025",
+          k: "Subscription",
+          v: "€2.3B",
+          n: 2.25,
+          d: "465,000 firms at today's blended price of €4,848 a year.",
+          src: "Price ladder, September 2026",
         },
         {
-          k: "Entry",
-          v: "26.2 %",
-          d: "Germany's share of the European ERP market, 2025. Our starting market is DACH.",
-          src: "Europe ERP Market, 2025",
+          k: "Marketplace",
+          v: "€17.8B",
+          n: 17.8,
+          d: "1 % of the manufacturers' purchasing.",
+          src: "Eurostat, 2023 · fee = assumption",
+        },
+        {
+          k: "Together",
+          v: "€20B",
+          n: 20.05,
+          d: "Addressable per year in the EU.",
+          src: "computed",
         },
       ],
     },
@@ -350,52 +368,57 @@ export const investorenCopy = {
       rows: [
         {
           k: "Subscription",
-          h: "Monthly, tiered by business volume",
-          d: "Four tiers from entry to enterprise. Each has a monthly limit, and the limit is soft: going past it means a notice and a small overage, not being switched off mid-operation. For software that places orders, a hard stop is not defensible behaviour.",
+          h: "Monthly, by number of items, users free",
+          d: "Start €199 up to 300 items, Base €449 up to 1,500, Advanced €899 up to 6,000, Enterprise priced per customer. Going past a tier's limit means a notice. The plan never holds an order back: for software that places orders, a hard stop is not defensible behaviour.",
         },
         {
           k: "Transaction",
-          h: "A share of marketplace purchases, later",
-          d: "When a company buys through Synapsio a fee applies, falling as volume grows and reduced for selected industries. This layer belongs to the marketplace and is not built yet. Payment processor fees are separate and are not our revenue.",
+          h: "1 to 1.5 % per marketplace purchase, later",
+          d: "When a company buys through Synapsio a fee applies, falling as volume grows. This layer belongs to the marketplace and is not built yet. Payment processor fees are separate and are not our revenue.",
         },
       ],
-      note: "Prices are set closer to launch. What already stands is the mechanism underneath: usage and budget are metered and enforced per company. Billing is therefore not a second system, only the same foundation with a price attached.",
+      note: "All prices net, as of September 2026. The mechanism underneath is built: items, usage and budget are metered and enforced per company. Billing is therefore not a second system, only the same foundation with a price attached.",
       noteNotes: [
-        { k: "Prices", v: "open until launch" },
-        { k: "Budget", v: "metered per company" },
+        { k: "Prices", v: "from €199 a month" },
+        { k: "Axis", v: "items, not users" },
       ],
     },
 
     plan: {
       h2: "The plan",
-      lede: "Three cases for 2030, rather than one number carrying everything.",
+      lede: "Three cases for 2032, all computed at today's price ladder.",
       cases: [
-        { k: "Floor", v: 9, label: "€9M", d: "DACH only, subscription only. No transaction layer, no EU expansion." },
+        { k: "Cautious", v: 23, label: "€23M", d: "1 % of firms at today's prices, no marketplace." },
         {
-          k: "Base",
-          v: 42,
-          label: "€42M",
-          d: "DACH in depth, EU from 2028, transaction layer live. This is the case we underwrite. Breakeven 2030.",
+          k: "Plan",
+          v: 145,
+          label: "€145M",
+          d: "3 % of firms at today's prices, 10 % of their purchasing through the marketplace at 1 %, i.e. €7.8B volume. This is the case we underwrite.",
         },
-        { k: "Ambition", v: 115, label: "€115M", d: "Full EU, marketplace effect, and settlement between systems." },
+        {
+          k: "Ambition",
+          v: 610,
+          label: "€610M",
+          d: "6 % of firms, all on Advanced, 20 % of their purchasing through the marketplace at 1 %, i.e. €31B volume.",
+        },
       ],
-      caseAxis: "ARR 2030",
+      caseAxis: "ARR 2032",
       honest:
-        "The early ramp stays deliberately measured: around twelve paying customers by the end of 2026. Synapsio is sold by a sales team, not by self-registration, and the fast ramp curves from the AI world come from products that roll themselves out. We raise the ambition in year five, not the velocity in year one.",
+        "The early ramp stays deliberately measured: first paid pilots three months after the round, 20 paying customers after 18 months. Synapsio is sold by a sales team, not by self-registration, and the fast ramp curves from the AI world come from products that roll themselves out. None of the cases assumes higher prices than today's price list.",
       honestNotes: [
-        { k: "End of 2026", v: "around 12 paying customers" },
-        { k: "Breakeven", v: "2030" },
+        { k: "Month 18", v: "20 customers, ~€100K ARR" },
+        { k: "Basis", v: "today's price ladder" },
       ],
-      peak: "Peak cumulative funding need before breakeven: around €3.5M.",
+      peak: "This round: €410K for 18 months, up to the seed round.",
     },
 
     funding: {
       h2: "Funding",
       years: ["2026", "2027", "2028", "2029"],
       steps: [
-        { k: "Pre-seed", when: "now", v: "€150 to 300K", d: "Product, first pilots, proof in live operation.", c: 5, s: 5 },
-        { k: "Seed", when: "Q2 to Q3 2027", v: "€1.5 to 2M", d: "Sales in DACH, transaction layer.", c: 10, s: 5 },
-        { k: "Series A", when: "2028 to 2029", v: "€5 to 8M", d: "EU expansion.", c: 15, s: 10 },
+        { k: "Pre-seed", when: "now, 18 months", v: "€410K", d: "A developer, a supply chain team, the first 20 customers.", c: 5, s: 9 },
+        { k: "Seed", when: "from spring 2028", v: "€1.5 to 2M", d: "Sales in DACH, marketplace.", c: 14, s: 5 },
+        { k: "Series A", when: "2029", v: "€5 to 8M", d: "EU expansion.", c: 19, s: 6 },
       ],
     },
 

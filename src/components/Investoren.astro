@@ -19,13 +19,14 @@
 //  · Only the base case carries the accent, because it is the only one we underwrite. Identity
 //    never rests on colour alone: every mark is directly labelled, and the case names repeat in
 //    the list underneath. No filled track — a hairline axis with marks, per the taste pass.
-//  · The market section uses TWO mark types on purpose. The TAM is an absolute RANGE (two houses
-//    disagree, so the bar spans their disagreement); the other two are SHARES of a whole, drawn
-//    as proportion bars. Drawing a share as if it were an absolute would be a false comparison.
+//  · The market is computed BOTTOM-UP, the same arithmetic as the pitch deck (firms × today's
+//    price ladder + 1 % of purchasing). The firm count has no bar: it is not a euro amount. The
+//    euro rows share ONE linear scale, so the subscription's small share next to the marketplace
+//    is visible as what it is. The total carries the accent.
 //  · No tooltips or toggles anywhere. Static figures, per the site-wide decision that visitors
 //    do not click.
 import { investorenCopy } from "../i18n/investoren";
-import { localePath, CAL_URL, CONTACT_EMAIL, type Locale } from "../i18n/ui";
+import { localePath, deckUrl, CAL_URL, CONTACT_EMAIL, type Locale } from "../i18n/ui";
 import SiteNav from "./SiteNav.astro";
 import SiteFooter from "./SiteFooter.astro";
 
@@ -33,22 +34,21 @@ interface Props { locale?: Locale }
 const { locale = "de" } = Astro.props;
 const c = investorenCopy[locale];
 const p = (path: string) => localePath(locale, path);
-const DECK = "/Synapsio_Pitch.pdf";
+const DECK = deckUrl(locale);
 
-// TAM range bar: the axis runs 0 to 60 bn USD so the two houses' figures sit in context.
-const TAM_AXIS = 60, TAM_LO = 40.5, TAM_HI = 51.1;
-const tamLeft = (TAM_LO / TAM_AXIS) * 100;
-const tamWidth = ((TAM_HI - TAM_LO) / TAM_AXIS) * 100;
-const shares = [24.6, 26.2];
+// One euro scale for the market rows that carry an amount (`n`, in bn €).
+const MKT_AXIS = Math.max(...c.markt.rings.map((r) => ("n" in r ? r.n : 0)));
+const lastBar = c.markt.rings.map((r) => "n" in r).lastIndexOf(true);
 
 const maxCase = Math.max(...c.plan.cases.map((x) => x.v));
 
 // Graduation for the ARR rail. Without it the axis is a bare line with 60 % of its length empty
 // between the base and the ambition case, and the distance stops being readable as a quantity.
-// Minor every 5 Mio., labelled major every 25.
-const planTicks = Array.from({ length: Math.floor(maxCase / 5) + 1 }, (_, i) => {
-  const v = i * 5;
-  return { v, x: (v / maxCase) * 100, major: v % 25 === 0 };
+// Minor every 50 Mio., labelled major every 100 (the cases run to several hundred).
+const TICK = 50, MAJOR = 100;
+const planTicks = Array.from({ length: Math.floor(maxCase / TICK) + 1 }, (_, i) => {
+  const v = i * TICK;
+  return { v, x: (v / maxCase) * 100, major: v % MAJOR === 0 };
 });
 ---
 
@@ -99,17 +99,17 @@ const planTicks = Array.from({ length: Math.floor(maxCase / 5) + 1 }, (_, i) => 
                 <span class="mono in-bar-k">{r.k}</span>
                 <span class="in-bar-v">{r.v}</span>
               </div>
-              <div class="in-track">
-                {i === 0 ? (
-                  <span class="in-range" style={`left:${tamLeft}%; width:${tamWidth}%`} />
-                ) : (
-                  <span class="in-fill" style={`width:${shares[i - 1]}%`} />
-                )}
-              </div>
-              {/* the range bar floats inside its scale, so that scale has to be stated or the
-                  segment's position means nothing. The share bars fill from zero and need none. */}
-              {i === 0 && (
-                <div class="in-scale">
+              {"n" in r && (
+                <div class="in-track">
+                  <span
+                    class={i === lastBar ? "in-range" : "in-fill"}
+                    style={`width:${(r.n / MKT_AXIS) * 100}%`}
+                  />
+                </div>
+              )}
+              {/* the scale is stated once, under the last euro bar */}
+              {i === lastBar && (
+                <div class="in-mscale">
                   <span class="mono">0</span>
                   <span class="mono">{c.markt.scaleMax}</span>
                 </div>
@@ -276,7 +276,7 @@ const planTicks = Array.from({ length: Math.floor(maxCase / 5) + 1 }, (_, i) => 
           three-across grid, which the layout-repetition rule does not allow. It is a TIME axis
           now: 24 columns spanning 2026 to 2029, six per year, each round placed and sized by its
           own `c` (start column) and `s` (span) so its position and duration are the drawing.
-          Pre-seed 5/7 = mid 2026 into 2027, seed 11/6 = Q2 to Q3 2027, Series A 17/8 = 2028 to
+          Pre-seed 5/9 = autumn 2026 for 18 months, seed 14/5 = from spring 2028, Series A 19/6 =
           2029. Each round's own top border is its lit stretch of the axis; the faint full-width
           rule behind it is the rest of the timeline. */}
       <div class="in-time">
@@ -380,7 +380,9 @@ const planTicks = Array.from({ length: Math.floor(maxCase / 5) + 1 }, (_, i) => 
   .in-fill, .in-range { position:absolute; bottom:0; height:3px; border-radius:2px;
     background:var(--teal-soft); }
   .in-range { background:var(--coral); }
-  .in-scale { display:flex; justify-content:space-between; margin:-4px 0 9px; }
+  /* own class: the plan chart below also uses .in-scale (74px tall, bordered), and sharing the
+     name pushed a hairline and a gap into the market figure */
+  .in-mscale { display:flex; justify-content:space-between; margin:-4px 0 9px; }
   .in-bar-d { margin:0 0 6px; color:var(--fg-soft); font-size:13.5px; line-height:1.55; }
 
   /* ---- what runs today ---- */
