@@ -7,7 +7,8 @@
 //    WS 2026/27), Arne TH Wildau (BWL, B.A.), all confirmed by Jakob 2026-09-25.
 //  - Company facts come from the footer legal line already published site-wide:
 //    Synapsio UG (haftungsbeschränkt), Schönwalde-Glien, Amtsgericht Potsdam, HRB 42364 P.
-//  - Photos: public/team/*.webp, re-encoded from the old repo's src/assets/team/*.png.
+//  - Photos: public/team/*.webp; Jakob and Luis re-encoded from the old repo's src/assets/team/*.png,
+//    Arne from the portrait he supplied himself.
 //
 // A person with `bio: ""` renders NO card (see UeberUns.astro). That is how Arne stays off the
 // page until his details arrive: a placeholder bio would be an invented claim about a real
@@ -80,7 +81,7 @@ export const ueberUnsCopy = {
           name: "Arne Schildmeyer",
           role: "Mitgründer",
           bio: "BWL (B.A.) an der TH Wildau. Plant Bedarf und Nachschub, steuert Lieferanten, Distribution und Lager. Früher bei Heineken und Stone Brewing, heute baut er Bestands- und Produktionssteuerung mit Stücklisten in der Medizintechnik.",
-          photo: "", // no photo until he has agreed to it being published
+          photo: "/team/arne.webp", // his own portrait, published with his agreement (2026-09-27)
           linkedin: "https://www.linkedin.com/in/arne-schildmeyer-831766140/",
         },
       ] as Person[],
@@ -174,7 +175,7 @@ export const ueberUnsCopy = {
           name: "Arne Schildmeyer",
           role: "Co-founder",
           bio: "B.A. in business at TH Wildau. Plans demand and replenishment, runs suppliers, distribution and warehousing. Formerly at Heineken and Stone Brewing, today he builds inventory and production control with bills of materials in medtech manufacturing.",
-          photo: "", // no photo until he has agreed to it being published
+          photo: "/team/arne.webp", // his own portrait, published with his agreement (2026-09-27)
           linkedin: "https://www.linkedin.com/in/arne-schildmeyer-831766140/",
         },
       ] as Person[],
