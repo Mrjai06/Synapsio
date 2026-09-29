@@ -66,14 +66,14 @@ export const ueberUnsCopy = {
         {
           name: "Jakob Ibrahim",
           role: "Mitgründer",
-          bio: "Informatikstudium an der TU Berlin. Baut Produkt und KI, von der Datenbank über die Agenten bis zur Oberfläche, und hat die Plattform allein geschrieben.",
+          bio: "Studiert Informatik an der TU Berlin. Baut Produkt und KI, von der Datenbank über die Agenten bis zur Oberfläche, und hat die Plattform allein geschrieben.",
           photo: "/team/jakob.webp",
           linkedin: "https://linkedin.com/in/jakob-ibrahim-62807721b",
         },
         {
           name: "Luis Boy",
           role: "Mitgründer",
-          bio: "BWL-Studium an der HWR Berlin. Führt Vertrieb und Kundengespräche: gewinnt die Piloten und holt zurück, was Kunden im Betrieb wirklich brauchen.",
+          bio: "Studiert BWL an der HWR Berlin. Führt Vertrieb und Kundengespräche: gewinnt die Piloten und holt zurück, was Kunden im Betrieb wirklich brauchen.",
           photo: "/team/luis.webp",
           linkedin: "https://www.linkedin.com/in/luis-boy-a6b787378/",
         },
@@ -160,14 +160,14 @@ export const ueberUnsCopy = {
         {
           name: "Jakob Ibrahim",
           role: "Co-founder",
-          bio: "Computer science at TU Berlin. Builds the product and the AI, from the database through the agents to the interface, and wrote the platform on his own.",
+          bio: "Studying computer science at TU Berlin. Builds the product and the AI, from the database through the agents to the interface, and wrote the platform on his own.",
           photo: "/team/jakob.webp",
           linkedin: "https://linkedin.com/in/jakob-ibrahim-62807721b",
         },
         {
           name: "Luis Boy",
           role: "Co-founder",
-          bio: "Business studies at HWR Berlin. Runs sales and customer conversations: wins the pilots and brings back what customers actually need on the floor.",
+          bio: "Studying business at HWR Berlin. Runs sales and customer conversations: wins the pilots and brings back what customers actually need on the floor.",
           photo: "/team/luis.webp",
           linkedin: "https://www.linkedin.com/in/luis-boy-a6b787378/",
         },
