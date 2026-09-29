@@ -80,7 +80,7 @@ export const ueberUnsCopy = {
         {
           name: "Arne Schildmeyer",
           role: "Mitgründer",
-          bio: "BWL (B.A.) an der TH Wildau. Plant Bedarf und Nachschub, steuert Lieferanten, Distribution und Lager. Früher bei Heineken und Stone Brewing, heute baut er Bestands- und Produktionssteuerung mit Stücklisten in der Medizintechnik.",
+          bio: "Arne verfügt über mehr als 10 Jahre internationale Erfahrung im Supply Chain Management, unter anderem bei Heineken und Stone Brewing. Er verbindet operative Supply-Chain-Expertise mit Digitalisierung, Automatisierung und datengetriebenen Lösungen. Dabei bringt er die Perspektive des Anwenders ein und stellt sicher, dass konkrete Probleme in der täglichen Supply Chain gelöst und Unternehmen nachhaltig skalierbarer werden.",
           photo: "/team/arne.webp", // his own portrait, published with his agreement (2026-09-27)
           linkedin: "https://www.linkedin.com/in/arne-schildmeyer-831766140/",
         },
@@ -174,7 +174,7 @@ export const ueberUnsCopy = {
         {
           name: "Arne Schildmeyer",
           role: "Co-founder",
-          bio: "B.A. in business at TH Wildau. Plans demand and replenishment, runs suppliers, distribution and warehousing. Formerly at Heineken and Stone Brewing, today he builds inventory and production control with bills of materials in medtech manufacturing.",
+          bio: "Arne has more than 10 years of international experience in supply chain management, including at Heineken and Stone Brewing. He combines hands-on supply chain expertise with digitalisation, automation and data-driven solutions. He brings the user's perspective and makes sure that concrete problems in the day-to-day supply chain get solved and that companies become sustainably more scalable.",
           photo: "/team/arne.webp", // his own portrait, published with his agreement (2026-09-27)
           linkedin: "https://www.linkedin.com/in/arne-schildmeyer-831766140/",
         },
