@@ -73,7 +73,7 @@ export const ueberUnsCopy = {
         {
           name: "Luis Boy",
           role: "Mitgründer",
-          bio: "Studiert BWL an der HWR Berlin. Führt Vertrieb und Kundengespräche: gewinnt die Piloten und holt zurück, was Kunden im Betrieb wirklich brauchen.",
+          bio: "Studiert BWL an der HWR Berlin. Führt Vertrieb und Kundengespräche: gewinnt die Kunden und holt zurück, was Kunden im Betrieb wirklich brauchen.",
           photo: "/team/luis.webp",
           linkedin: "https://www.linkedin.com/in/luis-boy-a6b787378/",
         },
@@ -126,8 +126,8 @@ export const ueberUnsCopy = {
     },
     close: {
       h2: "Sprechen Sie mit uns",
-      p: "Dreißig Minuten, unverbindlich. Wir schauen uns an, wie Sie heute bestellen, und sagen Ihnen ehrlich, ob ein Pilot Sinn ergibt.",
-      cta: "Pilot-Gespräch buchen",
+      p: "Dreißig Minuten, unverbindlich. Wir schauen uns an, wie Sie heute bestellen, und sagen Ihnen ehrlich, ob Synapsio für Sie Sinn ergibt.",
+      cta: "Gespräch vereinbaren",
       alt: "Investoren",
     },
   },
@@ -167,7 +167,7 @@ export const ueberUnsCopy = {
         {
           name: "Luis Boy",
           role: "Co-founder",
-          bio: "Studying business at HWR Berlin. Runs sales and customer conversations: wins the pilots and brings back what customers actually need on the floor.",
+          bio: "Studying business at HWR Berlin. Runs sales and customer conversations: wins the customers and brings back what customers actually need on the floor.",
           photo: "/team/luis.webp",
           linkedin: "https://www.linkedin.com/in/luis-boy-a6b787378/",
         },
@@ -220,8 +220,8 @@ export const ueberUnsCopy = {
     },
     close: {
       h2: "Talk to us",
-      p: "Thirty minutes, no commitment. We look at how you order today and tell you honestly whether a pilot makes sense.",
-      cta: "Book a pilot call",
+      p: "Thirty minutes, no commitment. We look at how you order today and tell you honestly whether Synapsio makes sense for you.",
+      cta: "Book a call",
       alt: "Investors",
     },
   },

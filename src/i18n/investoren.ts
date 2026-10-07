@@ -43,7 +43,7 @@ export const investorenCopy = {
       h1a: "Ein Agent, der den Einkauf ",
       h1em: "ausführt.",
       h1b: " Nicht noch ein Dashboard.",
-      sub: "Das Produkt ist live, die ersten Pilotgespräche laufen. Auf dieser Seite stehen der Markt, was heute tatsächlich funktioniert, und der Plan mit seinen drei Fällen.",
+      sub: "Das Produkt ist live, die ersten Kundengespräche laufen. Auf dieser Seite stehen der Markt, was heute tatsächlich funktioniert, und der Plan mit seinen drei Fällen.",
       cta: "Pitchdeck ansehen",
       alt: "Gespräch vereinbaren",
     },
@@ -209,7 +209,7 @@ export const investorenCopy = {
       ],
       caseAxis: "ARR 2032",
       honest:
-        "Der frühe Hochlauf bleibt bewusst konservativ: erste bezahlte Piloten drei Monate nach der Runde, 20 zahlende Kunden nach 18 Monaten. Synapsio wird vertrieblich verkauft, nicht per Selbstregistrierung, und die schnellen Hochlaufkurven aus dem KI-Umfeld stammen aus Produkten, die sich selbst ausrollen. Keiner der Fälle setzt höhere Preise voraus als die, die heute auf der Preisliste stehen.",
+        "Der frühe Hochlauf bleibt bewusst konservativ: die ersten zahlenden Kunden drei Monate nach der Runde, 20 zahlende Kunden nach 18 Monaten. Synapsio wird vertrieblich verkauft, nicht per Selbstregistrierung, und die schnellen Hochlaufkurven aus dem KI-Umfeld stammen aus Produkten, die sich selbst ausrollen. Keiner der Fälle setzt höhere Preise voraus als die, die heute auf der Preisliste stehen.",
       honestNotes: [
         { k: "Monat 18", v: "20 Kunden, ~100 T€ ARR" },
         { k: "Rechnung", v: "heutige Preisleiter" },
@@ -232,7 +232,7 @@ export const investorenCopy = {
 
     close: {
       h2: "Deck und Gespräch",
-      p: "Das Pitchdeck liegt offen als PDF. Für Zahlen im Detail, den Finanzplan und den Stand der Piloten sprechen wir am besten direkt.",
+      p: "Das Pitchdeck liegt offen als PDF. Für Zahlen im Detail, den Finanzplan und den Stand der Kundengespräche sprechen wir am besten direkt.",
       cta: "Pitchdeck ansehen",
       alt: "Gespräch vereinbaren",
       mail: "contact@synapsio.co.site",
@@ -250,7 +250,7 @@ export const investorenCopy = {
       h1a: "An agent that ",
       h1em: "runs",
       h1b: " procurement. Not another dashboard.",
-      sub: "The product is live and the first pilot conversations are under way. This page holds the market, what actually works today, and the plan with its three cases.",
+      sub: "The product is live and the first customer conversations are under way. This page holds the market, what actually works today, and the plan with its three cases.",
       cta: "Read the deck",
       alt: "Book a call",
     },
@@ -404,7 +404,7 @@ export const investorenCopy = {
       ],
       caseAxis: "ARR 2032",
       honest:
-        "The early ramp stays deliberately measured: first paid pilots three months after the round, 20 paying customers after 18 months. Synapsio is sold by a sales team, not by self-registration, and the fast ramp curves from the AI world come from products that roll themselves out. None of the cases assumes higher prices than today's price list.",
+        "The early ramp stays deliberately measured: first paying customers three months after the round, 20 paying customers after 18 months. Synapsio is sold by a sales team, not by self-registration, and the fast ramp curves from the AI world come from products that roll themselves out. None of the cases assumes higher prices than today's price list.",
       honestNotes: [
         { k: "Month 18", v: "20 customers, ~€100K ARR" },
         { k: "Basis", v: "today's price ladder" },
@@ -424,7 +424,7 @@ export const investorenCopy = {
 
     close: {
       h2: "Deck and conversation",
-      p: "The pitch deck is open as a PDF. For the detailed numbers, the financial model and the state of the pilots, a direct conversation works better.",
+      p: "The pitch deck is open as a PDF. For the detailed numbers, the financial model and the state of customer conversations, a direct conversation works better.",
       cta: "Read the deck",
       alt: "Book a call",
       mail: "contact@synapsio.co.site",

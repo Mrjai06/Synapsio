@@ -9,7 +9,7 @@
 
 export const homeCopy = {
   de: {
-    nav: { product: "Produkt", about: "Über uns", investors: "Investoren", blog: "Blog", cta: "Pilot-Gespräch", menu: "Menü", menuClose: "Menü schließen", language: "Sprache" },
+    nav: { product: "Produkt", about: "Über uns", investors: "Investoren", blog: "Blog", cta: "Gespräch vereinbaren", menu: "Menü", menuClose: "Menü schließen", language: "Sprache" },
 
     hero: {
       chip: "KI-Agent für den Einkauf",
@@ -244,17 +244,17 @@ export const homeCopy = {
     },
 
     pilot: {
-      chip: "Kostenloses Pilotprogramm · begrenzte Plätze",
+      chip: "Persönliches Erstgespräch · unverbindlich",
       h2a: "30 Minuten. Danach wissen Sie,", h2b: "ob es passt.",
-      p: "Wir nehmen eine kleine Zahl an Pilotkunden auf. Davor steht immer ein Gespräch. Unverbindlich, und vorbereiten müssen Sie dafür nichts.",
+      p: "Am Anfang steht immer ein Gespräch. Unverbindlich, und vorbereiten müssen Sie dafür nichts.",
       lbl: "Worüber wir sprechen",
       steps: [
         { t: "Wie Sie heute bestellen", d: "Excel, Telefon, ERP. Und wo dabei die Zeit draufgeht." },
         { t: "Was Synapsio heute übernimmt", d: "Und was noch nicht. Wir sagen Ihnen beides." },
-        { t: "Ob ein Pilot für Sie Sinn ergibt", d: "Wenn nicht, sagen wir das. Entscheiden können Sie danach in Ruhe." },
+        { t: "Ob Synapsio für Sie Sinn ergibt", d: "Wenn nicht, sagen wir das. Entscheiden können Sie danach in Ruhe." },
       ],
       cardLbl: "Das Gespräch",
-      cta: "Pilot-Gespräch buchen",
+      cta: "Gespräch vereinbaren",
       spec: [["Dauer", "30 Minuten"], ["Verbindlichkeit", "Keine"], ["Vorbereitung", "Keine"], ["Danach", "Entscheiden Sie"]],
       alt: "Lieber erst lesen? Pitchdeck ansehen →",
     },
@@ -529,14 +529,14 @@ export const homeCopy = {
     },
 
     pilot: {
-      chip: "Free pilot programme · limited places",
+      chip: "Personal first call · no obligation",
       h2a: "30 minutes. After that you know", h2b: "whether it fits.",
-      p: "We are taking on a small number of pilot customers. There is always a conversation first. No obligation, and nothing for you to prepare.",
+      p: "It always starts with a conversation. No obligation, and nothing for you to prepare.",
       lbl: "What we talk about",
       steps: [
         { t: "How you order today", d: "Excel, phone, ERP. And where the time goes." },
         { t: "What Synapsio handles today", d: "And what it does not. We tell you both." },
-        { t: "Whether a pilot makes sense for you", d: "If it does not, we say so. You can decide afterwards, in your own time." },
+        { t: "Whether Synapsio makes sense for you", d: "If it does not, we say so. You can decide afterwards, in your own time." },
       ],
       cardLbl: "The call",
       cta: "Book a call",

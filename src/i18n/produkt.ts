@@ -19,7 +19,7 @@ export const produktCopy = {
       ],
     },
     close: {
-      chip: "Pilotprogramm",
+      chip: "Erstgespräch",
       h: "Wenn das plausibel klingt, reden wir darüber.",
       p: "Sie haben jetzt gelesen, wie gerechnet wird, wer entscheidet und wo der Agent anhält. Der nächste Schritt ist ein Gespräch, kein Projekt: dreißig Minuten, in denen wir Ihren Einkauf durchgehen und Sie das fragen, was auf dieser Seite nicht steht. Vorbereiten müssen Sie nichts, mitbringen auch keine Daten, und verpflichtet sind Sie danach zu nichts.",
       cta: "Gespräch vereinbaren",
@@ -37,7 +37,7 @@ export const produktCopy = {
       h1em: "den eine KI führt",
       h1b: ".",
       sub: "Die Startseite zeigt, was Synapsio für Sie tut. Diese Seite zeigt, wie: welche Zahlen hineingehen, nach welchem Verfahren gerechnet wird, wo die KI entscheidet und wo Sie.",
-      cta: "Pilot-Gespräch buchen",
+      cta: "Gespräch vereinbaren",
       alt: "Live ansehen →",
     },
     fold: {
@@ -217,7 +217,7 @@ export const produktCopy = {
       ],
     },
     close: {
-      chip: "Pilot programme",
+      chip: "First call",
       h: "If that sounds plausible, let us talk about it.",
       p: "You have now read how the calculation works, who decides and where the agent stops. The next step is a conversation, not a project: thirty minutes going through your purchasing, with you asking whatever this page does not answer. Nothing to prepare, no data to bring, and no commitment afterwards.",
       cta: "Book a conversation",

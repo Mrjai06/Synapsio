@@ -17,7 +17,7 @@ export const blogCopy = {
     empty: "Der erste Beitrag erscheint in Kürze.",
     ctaH: "Sprechen Sie mit uns",
     ctaP: "Dreißig Minuten, unverbindlich. Wir schauen uns an, wie Sie heute bestellen.",
-    cta: "Pilot-Gespräch buchen",
+    cta: "Gespräch vereinbaren",
   },
   en: {
     meta: {
@@ -34,7 +34,7 @@ export const blogCopy = {
     empty: "The first post is coming shortly.",
     ctaH: "Talk to us",
     ctaP: "Thirty minutes, no commitment. We look at how you order today.",
-    cta: "Book a pilot call",
+    cta: "Book a call",
   },
 } as const;
 
