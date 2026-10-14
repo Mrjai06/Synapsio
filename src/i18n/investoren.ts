@@ -11,22 +11,22 @@
 //     ERP is the most-used system in purchasing with spreadsheets immediately behind.
 //     BME / Onventis, Einkaufsbarometer Mittelstand 2024.
 //
-//  Market size, bottom-up (since 2026-09, identical to the pitch deck v2):
-//   · Eurostat sbs_sc_ovw 2023, 10-249 employees: manufacturing 318,709 + wholesale 145,876
-//     = 464,585 firms; retail (G47) 163,317 shown as "later", NOT in the sum.
-//   · Subscription at today's blended price 4,848 €/yr (45 % Start 199 · 40 % Base 449 ·
-//     15 % Advanced 899 €/month) → 2.25 bn €. Marketplace 1 % of the manufacturers' purchasing
-//     (1.78 tn €, Eurostat 2023) → 17.8 bn €. Together ≈ 20 bn €.
+//  Market size, bottom-up (since 2026-10-14, identical to the pitch deck v6; the arithmetic lives
+//  in Synapsio_Pitchdeck_2026-09_v6_build.py, change it there first, then here):
+//   · Eurostat sbs_sc_ovw 2023, Germany + Austria. 10-249 employees: manufacturers (without food)
+//     ~60,000 + wholesale ~28,000 + specialist retail with own stock ~32,000 = ~120,000 firms.
+//     2-9 employees: wholesale + retail ~193,000 (Eurostat withholds small manufacturers).
+//     Together 313,864, shown as "über 300.000".
+//   · 10-249 at the blended price 4,848 €/yr (45 % Start · 40 % Base · 15 % Advanced, assumption)
+//     → ~580 M€. 2-9 at the Start price 2,388 €/yr → ~460 M€. Together ~1.05 bn €.
+//   · Without an ERP (Eurostat isoc_eb_iip 2025/2023, per size class and country): ~230,000.
+//   · EU (seed round, roadmap only): ~1.7 M firms, ~5.3 bn €, same method, Eurostat 2023.
+//   · The marketplace is shown, never counted: no figure until orders run through it.
 //
-//  Plan and funding: the pitch deck v2 and Synapsio_Budget_PreSeed.xlsx (OneDrive\SYNAPSIO).
-//     ARR 2032: 23 / 145 / 610 M€ (computed in Synapsio_Pitchdeck_2026-09_v2_build.py).
-//     Round 410 T€ for 18 months, derived from the budget. ⚠️ Change a number there first, then here.
-//     The August financial model (breakeven 2030, 3.5 M€ peak need) is SUPERSEDED, not quoted.
-//
-// ⚠️ The previous site published a TAM of 847 bn USD (an unused stale component) and a DACH SOM
-// of 25 to 60 M USD that never reconciled with the deck. Neither is carried over. The three ARR
-// cases replace the SOM band, because a revenue plan we underwrite is a more honest object than
-// a market slice we assert.
+//  Plan and funding: the pitch deck v6 and the budget (Synapsio_Budget_build.py).
+//     Round 440 T€ for 18 months. Targets only up to month 18; nothing after is quoted.
+//     The 2032 ARR cases (23 / 145 / 610 M€) and the dated seed / Series A amounts were REMOVED
+//     on 2026-10-14: the deck no longer carries them, and the page must not say more than the deck.
 //
 // ⚠️ NO hosting or GDPR claim on this page. The published privacy policy covers website visitors
 // only and names no subprocessors, so any „Server in der EU“ line is currently unbacked.
@@ -43,7 +43,7 @@ export const investorenCopy = {
       h1a: "Ein Agent, der den Einkauf ",
       h1em: "ausführt.",
       h1b: " Nicht noch ein Dashboard.",
-      sub: "Das Produkt ist live, die ersten Kundengespräche laufen. Auf dieser Seite stehen der Markt, was heute tatsächlich funktioniert, und der Plan mit seinen drei Fällen.",
+      sub: "Das Produkt ist live, die ersten Kundengespräche laufen. Auf dieser Seite stehen der Markt, was heute tatsächlich funktioniert, und der Plan bis zur Seed-Runde.",
       cta: "Pitchdeck ansehen",
       alt: "Gespräch vereinbaren",
     },
@@ -74,35 +74,35 @@ export const investorenCopy = {
 
     markt: {
       h2: "Der Markt",
-      p1: "Wir rechnen von unten, statt einen Marktbericht zu zitieren: Firmen mal Preis. In der EU haben 465.000 Hersteller und Großhändler zwischen 10 und 249 Beschäftigte.",
-      p2: "Zur heutigen Preisleiter ergibt das Abo 2,3 Mrd. € im Jahr. Der größere Teil ist der Einkauf selbst: Allein die Hersteller kaufen für 1,78 Bio. € im Jahr ein, 1 % davon über den Marktplatz sind 17,8 Mrd. €. Der Einzelhandel ist noch nicht eingerechnet.",
-      scaleMax: "20 Mrd. €",
+      p1: "Wir rechnen von unten, statt einen Marktbericht zu zitieren: Firmen mal Preis. In Deutschland und Österreich führen über 300.000 Hersteller und Händler ihren Bestand selbst.",
+      p2: "Zur heutigen Preisleiter ergibt das Abo über 1 Mrd. € im Jahr. Rund 230.000 dieser Firmen arbeiten ohne ERP, dort ist der Bedarf am größten. Der Marktplatz ist eingebaut, aber nicht eingerechnet: Eine Zahl nennen wir erst, wenn Bestellungen darüber laufen.",
+      scaleMax: "1,05 Mrd. €",
       rings: [
         {
           k: "Firmen",
-          v: "465.000",
-          d: "Herstellung 318.709 und Großhandel 145.876, je 10 bis 249 Beschäftigte. Später dazu: Einzelhandel mit 163.317.",
-          src: "Eurostat, 2023",
+          v: "über 300.000",
+          d: "Mit 10 bis 249 Beschäftigten rund 60.000 Hersteller, 28.000 Großhändler und 32.000 Fachhändler mit eigenem Bestand. Dazu rund 193.000 Groß- und Fachhändler mit 2 bis 9 Beschäftigten.",
+          src: "Eurostat, 2023 · Deutschland und Österreich",
         },
         {
-          k: "Abo",
-          v: "2,3 Mrd. €",
-          n: 2.25,
-          d: "465.000 Firmen zum heutigen Mischpreis von 4.848 € im Jahr.",
-          src: "Preisleiter, Stand September 2026",
+          k: "10 bis 249 Beschäftigte",
+          v: "580 Mio. €",
+          n: 0.58,
+          d: "120.000 Firmen zum Mischpreis von 4.848 € im Jahr: 45 % Start, 40 % Base, 15 % Advanced.",
+          src: "Preisleiter, Stand September 2026 · Mischung = Annahme",
         },
         {
-          k: "Marktplatz",
-          v: "17,8 Mrd. €",
-          n: 17.8,
-          d: "1 % des Einkaufs der Hersteller.",
-          src: "Eurostat, 2023 · Gebühr = Annahme",
+          k: "2 bis 9 Beschäftigte",
+          v: "460 Mio. €",
+          n: 0.46,
+          d: "193.000 Groß- und Fachhändler zum Start-Preis von 2.388 € im Jahr. Kleine Hersteller weist Eurostat nicht aus.",
+          src: "Eurostat, 2023 · Preisleiter",
         },
         {
           k: "Zusammen",
-          v: "20 Mrd. €",
-          n: 20.05,
-          d: "Im Jahr adressierbar in der EU.",
+          v: "über 1 Mrd. €",
+          n: 1.05,
+          d: "Im Jahr, in Deutschland und Österreich.",
           src: "gerechnet",
         },
       ],
@@ -186,47 +186,34 @@ export const investorenCopy = {
 
     plan: {
       h2: "Der Plan",
-      lede: "Drei Fälle für 2032, alle mit der heutigen Preisleiter gerechnet.",
+      lede: "Ziele setzen wir nur bis Monat 18. Was danach kommt, hängt an den Kunden, die wir bis dahin gewinnen.",
+      // Milestones in months after closing, identical to the deck's roadmap slide. `v` is the
+      // month and places the mark on the rail; the last one is the seed milestone and carries the accent.
       cases: [
-        {
-          k: "Vorsichtig",
-          v: 23,
-          label: "23 Mio. €",
-          d: "1 % der Firmen zu heutigen Preisen, ohne Marktplatz.",
-        },
-        {
-          k: "Plan",
-          v: 145,
-          label: "145 Mio. €",
-          d: "3 % der Firmen zu heutigen Preisen, 10 % ihres Einkaufs über den Marktplatz zu 1 %, also 7,8 Mrd. € Volumen. Das ist der Fall, den wir unterschreiben.",
-        },
-        {
-          k: "Ambition",
-          v: 610,
-          label: "610 Mio. €",
-          d: "6 % der Firmen, alle auf Advanced, 20 % ihres Einkaufs über den Marktplatz zu 1 %, also 31 Mrd. € Volumen.",
-        },
+        { k: "Monat 3", v: 3, label: "Monat 3", d: "Vertriebsleitung an Bord, erste Firmen nutzen Synapsio." },
+        { k: "Monat 6", v: 6, label: "Monat 6", d: "Erste zahlende Kunden." },
+        { k: "Monat 12", v: 12, label: "Monat 12", d: "10 zahlende Kunden." },
+        { k: "Monat 18", v: 18, label: "Monat 18", d: "20 zahlende Kunden, rund 100 T€ ARR. Damit gehen wir in die Seed-Runde." },
       ],
-      caseAxis: "ARR 2032",
+      caseAxis: "Monate nach Abschluss",
       honest:
-        "Der frühe Hochlauf bleibt bewusst konservativ: die ersten zahlenden Kunden drei Monate nach der Runde, 20 zahlende Kunden nach 18 Monaten. Synapsio wird vertrieblich verkauft, nicht per Selbstregistrierung, und die schnellen Hochlaufkurven aus dem KI-Umfeld stammen aus Produkten, die sich selbst ausrollen. Keiner der Fälle setzt höhere Preise voraus als die, die heute auf der Preisliste stehen.",
+        "Der Hochlauf bleibt bewusst konservativ. Synapsio wird vertrieblich verkauft, nicht per Selbstregistrierung, und die schnellen Hochlaufkurven aus dem KI-Umfeld stammen aus Produkten, die sich selbst ausrollen. Die rund 100 T€ ARR rechnen mit dem heutigen Mischpreis, nicht mit höheren Preisen.",
       honestNotes: [
-        { k: "Monat 18", v: "20 Kunden, ~100 T€ ARR" },
+        { k: "Monat 18", v: "20 zahlende Kunden, ~100 T€ ARR" },
         { k: "Rechnung", v: "heutige Preisleiter" },
       ],
-      peak: "Diese Runde: 410 T€ für 18 Monate, bis zur Seed-Runde.",
+      peak: "Diese Runde: 440 T€ für 18 Monate, bis zur Seed-Runde.",
     },
 
     funding: {
-      h2: "Finanzierung",
-      // The axis carries the time now, so the date is no longer repeated inside `d`. `c` is the
-      // start column and `s` the span on the 24-column grid described in Investoren.astro; both
-      // are derived from `when`, so change them together.
-      years: ["2026", "2027", "2028", "2029"],
+      h2: "Finanzierung und Märkte",
+      // Months after closing, not calendar years: the closing date is not fixed. Four labels of six
+      // columns each = 12 months per label. `c` is the start column and `s` the span on the
+      // 24-column grid; pre-seed 0-18 = columns 1-9, seed from 18 = column 10 to the end.
+      years: ["Monat 0", "Monat 12", "Monat 24", "Monat 36"],
       steps: [
-        { k: "Pre-Seed", when: "jetzt, 18 Monate", v: "410 T€", d: "Entwickler, Supply-Chain-Team, die ersten 20 Kunden.", c: 5, s: 9 },
-        { k: "Seed", when: "ab Frühjahr 2028", v: "1,5 bis 2 Mio. €", d: "Vertrieb in DACH, Marktplatz.", c: 14, s: 5 },
-        { k: "Series A", when: "2029", v: "5 bis 8 Mio. €", d: "EU-Expansion.", c: 19, s: 6 },
+        { k: "Pre-Seed", when: "jetzt, Monat 0 bis 18", v: "440 T€", d: "Deutschland und Österreich: über 300.000 Firmen, über 1 Mrd. € im Jahr. Vertrieb, Supply-Chain-Team, die ersten 20 zahlenden Kunden.", c: 1, s: 9 },
+        { k: "Seed", when: "ab Monat 18", v: "Europäische Union", d: "Über 1,7 Mio. Firmen, über 5 Mrd. € im Jahr (Eurostat 2023). Land für Land, dorthin, wo Nachfrage und Partner sind.", c: 10, s: 15 },
       ],
     },
 
@@ -250,7 +237,7 @@ export const investorenCopy = {
       h1a: "An agent that ",
       h1em: "runs",
       h1b: " procurement. Not another dashboard.",
-      sub: "The product is live and the first customer conversations are under way. This page holds the market, what actually works today, and the plan with its three cases.",
+      sub: "The product is live and the first customer conversations are under way. This page holds the market, what actually works today, and the plan up to the seed round.",
       cta: "Read the deck",
       alt: "Book a call",
     },
@@ -280,35 +267,35 @@ export const investorenCopy = {
 
     markt: {
       h2: "The market",
-      p1: "We compute it from the bottom up instead of quoting a market report: firms times price. The EU has 465,000 manufacturers and wholesalers with 10 to 249 employees.",
-      p2: "At today's price ladder the subscription comes to €2.3B a year. The larger part is purchasing itself: manufacturers alone buy €1.78T a year, and 1 % of that through the marketplace is €17.8B. Retail is not counted yet.",
-      scaleMax: "€20B",
+      p1: "We compute it from the bottom up instead of quoting a market report: firms times price. In Germany and Austria, over 300,000 manufacturers and distributors run their own inventory.",
+      p2: "At today's price ladder the subscription comes to over €1B a year. About 230,000 of these firms work without an ERP, which is where the need is greatest. The marketplace is built in but not counted: we put a figure on it only once orders run through it.",
+      scaleMax: "€1.05B",
       rings: [
         {
           k: "Firms",
-          v: "465,000",
-          d: "Manufacturing 318,709 and wholesale 145,876, each with 10 to 249 employees. Later: retail, another 163,317.",
-          src: "Eurostat, 2023",
+          v: "over 300,000",
+          d: "With 10 to 249 employees, about 60,000 manufacturers, 28,000 wholesalers and 32,000 specialist retailers with their own stock. Plus about 193,000 wholesalers and retailers with 2 to 9 employees.",
+          src: "Eurostat, 2023 · Germany and Austria",
         },
         {
-          k: "Subscription",
-          v: "€2.3B",
-          n: 2.25,
-          d: "465,000 firms at today's blended price of €4,848 a year.",
-          src: "Price ladder, September 2026",
+          k: "10 to 249 staff",
+          v: "€580M",
+          n: 0.58,
+          d: "120,000 firms at the blended price of €4,848 a year: 45 % Start, 40 % Base, 15 % Advanced.",
+          src: "Price ladder, September 2026 · mix = assumption",
         },
         {
-          k: "Marketplace",
-          v: "€17.8B",
-          n: 17.8,
-          d: "1 % of the manufacturers' purchasing.",
-          src: "Eurostat, 2023 · fee = assumption",
+          k: "2 to 9 staff",
+          v: "€460M",
+          n: 0.46,
+          d: "193,000 wholesalers and retailers at the Start price of €2,388 a year. Eurostat does not publish small manufacturers.",
+          src: "Eurostat, 2023 · price ladder",
         },
         {
           k: "Together",
-          v: "€20B",
-          n: 20.05,
-          d: "Addressable per year in the EU.",
+          v: "over €1B",
+          n: 1.05,
+          d: "Per year, in Germany and Austria.",
           src: "computed",
         },
       ],
@@ -386,39 +373,29 @@ export const investorenCopy = {
 
     plan: {
       h2: "The plan",
-      lede: "Three cases for 2032, all computed at today's price ladder.",
+      lede: "We set targets only up to month 18. What comes after depends on the customers we win by then.",
       cases: [
-        { k: "Cautious", v: 23, label: "€23M", d: "1 % of firms at today's prices, no marketplace." },
-        {
-          k: "Plan",
-          v: 145,
-          label: "€145M",
-          d: "3 % of firms at today's prices, 10 % of their purchasing through the marketplace at 1 %, i.e. €7.8B volume. This is the case we underwrite.",
-        },
-        {
-          k: "Ambition",
-          v: 610,
-          label: "€610M",
-          d: "6 % of firms, all on Advanced, 20 % of their purchasing through the marketplace at 1 %, i.e. €31B volume.",
-        },
+        { k: "Month 3", v: 3, label: "Month 3", d: "Sales lead on board, first companies using Synapsio." },
+        { k: "Month 6", v: 6, label: "Month 6", d: "First paying customers." },
+        { k: "Month 12", v: 12, label: "Month 12", d: "10 paying customers." },
+        { k: "Month 18", v: 18, label: "Month 18", d: "20 paying customers, about €100K ARR. That takes us into the seed round." },
       ],
-      caseAxis: "ARR 2032",
+      caseAxis: "Months after closing",
       honest:
-        "The early ramp stays deliberately measured: first paying customers three months after the round, 20 paying customers after 18 months. Synapsio is sold by a sales team, not by self-registration, and the fast ramp curves from the AI world come from products that roll themselves out. None of the cases assumes higher prices than today's price list.",
+        "The ramp stays deliberately measured. Synapsio is sold by a sales team, not by self-registration, and the fast ramp curves from the AI world come from products that roll themselves out. The roughly €100K ARR uses today's blended price, not higher prices.",
       honestNotes: [
-        { k: "Month 18", v: "20 customers, ~€100K ARR" },
+        { k: "Month 18", v: "20 paying customers, ~€100K ARR" },
         { k: "Basis", v: "today's price ladder" },
       ],
-      peak: "This round: €410K for 18 months, up to the seed round.",
+      peak: "This round: €440K for 18 months, up to the seed round.",
     },
 
     funding: {
-      h2: "Funding",
-      years: ["2026", "2027", "2028", "2029"],
+      h2: "Funding and markets",
+      years: ["Month 0", "Month 12", "Month 24", "Month 36"],
       steps: [
-        { k: "Pre-seed", when: "now, 18 months", v: "€410K", d: "A developer, a supply chain team, the first 20 customers.", c: 5, s: 9 },
-        { k: "Seed", when: "from spring 2028", v: "€1.5 to 2M", d: "Sales in DACH, marketplace.", c: 14, s: 5 },
-        { k: "Series A", when: "2029", v: "€5 to 8M", d: "EU expansion.", c: 19, s: 6 },
+        { k: "Pre-seed", when: "now, month 0 to 18", v: "€440K", d: "Germany and Austria: over 300,000 firms, over €1B a year. Sales, a supply chain team, the first 20 paying customers.", c: 1, s: 9 },
+        { k: "Seed", when: "from month 18", v: "European Union", d: "Over 1.7M firms, over €5B a year (Eurostat 2023). Country by country, where demand and partners are.", c: 10, s: 15 },
       ],
     },
 

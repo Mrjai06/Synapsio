@@ -6,23 +6,18 @@
 //   problem   three large figures in a row, each with its source underneath
 //   markt     measured bars beside prose
 //   heute     plain prose, no figure, one statement
-//   plan      one proportional scale carrying the three ARR cases + the cases as a stacked list
-//   funding   a horizontal rail with three stops
+//   plan      one month scale carrying the four milestones up to month 18 + them as a stacked list
+//   funding   a horizontal rail with two stops (this round DE/AT, seed round EU), in months
 //   close     centred
 //
 // CHART DECISIONS (they are deliberate, do not "improve" them into prettier lies):
-//  · The three ARR cases sit on ONE linear scale, not in three columns. As columns the floor case
-//    rendered as a 20px stub beside an empty ambition box, which read as two placeholders and one
-//    number. On a shared axis the same linear truth (ambition is thirteen times the floor) is the
-//    distance between two marks, and the section stops being the page's third three-column grid.
-//    A log scale would flatter the floor case; it stays linear.
-//  · Only the base case carries the accent, because it is the only one we underwrite. Identity
-//    never rests on colour alone: every mark is directly labelled, and the case names repeat in
-//    the list underneath. No filled track — a hairline axis with marks, per the taste pass.
-//  · The market is computed BOTTOM-UP, the same arithmetic as the pitch deck (firms × today's
-//    price ladder + 1 % of purchasing). The firm count has no bar: it is not a euro amount. The
-//    euro rows share ONE linear scale, so the subscription's small share next to the marketplace
-//    is visible as what it is. The total carries the accent.
+//  · The milestones sit on ONE linear month scale (0 to 18), so the spacing is the timing. Only
+//    month 18, the seed milestone, carries the accent. Every mark is directly labelled and the
+//    milestones repeat in the list underneath. No filled track — a hairline axis with marks.
+//    (Until 2026-10-14 this rail carried three ARR cases for 2032; the deck dropped them.)
+//  · The market is computed BOTTOM-UP, the same arithmetic as the pitch deck v6 (firms × today's
+//    price ladder, Germany + Austria; the marketplace is not counted). The firm count has no bar:
+//    it is not a euro amount. The euro rows share ONE linear scale. The total carries the accent.
 //  · No tooltips or toggles anywhere. Static figures, per the site-wide decision that visitors
 //    do not click.
 import { investorenCopy } from "../i18n/investoren";
@@ -41,11 +36,11 @@ const MKT_AXIS = Math.max(...c.markt.rings.map((r) => ("n" in r ? r.n : 0)));
 const lastBar = c.markt.rings.map((r) => "n" in r).lastIndexOf(true);
 
 const maxCase = Math.max(...c.plan.cases.map((x) => x.v));
+// The accented mark is the last milestone (month 18 = the seed milestone).
+const onCase = c.plan.cases.length - 1;
 
-// Graduation for the ARR rail. Without it the axis is a bare line with 60 % of its length empty
-// between the base and the ambition case, and the distance stops being readable as a quantity.
-// Minor every 50 Mio., labelled major every 100 (the cases run to several hundred).
-const TICK = 50, MAJOR = 100;
+// Graduation for the milestone rail, in months after closing: minor every 3, labelled every 6.
+const TICK = 3, MAJOR = 6;
 const planTicks = Array.from({ length: Math.floor(maxCase / TICK) + 1 }, (_, i) => {
   const v = i * TICK;
   return { v, x: (v / maxCase) * 100, major: v % MAJOR === 0 };
@@ -213,9 +208,9 @@ const planTicks = Array.from({ length: Math.floor(maxCase / TICK) + 1 }, (_, i) 
         {
           c.plan.cases.map((x, i) => (
             <span
-              class={"in-mark" + (i === 1 ? " on" : "")}
+              class={"in-mark" + (i === onCase ? " on" : "")}
               style={`--x:${(x.v / maxCase) * 100}%`}
-              data-edge={i === 0 ? "start" : i === c.plan.cases.length - 1 ? "end" : undefined}
+              data-edge={x.v === 0 ? "start" : x.v === maxCase ? "end" : undefined}
             >
               <span class="in-mark-v">{x.label}</span>
               <span class="in-mark-t" />
@@ -239,10 +234,10 @@ const planTicks = Array.from({ length: Math.floor(maxCase / TICK) + 1 }, (_, i) 
       <dl class="in-cases">
         {
           c.plan.cases.map((x, i) => (
-            <div class={"in-case" + (i === 1 ? " on" : "")}>
+            <div class={"in-case" + (i === onCase ? " on" : "")}>
               <dt class="mono">
                 {x.k}
-                <span class="in-case-v">{x.label}</span>
+                {x.label !== x.k && <span class="in-case-v">{x.label}</span>}
               </dt>
               <dd>{x.d}</dd>
             </div>
@@ -274,10 +269,10 @@ const planTicks = Array.from({ length: Math.floor(maxCase / TICK) + 1 }, (_, i) 
       <h2>{c.funding.h2}</h2>
       {/* Three equal columns made a sequence look like a comparison, and it was the page's second
           three-across grid, which the layout-repetition rule does not allow. It is a TIME axis
-          now: 24 columns spanning 2026 to 2029, six per year, each round placed and sized by its
-          own `c` (start column) and `s` (span) so its position and duration are the drawing.
-          Pre-seed 5/9 = autumn 2026 for 18 months, seed 14/5 = from spring 2028, Series A 19/6 =
-          2029. Each round's own top border is its lit stretch of the axis; the faint full-width
+          now: 24 columns spanning month 0 to 48 after closing, two months per column, each round
+          placed and sized by its own `c` (start column) and `s` (span) so its position and
+          duration are the drawing. Pre-seed 1/9 = month 0 to 18, seed 10/15 = from month 18.
+          Months rather than years because the closing date is not fixed. Each round's own top border is its lit stretch of the axis; the faint full-width
           rule behind it is the rest of the timeline. */}
       <div class="in-time">
         <div class="in-years" aria-hidden="true">
