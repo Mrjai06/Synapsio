@@ -3,7 +3,7 @@
 // FACT SOURCES, so nothing here is invented:
 //  - Team (since 2026-09): identical to the pitch deck v2. All three are "Mitgründer" (roles are
 //    deliberately open), bios describe what each person does. Arne's employer is NOT named (it is
-//    a pilot candidate). Degrees: Jakob TU Berlin (Informatik), Luis HWR Berlin (BWL, studies from
+//    a pilot candidate). Degrees: Jakob TU Berlin (Nachhaltiges Management, switched from Informatik 2026-10), Luis HWR Berlin (BWL, studies from
 //    WS 2026/27), Arne TH Wildau (BWL, B.A.), all confirmed by Jakob 2026-09-25.
 //  - Company facts come from the footer legal line already published site-wide:
 //    Synapsio UG (haftungsbeschränkt), Schönwalde-Glien, Amtsgericht Potsdam, HRB 42364 P.
@@ -66,7 +66,7 @@ export const ueberUnsCopy = {
         {
           name: "Jakob Ibrahim",
           role: "Mitgründer",
-          bio: "Studiert Informatik an der TU Berlin. Baut Produkt und KI, von der Datenbank über die Agenten bis zur Oberfläche, und hat die Plattform allein geschrieben.",
+          bio: "Studiert nachhaltiges Management an der TU Berlin. Baut Produkt und KI, von der Datenbank über die Agenten bis zur Oberfläche, und hat die Plattform allein geschrieben.",
           photo: "/team/jakob.webp",
           linkedin: "https://linkedin.com/in/jakob-ibrahim-62807721b",
         },
@@ -160,7 +160,7 @@ export const ueberUnsCopy = {
         {
           name: "Jakob Ibrahim",
           role: "Co-founder",
-          bio: "Studying computer science at TU Berlin. Builds the product and the AI, from the database through the agents to the interface, and wrote the platform on his own.",
+          bio: "Studying sustainable management at TU Berlin. Builds the product and the AI, from the database through the agents to the interface, and wrote the platform on his own.",
           photo: "/team/jakob.webp",
           linkedin: "https://linkedin.com/in/jakob-ibrahim-62807721b",
         },
